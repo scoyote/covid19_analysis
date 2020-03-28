@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+
+    sas_94:
+        image: registry.unx.sas.com/sacrok/sas94_centos7:latest
+        container_name: sas_94_c
+        volumes:
+        - /Users/samuelcroker/Documents/repositories/vscode-sas/SASRemote/:/sasmap
+        - /Users/samuelcroker/Documents/repositories/COVID-19:/covid19data
+        restart: always
+
