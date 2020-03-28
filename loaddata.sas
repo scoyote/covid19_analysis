@@ -78,8 +78,12 @@ quit;
 				DBMS=csv
 				replace;
 			data JHU&&sasname&i; 
-				set JHU&&sasname&i;
-				length filedate $8;
+				length  'province/state'n $50
+					    'Country/Region'n $50
+						province_state $50
+						country_region $50
+						length filedate $8;
+				set JHU&&sasname&i;;
 				filedate=&&sasname&i;
 			run;
 		%end;
@@ -102,17 +106,23 @@ data JHU_Legacy;
 	 JHU20200224 JHU20200225 JHU20200226 JHU20200227 JHU20200228 JHU20200229 JHU20200301 JHU20200302 JHU20200303 JHU20200304 JHU20200305 
 	 JHU20200306 JHU20200307 JHU20200308 JHU20200309 JHU20200310 JHU20200311 JHU20200312 JHU20200313 JHU20200314 JHU20200315 JHU20200316 
 	 JHU20200317 JHU20200318 JHU20200319 JHU20200320 JHU20200321;
+	 province_state='province/state'n;
+	 country_region='Country/Region'n;
+	drop 'province/state'n 'Country/Region'n;
 run;
 %put &sasnames;
-proc datasets library=work nolist;
-   modify JHU_LEGACY;
-      rename "Province/State"n=province_state;
-      rename "Country/Region"n=country_region;
-quit;
+/* proc datasets library=work nolist; */
+/*    modify JHU_LEGACY; */
+/*       rename "Province/State"n=province_state; */
+/*       rename "Country/Region"n=country_region; */
+/* quit; */
 
 data JHU_current; 
+	length  combined_key $50;
+	format province_state $50. ;
 	set JHU20200322 JHU20200323 JHU20200324 JHU20200325 JHU20200326
 	JHU20200327;
+	drop combined_key 'province/state'n 'Country/Region'n;
 run;
 data jhu_final;
 	set jhu_current jhu_legacy;
