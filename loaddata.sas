@@ -1,18 +1,22 @@
+%put ERROR: WARNING! THIS PROGAM HAS BEEN SUPERCEDED BY HARDLOADDATA.SAS and MACROS.SAS;
+%put ERROR: WARNING! THIS PROGAM HAS BEEN SUPERCEDED BY HARDLOADDATA.SAS and MACROS.SAS;
+%put ERROR: WARNING! THIS PROGAM HAS BEEN SUPERCEDED BY HARDLOADDATA.SAS and MACROS.SAS;
+%put ERROR: WARNING! THIS PROGAM HAS BEEN SUPERCEDED BY HARDLOADDATA.SAS and MACROS.SAS;
+%put ERROR: WARNING! THIS PROGAM HAS BEEN SUPERCEDED BY HARDLOADDATA.SAS and MACROS.SAS;
+
 *****************************************************************
 ***** loaddata.sas
 ***** pulls and prepares csv data from covid19;
 *****************************************************************
 ;
+
+%let rc = %sysfunc(dlgcdir("/covid_analysis"));
 libname covid '/covid19data';
 
    
-%let covidpath=/covid19data/csse_covid_19_data/csse_covid_19_daily_reports;
-
-
-           
+%let covidpath=/covid19data/csse_covid_19_data/csse_covid_19_daily_reports;           
 filename covid19 "&covidpath";
-%let rc = %sysfunc(dlgcdir("&covidpath"));
-%put &rc;
+;
 /* use the data step to read the JHU data directory and 
 	create macro variable arrays of filenames*/
 data filenames;
@@ -122,7 +126,7 @@ data JHU_current;
 	length  combined_key $50;
 	format province_state $50. ;
 	set JHU20200322 JHU20200323 JHU20200324 JHU20200325 JHU20200326
-	JHU20200327;
+	JHU20200327 JHU20200328;
 	drop combined_key 'province/state'n 'Country/Region'n;
 run;
 data jhu_final;
