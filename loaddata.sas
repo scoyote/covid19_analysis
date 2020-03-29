@@ -77,6 +77,7 @@ quit;
 				out=JHU&&sasname&i
 				DBMS=csv
 				replace;
+				guessingrows=200000;
 			data JHU&&sasname&i; 
 				length  'province/state'n $50
 					    'Country/Region'n $50

@@ -5,10 +5,15 @@
 proc sort data=jhu_current out=allcompose;
 	by province_state filedate;
 run;
+
+
+
+/* fix some errors in the data */
 data allcompose;set allcompose;
 	if province_state="Californ" then province_state="California";
 	if province_state="New Jers" then province_state="New Jersey";
 	if province_state="Washingt" then province_state="Washington";
+	if province_state = "" then province_state=country_region;
 run;
 	
 proc means data=allcompose noprint;
@@ -22,12 +27,18 @@ proc means data=allcompose noprint;
 		  province_State='Location';
 run;
 
+proc sql;
+	*select distinct upcase(country_region) from jhu_current where upcase(country_region) like "GER%";
+	select * from allcompose_summary where upcase(province_state) like "GERMANY";
+quit;
+proc sort data=allcompose_summary;by province_state filedate;run;
 data plotstate;
 	set allcompose_summary;
 	keep province_state;
 	by province_state filedate;
-	if last.province_state and last.filedate and confirmed>1500 and deaths>20 then output;
+	if last.province_state and last.filedate and confirmed>2000 and deaths>50 then output;
 run;
+
 proc sql; select distinct province_state into :states separated by '","' from plotstate; quit;
 
 
