@@ -6,7 +6,7 @@
 ;
 /* keep the region name such that datasets match actual data name */
 *****************************;
-%let pvs=Georgia;
+%let pvs=Florida;
 *****************************;
 data _null_; call symput("region_name",compress("&pvs")); run;
 
@@ -33,10 +33,13 @@ proc means data=&region_name noprint;
 run;
 data &region_name._summary;
 	set &region_name._summary;
+	dif_Confirmed = confirmed-lag(confirmed);
+	dif_deaths = deaths-lag(deaths);
 	label confirmed="Number of Confirmed Infections";
 	label deaths = "Number of Deaths";
 	label dateplot = "Date of Report";
 	dateplot = substr(filedate,5,2)||"-"||substr(filedate,7,2);
+	
 Run;
 /* use this sql to add values that are not in the 
 	daily extract, but are available */
@@ -78,22 +81,38 @@ run;
 
 
 
+/* options orientation=landscape papersize=(8in 8in) ; */
+/* ods graphics / reset width=7in height=4.5in imagemap; */
+/* ods pdf file="&outputpath./Georgia.pdf"; */
+/* 	title "&PVS COVID-19 Situation Report"; */
+/* 	title2 "Prevalence and Deaths"; */
+/* 	footnote "Source Johns Hopkins University CSSE: https://dph.georgia.gov/covid-19-daily-status-report"; */
+/* 	proc sgplot data=&region_name._summary nocycleattrs; */
+/* 		vbar dateplot / response=confirmed stat=sum; */
+/* 		vline dateplot / response=deaths stat=sum y2axis; */
+/* 		yaxis grid min=&respmin1 max=&respmax1 %offset();  */
+/* 		y2axis min=&respmin2 max=&respmax2 %offset(); */
+/* 		keylegend / location=outside; */
+/* 	run; */
+/* ods pdf close; */
+/* ods graphics / reset; */
+
+
 options orientation=landscape papersize=(8in 8in) ;
 ods graphics / reset width=7in height=4.5in imagemap;
-ods pdf file="&outputpath./Georgia.pdf";
+ods pdf file="&outputpath./&pvs..pdf";
 	title "&PVS COVID-19 Situation Report";
 	title2 "Prevalence and Deaths";
-	footnote "Source Johns Hopkins University CSSE: https://dph.georgia.gov/covid-19-daily-status-report";
+	footnote "Source Johns Hopkins University CSSE";
 	proc sgplot data=&region_name._summary nocycleattrs;
-		vbar dateplot / response=confirmed stat=sum;
-		vline dateplot / response=deaths stat=sum y2axis;
-		yaxis grid min=&respmin1 max=&respmax1 %offset(); 
-		y2axis min=&respmin2 max=&respmax2 %offset();
+		vbar dateplot / response=dif_confirmed stat=sum ;*lineattrs=(color='red') ;
+		vline dateplot / response=dif_deaths stat=sum y2axis;
+		yaxis grid min=&respmin1;* max=&respmax1 %offset(); 
+		y2axis min=&respmin2;* max=&respmax2 %offset();
 		keylegend / location=outside;
 	run;
 ods pdf close;
 ods graphics / reset;
-
 
 
 
