@@ -4,15 +4,22 @@
 ***** generated data steps. You have to run sanity checks on this
 *****************************************************************;
 ;
+/* clean up from previous runs if necessary */
 proc datasets library=WORK kill; run; quit;
-%include '/covid_analysis/MACROS.sas';
-libname covid '/covid19data';
 
-   
 %let covidpath=/covid19data/csse_covid_19_data/csse_covid_19_daily_reports;
-%let rc = %sysfunc(dlgcdir("&covidpath"));           
+%let progpath=/covid_analysis;
+%let outputpath=/covid_analysis/graphs/;
+
+libname covid '/covid19data';   
+libname fips "&progpath./data";        
 filename covid19 "&covidpath";
 
+
+/* load macros */
+%include "&progpath./MACROS.sas";
+
+%let rc = %sysfunc(dlgcdir("&covidpath"));
 options nomlogic nomprint;
 data _null_;
 	legacy_count=0;
@@ -26,7 +33,7 @@ data _null_;
 			fileext  = scan(memname,2,".");
 			if fileext = "csv" then do;
 				filedate = compress(cats(scan(filepref,3,'-'),scan(filepref,1,'-'),scan(filepref,2,'-')));
-				if filedate <= '20200321' then do;
+				if filedate <= '20200321' then do; /* this accounts for JHU infile structure change */
 					legacy_count+1;
 					call execute(cats('%LoadCSV(&covidpath/',memname,',',filedate,',',2,',',legacy_count,')'));
 				end;
@@ -39,3 +46,6 @@ data _null_;
 	end;
 	rc=dclose(handle);
 run;
+
+%let rc = %sysfunc(dlgcdir("&outputpath"));
+

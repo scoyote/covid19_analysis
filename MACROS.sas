@@ -7,7 +7,7 @@
 		   DSD
 		   lrecl=32767 
 		   firstobs=2 ;
-		informat FIPS best32. ;
+		informat FIPS $5. ;
 		informat Admin2 $50. ;
 		informat Province_State $50. ;
 		informat Country_Region $50. ;
@@ -19,7 +19,7 @@
 		informat Recovered best32. ;
 		informat Active best32. ;
 		informat Combined_Key $50. ;
-		format FIPS best12. ;
+		format FIPS $5. ;
 		format Admin2 $50. ;
 		format Province_State $50. ;
 		format Country_Region $50. ;
@@ -33,7 +33,7 @@
 		format Combined_Key $50. ;
 		%if &typer=1 %then %do;
 			input
-			   FIPS
+			   FIPS $
 			   Admin2  $
 			   Province_State  $
 			   Country_Region  $

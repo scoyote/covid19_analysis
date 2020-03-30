@@ -1,0 +1,740 @@
+<?xml version="1.0" encoding="UTF-8"?><Task schemaVersion="5.4">
+    <Registration>
+        <Name>Bubble Plot</Name>
+        <Description>Bubble plots show the relationships between three or more variables.</Description>
+        <GUID>5C4AC292-B217-4853-AA24-21D97B16D7D9</GUID>
+        <Procedures>SGPLOT</Procedures>
+        <Version>3.8</Version>
+        <Links>
+            <Link href="http://documentation.sas.com/?softwareId=STUDIOMID&amp;softwareVersion=3.8&amp;softwareContextId=tasks&amp;requestor=inapp">SAS Studio Task Reference Guide</Link>
+            <Link href=""> </Link>
+            <Link href=""> </Link>
+            <Link href="http://documentation.sas.com/?softwareId=MVADOC&amp;softwareVersion=3.8_9.4&amp;softwareContextId=proc_sgplot&amp;requestor=inapp">The SGPLOT Procedure</Link>
+            <Link href=""> </Link>
+            <Link href=""> </Link>
+            <Link href="http://support.sas.com/training/tutorial/viya/index.html">SAS Tutorials</Link>            
+         </Links>
+    </Registration>
+        
+    <Metadata>
+    <!--- Define the data roles for this task.    -->
+        <DataSources>
+            <DataSource name="dataSource" where="true">
+                <Roles>
+                    <Role maxVars="1" minVars="1" name="xVar" type="A">X axis:</Role>
+                    <Role maxVars="1" minVars="1" name="yVar" type="A">Y axis:</Role>
+                    <Role maxVars="1" minVars="1" name="sizeVar" type="N">Bubble size:</Role>
+                    <Role maxVars="1" minVars="0" name="labelVar" type="A">Bubble label:</Role>
+                    <Role maxVars="1" minVars="0" name="colorVar" type="A">Bubble color:</Role>
+                    <Role maxVars="1" minVars="0" name="urlVar" type="C">URL variable:</Role>
+                </Roles>
+            </DataSource>
+        </DataSources>
+
+        <Options>
+            <Option inputType="string" name="dataTab">DATA</Option>
+            <Option inputType="string" name="dataGroup">DATA</Option>
+            <Option inputType="string" name="rolesGroup">ROLES</Option>
+            <Option inputType="string" name="appearanceTab">APPEARANCE</Option>
+
+            <!--- Define the task options.-->
+            <Option defaultValue="1" indent="1" inputType="radio" name="coloringByGradient" variable="radioColoring">By color gradient</Option>
+            <Option indent="1" inputType="radio" name="coloringByGroup" variable="radioColoring">By group</Option>
+            <Option indent="1" inputType="string" name="coloringGradientGrp">Color Gradient</Option>
+            <Option defaultValue="0" inputType="checkbox" name="useColorModel">Use custom three-color model</Option>
+            <Option defaultValue="#667FA2" indent="1" inputType="color" name="startColor">Start color</Option>
+            <Option defaultValue="#FAFBFE" indent="1" inputType="color" name="middleColor">Middle color</Option>
+            <Option defaultValue="#D05B5B" indent="1" inputType="color" name="endColor">End color</Option>
+            <Option defaultValue="right" inputType="combobox" name="gradientLegendPos" width="250px">Legend position:</Option>
+            <Option inputType="string" name="legendRight" returnValue="right">Right (default)</Option>
+            <Option inputType="string" name="legendBottom" returnValue="bottom">Bottom</Option>
+            <Option inputType="string" name="legendLeft" returnValue="left">Left</Option>
+            <Option inputType="string" name="legendTop" returnValue="top">Top</Option>
+
+            <Option defaultValue="outside" indent="1" inputType="combobox" name="discreteLegendLoc" width="250px">Legend location:</Option>
+            <Option inputType="string" name="outside">Outside (default)</Option>
+            <Option inputType="string" name="inside">Inside</Option>
+            
+            <Option defaultValue="0" inputType="checkbox" name="includeAsFootnote">Include filter clause as footnote</Option>
+                <!--- 'whereClause' option only used in code template.-->            
+            <Option inputType="string" name="whereClause">Where clause:</Option>
+
+            <Option inputType="string" name="title">TITLE AND FOOTNOTE</Option>
+            <Option defaultValue="" inputType="inputtext" name="titleString" width="400px">Title:</Option>
+            <Option decimalPlaces="0" defaultValue="14" increment="1" indent="1" inputType="numstepper" invalidMessage="Enter an integer greater than or equal to 5 and less than or equal to 24." maxValue="24" minValue="5" missingMessage="Enter an integer greater than or equal to 5 and less than or equal to 24." name="titleSize" promptMessage="Enter an integer greater than or equal to 5 and less than or equal to 24." rangeMessage="Enter an integer greater than or equal to 5 and less than or equal to 24." required="true" size="8em">Font size (default: 14 pt):</Option>
+            <Option defaultValue="" inputType="inputtext" name="footnoteString" width="400px">Footnote:</Option>
+            <Option decimalPlaces="0" defaultValue="12" increment="1" indent="1" inputType="numstepper" invalidMessage="Enter an integer greater than or equal to 5 and less than or equal to 20." maxValue="20" minValue="5" missingMessage="Enter an integer greater than or equal to 5 and less than or equal to 20." name="footnoteSize" promptMessage="Enter an integer greater than or equal to 5 and less than or equal to 20." rangeMessage="Enter an integer greater than or equal to 5 and less than or equal to 20." required="true" size="8em">Font size (default: 12 pt):</Option>
+
+            <!--- Bubbles options -->                            
+            <Option inputType="string" name="bubbleGroup">BUBBLES</Option>
+            <Option defaultValue="0" inputType="checkbox" name="setColor">Set color</Option>
+            <Option defaultValue="#003399" indent="1" inputType="color" name="bubbleColor">Color</Option>
+            <Option decimalPlaces="0" defaultValue="7" increment="1" inputType="numstepper" invalidMessage="Enter an integer greater than or equal to 1 and less than or equal to 100." maxValue="100" minValue="1" missingMessage="Enter an integer greater than or equal to 1 and less than or equal to 100." name="minRadius" promptMessage="Enter an integer greater than or equal to 1 and less than or equal to 100." rangeMessage="Enter an integer greater than or equal to 1 and less than or equal to 100." required="true" size="8em">Minimum radius (default: 7 pixels):</Option>
+            <Option decimalPlaces="0" defaultValue="14" increment="1" inputType="numstepper" invalidMessage="Enter an integer greater than or equal to 1 and less than or equal to 100." maxValue="100" minValue="1" missingMessage="Enter an integer greater than or equal to 1 and less than or equal to 100." name="maxRadius" promptMessage="Enter an integer greater than or equal to 1 and less than or equal to 100." rangeMessage="Enter an integer greater than or equal to 1 and less than or equal to 100." required="true" size="8em">Maximum radius (default: 14 pixels):</Option>
+            <Option defaultValue="0" inputType="combobox" name="fillTrans" width="175px">Color transparency:</Option>
+            <Option inputType="string" name="fillTransDefaultChoice" returnValue="0">0% (default)</Option>
+            <Option inputType="string" name="fillTrans25Choice" returnValue="0.25">25%</Option>
+            <Option inputType="string" name="fillTrans50Choice" returnValue="0.5">50%</Option> 
+            <Option inputType="string" name="fillTrans75Choice" returnValue="0.75">75%</Option> 
+            <Option inputType="string" name="fillTrans100Choice" returnValue="1">100%</Option>
+            <Option inputType="string" name="bubbleDetails">Details</Option>
+            <Option defaultValue="none" inputType="combobox" name="dataSkin" width="175px">Effect:</Option>
+            <Option inputType="string" name="none">(none)</Option>
+            <Option inputType="string" name="gloss">Gloss</Option>
+            <Option inputType="string" name="sheen">Sheen</Option>
+            <Option inputType="string" name="crisp">Crisp</Option>
+            <Option inputType="string" name="matte">Matte</Option>
+            <Option inputType="string" name="pressed">Pressed</Option>
+            <!--- Bubble label options -->                            
+            <Option inputType="string" name="bubbleLabels">BUBBLE LABELS</Option>
+            <Option indent="1" inputType="string" name="labelGroup">Options</Option>
+            <Option defaultValue="0" inputType="checkbox" name="setLabelColor">Set label color</Option>
+            <Option defaultValue="#000000" indent="1" inputType="color" name="labelColor">Color</Option>
+            <Option decimalPlaces="0" defaultValue="7" increment="1" inputType="numstepper" invalidMessage="Enter an integer greater than or equal to 5 and less than or equal to 20." maxValue="20" minValue="5" missingMessage="Enter an integer greater than or equal to 5 and less than or equal to 20." name="labelSize" promptMessage="Enter an integer greater than or equal to 5 and less than or equal to 20." rangeMessage="Enter an integer greater than or equal to 5 and less than or equal to 20." required="true" size="8em">Font size (default: 7 pixels):</Option>
+            <Option defaultValue="topright" inputType="combobox" name="labelPosition" width="200px">Label position:</Option>
+            <Option inputType="string" name="topRight" returnValue="topright">Top right (default)</Option>
+            <Option inputType="string" name="topLeft" returnValue="topleft">Top left</Option>
+            <Option inputType="string" name="bottomRight" returnValue="bottomright">Bottom right</Option>
+            <Option inputType="string" name="bottomLeft" returnValue="bottomleft">Bottom left</Option>
+            <Option inputType="string" name="top">Top</Option>
+            <Option inputType="string" name="right">Right</Option>
+            <Option inputType="string" name="left">Left</Option>
+            <Option inputType="string" name="bottom">Bottom</Option>
+            <Option inputType="string" name="center">Center</Option>
+
+            <!--- AXES options -->                            
+            <Option inputType="string" name="xAxis">X AXIS</Option>
+            <Option defaultValue="1" inputType="checkbox" name="showXGrid">Show grid lines</Option>
+            <Option defaultValue="defaultLabel" inputType="combobox" name="displayXLabel">Display label:</Option>
+            <Option inputType="string" name="defaultLabel">Default label</Option>
+            <Option inputType="string" name="noLabel">No label</Option>
+            <Option inputType="string" name="customLabel">Custom label</Option>
+            <Option defaultValue="" indent="1" inputType="inputtext" name="xLabel" required="true" width="300px">Label:</Option>
+            <Option defaultValue="0" inputType="checkbox" name="logXAxis">Use logarithmic scale</Option>
+            <Option defaultValue="10" indent="1" inputType="combobox" name="logBaseComboX">Base value:</Option>
+            <Option inputType="string" name="logBase2" returnValue="2">2</Option>
+            <Option inputType="string" name="logBase10" returnValue="10">10 (default)</Option>
+            <Option inputType="string" name="logBaseE" returnValue="e">e</Option>
+            <Option defaultValue="0" inputType="checkbox" name="labelRotation">Rotate labels in case of tick collisions</Option>
+            <Option defaultValue="1" indent="1" inputType="radio" name="diagonalRotation" variable="tickRotate">Rotate by 45 degrees</Option>
+            <Option indent="1" inputType="radio" name="verticalRotation" variable="tickRotate">Rotate by 90 degrees</Option>
+            <Option defaultValue="0" inputType="checkbox" name="xRefLine">Create a reference line</Option>
+            <Option indent="1" inputType="distinct" name="xRefLineLevel" required="true" selectMessage="Select a reference value" source="xVar">Reference value:</Option>
+            <Option defaultValue="0" indent="1" inputType="combobox" name="xRefLineOffset" width="175px">Line offset:</Option>
+				<Option inputType="string" name="xRefLineOffsetDefaultChoice" returnValue="0">0 (default)</Option>
+				<Option inputType="string" name="xRefLineOffsetNegative50Choice" returnValue="-0.5">-0.5</Option>
+				<Option inputType="string" name="xRefLineOffsetNegative25Choice" returnValue="-0.25">-0.25</Option> 
+				<Option inputType="string" name="xRefLineOffset25Choice" returnValue="0.25">0.25</Option> 
+				<Option inputType="string" name="xRefLineOffset50Choice" returnValue="0.5">0.5</Option>         
+            <Option indent="1" inputType="numbertext" invalidMessage="Enter a number." missingMessage="Enter a number." name="xRefLineValue" promptMessage="Enter a number." rangeMessage="Enter a number." required="true" width="6em">Reference value:</Option>
+            <Option defaultValue="1" indent="1" inputType="radio" name="xRefValue" variable="xRefLabel">Reference value as label</Option>
+            <Option indent="1" inputType="radio" name="xRefCustom" variable="xRefLabel">Custom label</Option>
+            <Option defaultValue="" indent="2" inputType="inputtext" name="xRefCustomLabel" required="true" width="300px">Label:</Option>
+            <Option defaultValue="0" inputType="checkbox" name="xAxisMin">Specify minimum value</Option>
+            <Option indent="1" inputType="numbertext" invalidMessage="Enter a number." missingMessage="Enter a number." name="xAxisMinValue" promptMessage="Enter a number." rangeMessage="Enter a number." required="true" width="6em">Minimum value:</Option>
+            <Option defaultValue="0" inputType="checkbox" name="xAxisMax">Specify maximum value</Option>
+            <Option indent="1" inputType="numbertext" invalidMessage="Enter a number." missingMessage="Enter a number." name="xAxisMaxValue" promptMessage="Enter a number." rangeMessage="Enter a number." required="true" width="6em">Maximum value:</Option>
+
+            <Option inputType="string" name="yAxis">Y AXIS</Option>
+            <Option defaultValue="1" inputType="checkbox" name="showYGrid">Show grid lines</Option>
+            <Option defaultValue="defaultLabel" inputType="combobox" name="displayYLabel">Display label:</Option>
+            <Option defaultValue="" indent="1" inputType="inputtext" name="yLabel" required="true" width="300px">Label:</Option>
+            <Option defaultValue="0" inputType="checkbox" name="logYAxis">Use logarithmic scale</Option>
+            <Option defaultValue="10" indent="1" inputType="combobox" name="logBaseComboY">Base value:</Option>
+            <Option defaultValue="0" inputType="checkbox" name="yRefLine">Create a reference line</Option>
+            <Option indent="1" inputType="distinct" name="yRefLineLevel" required="true" selectMessage="Select a reference value" source="yVar">Reference value:</Option>
+            <Option defaultValue="0" indent="1" inputType="combobox" name="yRefLineOffset" width="175px">Line offset:</Option>
+				<Option inputType="string" name="yRefLineOffsetDefaultChoice" returnValue="0">0 (default)</Option>
+				<Option inputType="string" name="yRefLineOffsetNegative50Choice" returnValue="-0.5">-0.5</Option>
+				<Option inputType="string" name="yRefLineOffsetNegative25Choice" returnValue="-0.25">-0.25</Option> 
+				<Option inputType="string" name="yRefLineOffset25Choice" returnValue="0.25">0.25</Option> 
+				<Option inputType="string" name="yRefLineOffset50Choice" returnValue="0.5">0.5</Option>
+            <Option indent="1" inputType="numbertext" invalidMessage="Enter a number." missingMessage="Enter a number." name="yRefLineValue" promptMessage="Enter a number." rangeMessage="Enter a number." required="true" width="6em">Reference value:</Option>
+            <Option defaultValue="1" indent="1" inputType="radio" name="yRefValue" variable="yRefLabel">Reference value as label</Option>
+            <Option indent="1" inputType="radio" name="yRefCustom" variable="yRefLabel">Custom label</Option>
+            <Option defaultValue="" indent="2" inputType="inputtext" name="yRefCustomLabel" required="true" width="300px">Label:</Option>
+            <Option defaultValue="0" inputType="checkbox" name="yAxisMin">Specify minimum value</Option>
+            <Option indent="1" inputType="numbertext" invalidMessage="Enter a number." missingMessage="Enter a number." name="yAxisMinValue" promptMessage="Enter a number." rangeMessage="Enter a number." required="true" width="6em">Minimum value:</Option>
+            <Option defaultValue="0" inputType="checkbox" name="yAxisMax">Specify maximum value</Option>
+            <Option indent="1" inputType="numbertext" invalidMessage="Enter a number." missingMessage="Enter a number." name="yAxisMaxValue" promptMessage="Enter a number." rangeMessage="Enter a number." required="true" width="6em">Maximum value:</Option>
+
+            <Option inputType="string" name="graphSize">GRAPH SIZE</Option>
+            <Option defaultValue="in" inputType="combobox" name="dimType" width="100px">Units:</Option>
+            <Option inputType="string" name="in">Inches (default)</Option>
+            <Option inputType="string" name="cm">Cms</Option>
+            <Option inputType="string" name="px">Pixels</Option>
+            <Option decimalPlaces="0,1" defaultValue="6.4" increment="0.1" inputType="numstepper" invalidMessage="Enter a number from 2 to 12 for the width in inches" maxValue="12.0" minValue="2.0" missingMessage="Enter a number from 2 to 12 for the width in inches" name="inchWidth" promptMessage="Enter a number from 2 to 12 for the width in inches" rangeMessage="Enter a number from 2 to 12 for the width in inches" required="true" size="10em">Width:</Option>
+            <Option decimalPlaces="0,1" defaultValue="4.8" increment="0.1" inputType="numstepper" invalidMessage="Enter a number from 2 to 12 for the height in inches" maxValue="12.0" minValue="2.0" missingMessage="Enter a number from 2 to 12 for the height in inches" name="inchHeight" promptMessage="Enter a number from 2 to 12 for the height in inches" rangeMessage="Enter a number from 2 to 12 for the height in inches" required="true" size="10em">Height:</Option>
+            <Option decimalPlaces="0,1" defaultValue="16" increment="0.1" inputType="numstepper" invalidMessage="Enter a number from 5 to 30 for the width in cms" maxValue="30.0" minValue="5.0" missingMessage="Enter a number from 5 to 30 for the width in cms" name="cmWidth" promptMessage="Enter a number from 5 to 30 for the width in cms" rangeMessage="Enter a number from 5 to 30 for the width in cms" required="true" size="10em">Width:</Option>
+            <Option decimalPlaces="0,1" defaultValue="12" increment="0.1" inputType="numstepper" invalidMessage="Enter a number from 5 to 30 for the height in cms" maxValue="30.0" minValue="5.0" missingMessage="Enter a number from 5 to 30 for the height in cms" name="cmHeight" promptMessage="Enter a number from 5 to 30 for the height in cms" rangeMessage="Enter a number from 5 to 30 for the height in cms" required="true" size="10em">Height:</Option>
+            <Option decimalPlaces="0,1" defaultValue="640" increment="1" inputType="numstepper" invalidMessage="Enter a number from 50 to 1200 for the width in pixels" maxValue="1200" minValue="50" missingMessage="Enter a number from 50 to 1200 for the width in pixels" name="pixelWidth" promptMessage="Enter a number from 50 to 1200 for the width in pixels" rangeMessage="Enter a number from 50 to 1200 for the width in pixels" required="true" size="10em">Width:</Option>
+            <Option decimalPlaces="0,1" defaultValue="480" increment="1" inputType="numstepper" invalidMessage="Enter a number from 50 to 1200 for the height in pixels" maxValue="1200" minValue="50" missingMessage="Enter a number from 50 to 1200 for the height in pixels" name="pixelHeight" promptMessage="Enter a number from 50 to 1200 for the height in pixels" rangeMessage="Enter a number from 50 to 1200 for the height in pixels" required="true" size="10em">Height:</Option>
+        </Options>
+    </Metadata>
+
+    <!--- Define the task options relationships                  -->
+    <!--- The UI engine will determine the best respresentation. -->
+    <UI>
+        <Container option="dataTab">
+            <Group open="true" option="dataGroup">
+                <DataItem data="dataSource"/>
+            </Group>
+
+            <Group open="true" option="rolesGroup">
+                <RoleItem role="xVar"/>
+                <RoleItem role="yVar"/>
+                <RoleItem role="sizeVar"/>
+                <RoleItem role="colorVar"/>
+                <OptionItem option="coloringByGradient"/>
+                <OptionItem option="coloringByGroup"/>
+                <Group open="true" option="coloringGradientGrp">
+                    <OptionItem option="useColorModel"/>
+                    <OptionItem option="startColor"/>
+                    <OptionItem option="middleColor"/>
+                    <OptionItem option="endColor"/>
+                    <OptionChoice option="gradientLegendPos">
+                        <OptionItem option="legendRight"/>
+                        <OptionItem option="legendBottom"/>
+                        <OptionItem option="legendLeft"/>
+                        <OptionItem option="legendTop"/>
+                    </OptionChoice>
+                </Group>
+                <OptionChoice option="discreteLegendLoc">
+                    <OptionItem option="outside"/>
+                    <OptionItem option="inside"/>
+                </OptionChoice>
+            </Group>
+        </Container>
+
+        <Container option="appearanceTab">
+            <Group open="true" option="bubbleGroup">
+                <OptionItem option="setColor"/>
+                <OptionItem option="bubbleColor"/>
+                <OptionItem option="minRadius"/>
+                <OptionItem option="maxRadius"/>
+                <OptionChoice option="fillTrans">   
+                	<OptionItem option="fillTransDefaultChoice"/> 
+                	<OptionItem option="fillTrans25Choice"/> 
+                	<OptionItem option="fillTrans50Choice"/> 
+                	<OptionItem option="fillTrans75Choice"/> 
+                	<OptionItem option="fillTrans100Choice"/>
+                </OptionChoice>
+			<Group open="false" option="bubbleDetails">
+                    <OptionChoice option="dataSkin">
+                        <OptionItem option="none"/>
+                        <OptionItem option="gloss"/>
+                        <OptionItem option="sheen"/>
+                        <OptionItem option="crisp"/>
+                        <OptionItem option="matte"/>
+                        <OptionItem option="pressed"/>
+                    </OptionChoice>
+                    <RoleItem role="urlVar"/>
+                </Group>
+            </Group>
+
+            <Group open="false" option="bubbleLabels">
+                <RoleItem role="labelVar"/>
+                <Group open="true" option="labelGroup">
+                    <OptionItem option="setLabelColor"/>
+                    <OptionItem option="labelColor"/>
+                    <OptionItem option="labelSize"/>
+                    <OptionChoice option="labelPosition">
+                        <OptionItem option="topRight"/>
+                        <OptionItem option="topLeft"/>
+                        <OptionItem option="bottomRight"/>
+                        <OptionItem option="bottomLeft"/>
+                        <OptionItem option="top"/>
+                        <OptionItem option="right"/>
+                        <OptionItem option="left"/>
+                        <OptionItem option="bottom"/>
+                        <OptionItem option="center"/>
+                    </OptionChoice>
+                </Group>
+            </Group>
+
+            <Group open="false" option="xAxis">
+                <OptionItem option="xAxisMin"/>
+                <OptionItem option="xAxisMinValue"/>
+                <OptionItem option="xAxisMax"/>
+                <OptionItem option="xAxisMaxValue"/>
+                <OptionItem option="showXGrid"/>
+                <OptionChoice option="displayXLabel">
+                    <OptionItem option="defaultLabel"/>
+                    <OptionItem option="noLabel"/>
+                    <OptionItem option="customLabel"/>
+                </OptionChoice>
+                <OptionItem option="xLabel"/>
+                <OptionItem option="logXAxis"/>
+                <OptionChoice option="logBaseComboX">
+                    <OptionItem option="logBase10"/>
+                    <OptionItem option="logBase2"/>
+                    <OptionItem option="logBaseE"/>
+                </OptionChoice>
+                <OptionItem option="labelRotation"/>
+                <OptionItem option="diagonalRotation"/>
+                <OptionItem option="verticalRotation"/>
+                <OptionItem option="xRefLine"/>
+                <OptionItem option="xRefLineLevel"/>
+                <OptionChoice option="xRefLineOffset">
+                	<OptionItem option="xRefLineOffsetNegative50Choice"/> 
+                	<OptionItem option="xRefLineOffsetNegative25Choice"/> 
+                	<OptionItem option="xRefLineOffsetDefaultChoice"/> 
+                	<OptionItem option="xRefLineOffset25Choice"/> 
+                	<OptionItem option="xRefLineOffset50Choice"/> 
+                </OptionChoice>
+				<OptionItem option="xRefLineValue"/>
+                <OptionItem option="xRefValue"/>
+                <OptionItem option="xRefCustom"/>
+                <OptionItem option="xRefCustomLabel"/>
+            </Group>
+
+            <Group open="false" option="yAxis">
+                <OptionItem option="yAxisMin"/>
+                <OptionItem option="yAxisMinValue"/>
+                <OptionItem option="yAxisMax"/>
+                <OptionItem option="yAxisMaxValue"/>
+                <OptionItem option="showYGrid"/>
+                <OptionChoice option="displayYLabel">
+                    <OptionItem option="defaultLabel"/>
+                    <OptionItem option="noLabel"/>
+                    <OptionItem option="customLabel"/>
+                </OptionChoice>
+                <OptionItem option="yLabel"/>
+                <OptionItem option="logYAxis"/>
+                <OptionChoice option="logBaseComboY">
+                    <OptionItem option="logBase10"/>
+                    <OptionItem option="logBase2"/>
+                    <OptionItem option="logBaseE"/>
+                </OptionChoice>
+                <OptionItem option="yRefLine"/>
+                <OptionItem option="yRefLineLevel"/>
+                <OptionChoice option="yRefLineOffset">
+                	<OptionItem option="yRefLineOffsetNegative50Choice"/> 
+                	<OptionItem option="yRefLineOffsetNegative25Choice"/> 
+                	<OptionItem option="yRefLineOffsetDefaultChoice"/> 
+                	<OptionItem option="yRefLineOffset25Choice"/> 
+                	<OptionItem option="yRefLineOffset50Choice"/> 
+                </OptionChoice>
+				<OptionItem option="yRefLineValue"/>
+                <OptionItem option="yRefValue"/>
+                <OptionItem option="yRefCustom"/>
+                <OptionItem option="yRefCustomLabel"/>
+            </Group>
+
+            <Group open="false" option="title">
+                <OptionItem option="titleString"/>
+                <OptionItem option="titleSize"/>
+                <OptionItem option="footnoteString"/>
+                <OptionItem option="footnoteSize"/>
+                <OptionItem option="includeAsFootnote"/>
+            </Group>
+
+            <Group option="graphSize">
+                <OptionChoice option="dimType">
+                    <OptionItem option="in"/>
+                    <OptionItem option="cm"/>
+                    <OptionItem option="px"/>
+                </OptionChoice>
+                <OptionItem option="inchWidth"/>
+                <OptionItem option="inchHeight"/>
+                <OptionItem option="cmWidth"/>
+                <OptionItem option="cmHeight"/>
+                <OptionItem option="pixelWidth"/>
+                <OptionItem option="pixelHeight"/>
+            </Group>
+        </Container>
+    </UI>
+
+    <Dependencies>
+        <Dependency condition="($dataSource.getWhereClause()!='')">
+            <Target action="show" conditionResult="true" option="includeAsFootnote"/>
+            <Target action="hide" conditionResult="false" option="includeAsFootnote"/>
+        </Dependency>
+
+        <Dependency condition="($colorVar.size()&gt;0 &amp;&amp; $colorVar[0].get('type')=='Numeric')">
+            <Target action="show" conditionResult="true" option="radioColoring"/>
+            <Target action="hide" conditionResult="false" option="radioColoring"/>
+        </Dependency>
+
+        <Dependency condition="($colorVar.size()&gt;0 &amp;&amp; ($colorVar[0].get('type')=='Char' || ($colorVar[0].get('type')=='Numeric' &amp;&amp; $radioColoring=='coloringByGroup')))">
+            <Target action="show" conditionResult="true" option="discreteLegendLoc"/>
+            <Target action="hide" conditionResult="false" option="discreteLegendLoc"/>
+        </Dependency>
+
+        <Dependency condition="($colorVar.size()&gt;0 &amp;&amp; $colorVar[0].get('type')=='Numeric' &amp;&amp; $radioColoring=='coloringByGradient')">
+            <Target action="show" conditionResult="true" option="coloringGradientGrp"/>
+            <Target action="hide" conditionResult="false" option="coloringGradientGrp"/>
+        </Dependency>
+
+        <Dependency condition="($colorVar.size()&gt;0 &amp;&amp; $colorVar[0].get('type')=='Numeric' &amp;&amp; $radioColoring=='coloringByGradient' &amp;&amp; $useColorModel=='1')">
+            <Target action="show" conditionResult="true" option="startColor"/>
+            <Target action="hide" conditionResult="false" option="startColor"/>
+            <Target action="show" conditionResult="true" option="middleColor"/>
+            <Target action="hide" conditionResult="false" option="middleColor"/>
+            <Target action="show" conditionResult="true" option="endColor"/>
+            <Target action="hide" conditionResult="false" option="endColor"/>
+        </Dependency>
+
+        <Dependency condition="($titleString!='')">
+            <Target action="enable" conditionResult="true" option="titleSize"/>
+            <Target action="disable" conditionResult="false" option="titleSize"/>
+        </Dependency>
+
+        <Dependency condition="($footnoteString!='' || ($dataSource.getWhereClause()!='' &amp;&amp; $includeAsFootnote=='1'))">
+            <Target action="enable" conditionResult="true" option="footnoteSize"/>
+            <Target action="disable" conditionResult="false" option="footnoteSize"/>
+        </Dependency>
+
+        <Dependency condition="($colorVar.size()&gt;0)">
+            <Target action="disable" conditionResult="true" option="setColor"/>
+            <Target action="enable" conditionResult="false" option="setColor"/>
+        </Dependency>
+
+        <Dependency condition="(!($colorVar.size()&gt;0) &amp;&amp; $setColor=='1')">
+            <Target action="show" conditionResult="true" option="bubbleColor"/>
+            <Target action="hide" conditionResult="false" option="bubbleColor"/>
+        </Dependency>
+
+        <Dependency condition="($labelVar.size()&gt;0)">
+            <Target action="show" conditionResult="true" option="labelGroup"/>
+            <Target action="hide" conditionResult="false" option="labelGroup"/>
+        </Dependency>
+
+        <Dependency condition="($labelVar.size()&gt;0 &amp;&amp; $setLabelColor=='1')">
+            <Target action="show" conditionResult="true" option="labelColor"/>
+            <Target action="hide" conditionResult="false" option="labelColor"/>
+        </Dependency>
+
+         <Dependency condition="($xVar.size()&gt;0 &amp;&amp; $xVar[0].get('type')=='Char')">
+            <Target action="disable" conditionResult="true" option="xAxisMin"/>
+            <Target action="enable" conditionResult="false" option="xAxisMin"/>
+            <Target action="disable" conditionResult="true" option="xAxisMax"/>
+            <Target action="enable" conditionResult="false" option="xAxisMax"/>
+        </Dependency>
+
+       <Dependency condition="($xAxisMin &amp;&amp; $xAxisMin=='1')">
+            <Target action="show" conditionResult="true" option="xAxisMinValue"/>
+            <Target action="hide" conditionResult="false" option="xAxisMinValue"/>
+        </Dependency>
+
+        <Dependency condition="($xAxisMax &amp;&amp; $xAxisMax=='1')">
+            <Target action="show" conditionResult="true" option="xAxisMaxValue"/>
+            <Target action="hide" conditionResult="false" option="xAxisMaxValue"/>
+        </Dependency>
+
+        <Dependency condition="($yVar.size()&gt;0 &amp;&amp; $yVar[0].get('type')=='Char')">
+            <Target action="disable" conditionResult="true" option="yAxisMin"/>
+            <Target action="enable" conditionResult="false" option="yAxisMin"/>
+            <Target action="disable" conditionResult="true" option="yAxisMax"/>
+            <Target action="enable" conditionResult="false" option="yAxisMax"/>
+        </Dependency>
+
+        <Dependency condition="($yAxisMin &amp;&amp; $yAxisMin=='1')">
+            <Target action="show" conditionResult="true" option="yAxisMinValue"/>
+            <Target action="hide" conditionResult="false" option="yAxisMinValue"/>
+        </Dependency>
+
+        <Dependency condition="($yAxisMax &amp;&amp; $yAxisMax=='1')">
+            <Target action="show" conditionResult="true" option="yAxisMaxValue"/>
+            <Target action="hide" conditionResult="false" option="yAxisMaxValue"/>
+        </Dependency>
+
+        <Dependency condition="($displayXLabel=='customLabel')">
+            <Target action="show" conditionResult="true" option="xLabel"/>
+            <Target action="hide" conditionResult="false" option="xLabel"/>
+        </Dependency>
+
+        <Dependency condition="($displayYLabel=='customLabel')">
+            <Target action="show" conditionResult="true" option="yLabel"/>
+            <Target action="hide" conditionResult="false" option="yLabel"/>
+        </Dependency>
+
+        <Dependency condition="($xVar.size()&gt;0 &amp;&amp; $xVar[0].get('type')=='Char')">
+            <Target action="disable" conditionResult="true" option="logXAxis"/>
+            <Target action="enable" conditionResult="false" option="logXAxis"/>
+        </Dependency>
+
+        <Dependency condition="($logXAxis &amp;&amp; $logXAxis=='1')">
+            <Target action="show" conditionResult="true" option="logBaseComboX"/>
+            <Target action="hide" conditionResult="false" option="logBaseComboX"/>
+        </Dependency>
+
+        <Dependency condition="($yVar.size()&gt;0 &amp;&amp; $yVar[0].get('type')=='Char')">
+            <Target action="disable" conditionResult="true" option="logYAxis"/>
+            <Target action="enable" conditionResult="false" option="logYAxis"/>
+        </Dependency>
+
+        <Dependency condition="($logYAxis &amp;&amp; $logYAxis=='1')">
+            <Target action="show" conditionResult="true" option="logBaseComboY"/>
+            <Target action="hide" conditionResult="false" option="logBaseComboY"/>
+        </Dependency>
+
+        <Dependency condition="($labelRotation=='1')">
+            <Target action="show" conditionResult="true" option="tickRotate"/>
+            <Target action="hide" conditionResult="false" option="tickRotate"/>
+        </Dependency>
+
+        <Dependency condition="($xVar.size()&gt;0 &amp;&amp; $xRefLine=='1')">
+            <Target action="show" conditionResult="true" option="xRefLabel"/>
+            <Target action="hide" conditionResult="false" option="xRefLabel"/>
+        </Dependency>
+
+        <Dependency condition="($xVar.size()&gt;0 &amp;&amp; $xRefLine=='1' &amp;&amp; $xRefLabel=='xRefCustom')">
+            <Target action="show" conditionResult="true" option="xRefCustomLabel"/>
+            <Target action="hide" conditionResult="false" option="xRefCustomLabel"/>
+        </Dependency>
+
+        <Dependency condition="($xVar.size()&gt;0 &amp;&amp; $xVar[0].get('type')=='Char' &amp;&amp; $xRefLine=='1')">
+            <Target action="show" conditionResult="true" option="xRefLineLevel"/>
+            <Target action="hide" conditionResult="false" option="xRefLineLevel"/>
+            <Target action="show" conditionResult="true" option="xRefLineOffset"/>
+            <Target action="hide" conditionResult="false" option="xRefLineOffset"/>
+        </Dependency>
+
+        <Dependency condition="($xVar.size()&gt;0 &amp;&amp; $xVar[0].get('type')=='Numeric' &amp;&amp; $xRefLine=='1')">
+            <Target action="show" conditionResult="true" option="xRefLineValue"/>
+            <Target action="hide" conditionResult="false" option="xRefLineValue"/>
+        </Dependency>
+
+        <Dependency condition="($yVar.size()&gt;0 &amp;&amp; $yRefLine=='1')">
+            <Target action="show" conditionResult="true" option="yRefLabel"/>
+            <Target action="hide" conditionResult="false" option="yRefLabel"/>
+        </Dependency>
+
+        <Dependency condition="($yVar.size()&gt;0 &amp;&amp; $yRefLine=='1' &amp;&amp; $yRefLabel=='yRefCustom')">
+            <Target action="show" conditionResult="true" option="yRefCustomLabel"/>
+            <Target action="hide" conditionResult="false" option="yRefCustomLabel"/>
+        </Dependency>
+
+        <Dependency condition="($yVar.size()&gt;0 &amp;&amp; $yVar[0].get('type')=='Char' &amp;&amp; $yRefLine=='1')">
+            <Target action="show" conditionResult="true" option="yRefLineLevel"/>
+            <Target action="hide" conditionResult="false" option="yRefLineLevel"/>
+            <Target action="show" conditionResult="true" option="yRefLineOffset"/>
+            <Target action="hide" conditionResult="false" option="yRefLineOffset"/>
+        </Dependency>
+
+        <Dependency condition="($yVar.size()&gt;0 &amp;&amp; $yVar[0].get('type')=='Numeric' &amp;&amp; $yRefLine=='1')">
+            <Target action="show" conditionResult="true" option="yRefLineValue"/>
+            <Target action="hide" conditionResult="false" option="yRefLineValue"/>
+        </Dependency>
+
+        <Dependency condition="($dimType=='px')">
+           <Target action="show" conditionResult="true" option="pixelWidth"/>
+           <Target action="show" conditionResult="true" option="pixelHeight"/>
+           <Target action="hide" conditionResult="true" option="inchWidth"/>
+           <Target action="hide" conditionResult="true" option="inchHeight"/>
+           <Target action="hide" conditionResult="true" option="cmWidth"/>
+           <Target action="hide" conditionResult="true" option="cmHeight"/>
+        </Dependency>
+
+        <Dependency condition="($dimType=='in')">
+           <Target action="hide" conditionResult="true" option="pixelWidth"/>
+           <Target action="hide" conditionResult="true" option="pixelHeight"/>
+           <Target action="show" conditionResult="true" option="inchWidth"/>
+           <Target action="show" conditionResult="true" option="inchHeight"/>
+           <Target action="hide" conditionResult="true" option="cmWidth"/>
+           <Target action="hide" conditionResult="true" option="cmHeight"/>
+        </Dependency>
+
+        <Dependency condition="($dimType=='cm')">
+           <Target action="hide" conditionResult="true" option="pixelWidth"/>
+           <Target action="hide" conditionResult="true" option="pixelHeight"/>
+           <Target action="hide" conditionResult="true" option="inchWidth"/>
+           <Target action="hide" conditionResult="true" option="inchHeight"/>
+           <Target action="show" conditionResult="true" option="cmWidth"/>
+           <Target action="show" conditionResult="true" option="cmHeight"/>
+        </Dependency>
+    </Dependencies>
+    
+    <Requirements>
+        <Requirement condition="!($MathTool.toInteger($maxRadius) &lt; $MathTool.toInteger($minRadius))">
+            <Message nlsKey="bubblePlotRadiusRequirementKey">The maximum radius must be larger than the minimum radius.</Message>
+        </Requirement>
+        <Requirement condition="(!($xAxisMin=='1' &amp;&amp; $xAxisMax=='1' &amp;&amp; ($MathTool.toDouble($xAxisMinValue) &gt; $MathTool.toDouble($xAxisMaxValue))))">
+            <Message nlsKey="xAxisMinMaxMsgKey">The maximum value of x axis should be greater than or equal to the minimum value of x axis.</Message>
+        </Requirement>
+        <Requirement condition="(!($yAxisMin=='1' &amp;&amp; $yAxisMax=='1' &amp;&amp; ($MathTool.toDouble($yAxisMinValue) &gt; $MathTool.toDouble($yAxisMaxValue))))">
+            <Message nlsKey="yAxisMinMaxMsgKey">The maximum value of y axis should be greater than or equal to the minimum value of y axis.</Message>
+        </Requirement>
+    </Requirements>
+
+    <!--- Define the velocity code template. -->
+    <CodeTemplate>
+        <![CDATA[
+
+##--Extract first item from list--##
+#if($xVar.size()>0) #set($X=$xVar.get(0)) #end
+#if($yVar.size()>0) #set($Y=$yVar.get(0)) #end
+#if($sizeVar.size()>0) #set($S=$sizeVar.get(0)) #end
+#if($colorVar.size()>0) #set($COL=$colorVar.get(0)) #end
+#if($labelVar.size()>0) #set($LBL=$labelVar.get(0)) #end
+#if($urlVar.size()>0) #set($URL=$urlVar.get(0)) #end
+
+#if(($setColor && $setColor=='1') || $fillTrans!='0') #set ($SETATTRS='Yes') 
+#else #set($SETATTRS='No')
+#end
+
+#if($COL && ($COL.get('type')=='Char' || ($COL.get('type')=='Numeric' && $radioColoring=='coloringByGroup'))) #set($COLORMODE='discrete') #end 
+#if($COL && $COL.get('type')=='Numeric' && $radioColoring=='coloringByGradient') #set($COLORMODE='continuous') #end 
+
+##--Set Graph Size--##
+#if($dimType=="in")
+    #set($WIDTH="$inchWidth$dimType")
+    #set($HEIGHT="$inchHeight$dimType")
+#end
+
+#if($dimType=="cm")
+    #set($WIDTH="$cmWidth$dimType")
+    #set($HEIGHT="$cmHeight$dimType")
+#end
+
+#if($dimType=="px")
+    #set($WIDTH="$pixelWidth$dimType")
+    #set($HEIGHT="$pixelHeight$dimType")
+#end
+
+##--Set output size--##
+ods graphics / reset width=$WIDTH height=$HEIGHT imagemap;
+
+##--SGPLOT proc statement--##
+proc sgplot data=$dataSource #if($dataSource.getWhereClause()!="")(where=($dataSource.getWhereClause())) #end;
+
+##-Build quoted strings for title and footnote to clean up any quotes provided by user
+#if($titleString!="") #set($qTitleString=$CTMUtil.doubleQuoteString($titleString)) #end
+#if($footnoteString!="") #set($qFootnoteString=$CTMUtil.doubleQuoteString($footnoteString)) #end
+
+##--TITLE and FOOTNOTE--##
+#set($pt="pt")
+#if($titleString!="") 
+    #set($titleSizePt="$titleSize$pt")
+    title height=$titleSizePt $qTitleString;
+#end
+#if($footnoteString!="" || ($dataSource.getWhereClause()!="" && $includeAsFootnote=='1'))
+    #set($footSizePt="$footnoteSize$pt")
+    #if($dataSource.getWhereClause()!="" && $includeAsFootnote=='1') footnote justify=left height=$footSizePt
+        #set($whereStr="$whereClause $dataSource.getWhereClause()") $CTMUtil.doubleQuoteString($whereStr);
+    #end
+
+    #if($footnoteString!="")
+        footnote2 justify=left height=$footSizePt $qFootnoteString;
+    #end
+#end
+
+##--Bubble plot settings--##
+bubble x=$X y=$Y size=$S/
+    #if($COLORMODE && $COLORMODE=='discrete') group=$COL #end
+    #if($COLORMODE && $COLORMODE=='continuous') colorresponse=$COL #end
+    #if($LBL) datalabel=$LBL #end
+    #if($URL) url=$URL #end
+    #if($useColorModel && $useColorModel=='1') colormodel=($startColor $middleColor $endColor) #end
+    #if($SETATTRS=='Yes') fillattrs=(
+        #if($setColor=='1') color=$bubbleColor #end
+        #if($fillTrans!='0') transparency=$fillTrans #end)
+    #end
+    #if($dataSkin!='none') dataskin=$dataSkin #end
+    #if($LBL && $labelPosition != 'topright') datalabelpos=$labelPosition #end
+    #if($LBL) datalabelattrs=(size=$labelSize
+        #if($setLabelColor=='1') color=$labelColor #end)
+    #end
+    bradiusmin=$minRadius
+    bradiusmax=$maxRadius
+;
+
+#set($XAXIS=0)
+#if($showXGrid=='1' || $displayXLabel!='defaultLabel' || $logXAxis=='1' || $labelRotation=='1' || $xAxisMin=='1' || $xAxisMax=='1') #set($XAXIS=1) #end
+#if($XAXIS=='1')
+##--X Axis--##
+    xaxis
+    #if($xAxisMin=='1') min=$xAxisMinValue #end
+    #if($xAxisMax=='1') max=$xAxisMaxValue #end
+    #if($showXGrid=='1') grid #end
+    #if($displayXLabel=='noLabel') display=(nolabel) #end
+    #if($displayXLabel=='customLabel') label=$CTMUtil.doubleQuoteString($xLabel) #end
+    #if($logXAxis=='1')
+        type=log #if($logBaseComboX!='10') logbase=$logBaseComboX #end
+    #end
+    #if($labelRotation=='1') valuesrotate=#if($tickRotate=='diagonalRotation') diagonal #else vertical #end #end
+;
+#end
+
+#set($YAXIS=0)
+#if($showYGrid=='1' || $displayYLabel!='defaultLabel' || $logYAxis=='1' || $yAxisMin=='1' || $yAxisMax=='1') #set($YAXIS=1) #end
+#if($YAXIS=='1')
+##--Y Axis--##
+    yaxis
+    #if($yAxisMin=='1') min=$yAxisMinValue #end
+    #if($yAxisMax=='1') max=$yAxisMaxValue #end
+    #if($showYGrid=='1') grid #end
+    #if($displayYLabel=='noLabel') display=(nolabel) #end
+    #if($displayYLabel=='customLabel') label=$CTMUtil.doubleQuoteString($yLabel) #end
+    #if($logYAxis=='1')
+        type=log #if($logBaseComboY!='10') logbase=$logBaseComboY #end
+    #end
+;
+#end
+
+#if($X && $xRefLine=='1')
+##--X Axis Reference Line--##
+    refline #if($X.get('type')=='Char') $CTMUtil.doubleQuoteString($xRefLineLevel) #else $xRefLineValue #end /
+    axis=x
+    lineattrs=(thickness=2 color=blue)
+    #if($X.get('type')=='Char' && $xRefLineOffset!='0') discreteoffset=$xRefLineOffset #end
+	label#if($xRefLabel=='xRefCustom')=$CTMUtil.doubleQuoteString($xRefCustomLabel) #end
+    labelattrs=(color=blue)
+;
+#end
+
+#if($Y && $yRefLine=='1')
+##--Y Axis Reference Line--##
+    refline #if($Y.get('type')=='Char') $CTMUtil.doubleQuoteString($yRefLineLevel) #else $yRefLineValue #end /
+    axis=y
+    lineattrs=(thickness=2 color=green)
+    #if($Y.get('type')=='Char' && $yRefLineOffset!='0') discreteoffset=$yRefLineOffset #end
+	label#if($yRefLabel=='yRefCustom')=$CTMUtil.doubleQuoteString($yRefCustomLabel) #end
+    labelattrs=(color=green)
+;
+#end
+
+#if($COLORMODE)
+    #if($COLORMODE=='continuous' && $gradientLegendPos!='right')
+##--Legend Settings--##
+        gradlegend / position=$gradientLegendPos;
+    #end
+
+    #if($COLORMODE=='discrete' && $discreteLegendLoc=='inside')
+##--Legend Settings--##
+        keylegend / location=$discreteLegendLoc;
+    #end
+#end
+run;
+
+ods graphics / reset;
+#if($titleString!="") title; #end
+#if($footnoteString!="" || ($dataSource.getWhereClause()!="" && $includeAsFootnote=='1'))
+    #if($dataSource.getWhereClause()!="" && $includeAsFootnote=='1') footnote; #end
+    #if($footnoteString!="") footnote2; #end
+#end
+
+]]>
+    </CodeTemplate>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<TemplateValues version="3.8">
+<![CDATA[
+{"noLabel":"No label","yRefLabel":"yRefValue","fillTrans":"0.75","endColor":"CXd15c6a","px":"Pixels","none":"(none)","sasOS":"Linux LIN X64 4.19.76-linuxkit","yRefLineLevel":"","legendRight":"Right (default)","xRefLineLevel":"","discreteLegendLoc":"outside","sizeVar":"json:[{\"value\":\"deaths_rank\",\"type\":\"Numeric\",\"length\":8,\"format\":\"\",\"informat\":\"\",\"className\":\"RoleObject\"}]","defaultLabel":"Default label","crisp":"Crisp","pressed":"Pressed","in":"Inches (default)","yRefLine":"0","urlVar":"","yLabel":"","fillTrans25Choice":"25%","xRefLineOffset":"0","left":"Left","xRefValue":"1","pixelWidth":"640","colorVar":"","middleColor":"CX00fa05","yRefCustom":"0","bottomRight":"Bottom right","showYGrid":"1","bubbleGroup":"BUBBLES","bubbleLabels":"BUBBLE LABELS","logYAxis":"1","yRefLineOffsetDefaultChoice":"0 (default)","rolesGroup":"ROLES","yRefLineOffset25Choice":"0.25","top":"Top","labelPosition":"center","setLabelColor":"1","titleString":"","minRadius":"5","logBase10":"10 (default)","bottomLeft":"Bottom left","gradientLegendPos":"right","graphSize":"GRAPH SIZE","topRight":"Top right (default)","cm":"Cms","right":"Right","legendLeft":"Left","verticalRotation":"0","yRefLineOffsetNegative50Choice":"-0.5","yRefValue":"1","yAxis":"Y AXIS","sasVersion":"9.46","includeAsFootnote":"0","xRefLineOffset25Choice":"0.25","cmWidth":"16","displayYLabel":"defaultLabel","xRefLineOffsetDefaultChoice":"0 (default)","xLabel":"","whereClause":"Where clause:","xAxis":"X AXIS","yRefLineOffsetNegative25Choice":"-0.25","yAxisMaxValue":"","footnoteSize":"12","cmHeight":"12","xRefLineOffsetNegative25Choice":"-0.25","inside":"Inside","yRefLineValue":"","dataTab":"DATA","xRefLineValue":"","startColor":"CX005ff5","radioColoring":"coloringByGroup","pixelHeight":"480","xAxisMin":"0","yAxisMin":"0","labelVar":"json:[{\"value\":\"plotlabel\",\"type\":\"Char\",\"length\":200,\"format\":\"\",\"informat\":\"\",\"className\":\"RoleObject\"}]","bottom":"Bottom","dimType":"in","xRefCustom":"0","xAxisMax":"0","labelGroup":"Options","yRefLineOffset":"0","coloringByGradient":"0","outside":"Outside (default)","xVar":"json:[{\"value\":\"population_estimate\",\"type\":\"Numeric\",\"length\":8,\"format\":\"COMMA16.\",\"informat\":\"\",\"className\":\"RoleObject\"}]","footnoteString":"","appearanceTab":"APPEARANCE","dataSource":{"whereclause":"confirmed > 10 and deaths > 10 and population_estimate > 0","librarytable":"WORK.COUNTY_RANKS"},"fillTrans50Choice":"50%","tickRotate":"diagonalRotation","maxRadius":"20","legendBottom":"Bottom","xRefLineOffsetNegative50Choice":"-0.5","xAxisMinValue":"","xRefCustomLabel":"","titleSize":"14","xRefLineOffset50Choice":"0.5","title":"TITLE AND FOOTNOTE","displayXLabel":"defaultLabel","xRefLabel":"xRefValue","logBaseComboX":"10","inchHeight":"12","fillTransDefaultChoice":"0% (default)","yRefCustomLabel":"","inchWidth":"12","labelSize":"5","gloss":"Gloss","logBaseE":"e","yVar":"json:[{\"value\":\"confirmed\",\"type\":\"Numeric\",\"length\":8,\"format\":\"COMMA16.\",\"informat\":\"\",\"className\":\"RoleObject\"}]","bubbleColor":"CX004df8","logXAxis":"1","sheen":"Sheen","bubbleDetails":"Details","coloringGradientGrp":"Color Gradient","legendTop":"Top","dataSkin":"none","yRefLineOffset50Choice":"0.5","center":"Center","xRefLine":"0","labelColor":"CX000000","logBaseComboY":"10","yAxisMax":"0","dataGroup":"DATA","setColor":"1","coloringByGroup":"1","useColorModel":"0","topLeft":"Top left","showXGrid":"1","logBase2":"2","diagonalRotation":"1","yAxisMinValue":"","fillTrans75Choice":"75%","fillTrans100Choice":"100%","customLabel":"Custom label","xAxisMaxValue":"","matte":"Matte","labelRotation":"0"}
+]]>
+</TemplateValues>
+</Task>

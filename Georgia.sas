@@ -4,24 +4,20 @@
 ***** data
 *****************************************************************
 ;
-libname covid '/covid19data';
-
 /* keep the region name such that datasets match actual data name */
 *****************************;
-%let pvs=New York;
+%let pvs=Georgia;
 *****************************;
-
-
 data _null_; call symput("region_name",compress("&pvs")); run;
 
 
 /* *****************************; */
-/* proc sql; select distinct Province_State, filedate from jhu_final where upcase(province_state) like "LOU%"; */
+/* proc sql; select distinct location, filedate from jhu_final where upcase(location) like "LOU%"; */
 /* quit; */
 
 data &region_name;
-	set  WORK.JHU_final;
-	where Province_State = "&pvs";
+	set  WORK.JHU_current;
+	where location = "&pvs-US";
 run;
 
 /* Calculate the daily sums over region - this really applies once
@@ -80,18 +76,22 @@ run;
 			offsetmax=0 %end;
 %mend offset;
 
-ods graphics / reset width=8in height=4.5in imagemap;
-title &PVS COVID-19 Situation Report;
-title2 Prevalence, Deaths and Testing;
-footnote https://dph.georgia.gov/covid-19-daily-status-report;
-proc sgplot data=&region_name._summary nocycleattrs;
-	vbar dateplot / response=confirmed stat=sum;
-	vline dateplot / response=deaths stat=sum y2axis;
-	yaxis grid min=&respmin1 max=&respmax1 %offset(); 
-	y2axis min=&respmin2 max=&respmax2 %offset();
-	keylegend / location=outside;
-run;
 
+
+options orientation=landscape papersize=(8in 8in) ;
+ods graphics / reset width=7in height=4.5in imagemap;
+ods pdf file="&outputpath./Georgia.pdf";
+	title "&PVS COVID-19 Situation Report";
+	title2 "Prevalence and Deaths";
+	footnote "Source Johns Hopkins University CSSE: https://dph.georgia.gov/covid-19-daily-status-report";
+	proc sgplot data=&region_name._summary nocycleattrs;
+		vbar dateplot / response=confirmed stat=sum;
+		vline dateplot / response=deaths stat=sum y2axis;
+		yaxis grid min=&respmin1 max=&respmax1 %offset(); 
+		y2axis min=&respmin2 max=&respmax2 %offset();
+		keylegend / location=outside;
+	run;
+ods pdf close;
 ods graphics / reset;
 
 
