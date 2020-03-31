@@ -6,10 +6,20 @@
 			confirmed = &conf;
 			deaths 	  = &death;
 		end;
-		%LET adjust_note=Adjusted for &date: Confirmed = &conf Deaths = death;
+		%LET adjust_note=Adjusted for &date: Confirmed = &conf Deaths = &death;
 	%end;
 	%put note = &adjust_note;
 %mend AddAdjustment;
+
+%macro AddData(typer,date,conf,death);
+	%if &typer=1 %then %do;
+		proc sql;
+			insert into &region_name._summary 
+				(filedate,_type_,_freq_, confirmed, deaths) 
+				values ("&date",1,160,&conf,&death);
+		quit;
+	%end;
+%mend AddData;
 
 /* Define a macro for offset */
 %macro offset ();
@@ -121,6 +131,7 @@
 		%else %do;
 			data JHU_current;
 				set JHU_current JHU&outdataset;
+				
 			run;
 		%end;
 	%end;

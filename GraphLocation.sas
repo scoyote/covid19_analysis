@@ -4,7 +4,7 @@
 ***** data
 *****************************************************************;
 
-proc sql;
+proc sql noprint;
 	create table CountyLevel as
 		select 
 		     fips
@@ -33,27 +33,26 @@ proc sql;
 		order by fips,filedate;
 quit;
 
-
 /*****************************************************************************************/
 /* Sanity Checkpoint */
 /* look for possible errors. I think it is sometimes reasonable to have multiple updates, 
 		but probably not a lot... lets check*/
-	data errors_to_check;
-		set countylevel;
-		if freq > 1 then do;
-			put fips= location= census_state= census_county=;
-			output;
-		end;
-	run;
-	proc sql;
-		select * 
-			from jhu_current 
-			where fips in (
-				select distinct fips 
-					from errors_to_check
-				) 
-			order by fips,filedate;
-	quit;
+/* 	data errors_to_check; */
+/* 		set countylevel; */
+/* 		if freq > 1 then do; */
+/* 			put fips= location= census_state= census_county=; */
+/* 			output; */
+/* 		end; */
+/* 	run; */
+/* 	proc sql; */
+/* 		select *  */
+/* 			from jhu_current  */
+/* 			where fips in ( */
+/* 				select distinct fips  */
+/* 					from errors_to_check */
+/* 				)  */
+/* 			order by fips,filedate; */
+/* 	quit; */
 /*****************************************************************************************/
 
 data County_Most_Recent;
@@ -83,7 +82,6 @@ proc rank data=county_most_recent out=County_Ranks groups=10 ties=dense;
 run;
 
 proc sql;
-	*%let var=confirmed_percapita_rank;
 	%let var=confirmed_rank;
 	select &var
 			, count(*) as freq 
@@ -92,16 +90,18 @@ proc sql;
 quit;
 
 proc sort data=County_Ranks;
+	by location filedate;
+run;
+
+
+proc sort data=County_Ranks;
 	by descending confirmed_percapita;
 run;
 
 %let rc = %sysfunc(dlgcdir("&outputpath")); %put RC=&rc;
 
-proc sql; 
-select distinct location into :usstates separated by '","' from plotstate where  location contains '-US' and confirmed > 1 and deaths > 1 ; 
-quit;
 
-proc reg data=county_ranks(where=(confirmed_rank>0 and location in ("&usstates") ));
+proc reg data=county_ranks(where=(confirmed_rank>0 ));
 	model log_confirmed=log_population_estimate / alpha=.2 ;
 	output out=regvals 
 		predicted=p_log_confirmed 
@@ -127,7 +127,8 @@ ods html close;ods rtf close;ods pdf close;ods document close;
 ods html5 file="&outputpath./percapita/CountyPerCapita.html" gpath= "&outputpath/percapita/" device=svg options(svg_mode="inline");
 	title US Counties;
 	footnote 'Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19';
-*	proc sgplot data=county_Ranks(where=(confirmed > 10 and deaths > 5 and population_estimate > 0))  noautolegend;
+
+
 	proc sgplot data=regvals(where=(confirmed_rank>0 ))  noautolegend;
 		bubble x=population_estimate 
 			   y=confirmed 
@@ -147,6 +148,7 @@ ods html5 file="&outputpath./percapita/CountyPerCapita.html" gpath= "&outputpath
 		xaxis grid type=log;
 		yaxis grid type=log;
 	run;
+
 ods html5 close;
 ods graphics / reset;
 	

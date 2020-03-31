@@ -4,20 +4,6 @@
 ***** generated data steps. You have to run sanity checks on this
 *****************************************************************;
 ;
-/* clean up from previous runs if necessary */
-proc datasets library=WORK kill; run; quit;
-
-%let covidpath=/covid19data/csse_covid_19_data/csse_covid_19_daily_reports;
-%let progpath=/covid_analysis;
-%let outputpath=/covid_analysis/graphs/;
-
-libname covid '/covid19data';   
-libname fips "&progpath./data";        
-filename covid19 "&covidpath";
-
-
-/* load macros */
-%include "&progpath./MACROS.sas";
 
 %let rc = %sysfunc(dlgcdir("&covidpath"));
 options nomlogic nomprint;

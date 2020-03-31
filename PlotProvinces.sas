@@ -32,7 +32,8 @@ data plotstate;
 	by location filedate;
 	if last.location and last.filedate then output; 
 run;
-proc sql; 
+
+proc sql noprint; 
 	select distinct location into :smallstates separated by '","' from plotstate where confirmed between 100 and 800 and deaths>5; 
 	select distinct location into :middlestates separated by '","' from plotstate where confirmed between 800 and 2500 and deaths>5; 
 	select distinct location into :bigstates separated by '","' from plotstate where confirmed >= 2500 and deaths>5 ; 
@@ -118,4 +119,5 @@ ods html5 file="&outputpath./trajectories/USStateTrajectories.html" gpath= "&out
 		xaxis grid type=log;
 		yaxis grid type=log;
 	run;
-
+ods html5 close;
+ods graphics / reset;
