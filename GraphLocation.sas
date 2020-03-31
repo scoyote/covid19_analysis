@@ -97,8 +97,11 @@ run;
 
 %let rc = %sysfunc(dlgcdir("&outputpath")); %put RC=&rc;
 
+proc sql; 
+select distinct location into :usstates separated by '","' from plotstate where  location contains '-US' and confirmed > 1 and deaths > 1 ; 
+quit;
 
-proc reg data=county_ranks(where=(confirmed_rank>0));
+proc reg data=county_ranks(where=(confirmed_rank>0 and location in ("&usstates") ));
 	model log_confirmed=log_population_estimate / alpha=.2 ;
 	output out=regvals 
 		predicted=p_log_confirmed 
@@ -114,17 +117,18 @@ data regvals; set regvals;
 	lcl_confirmed=exp(lcl_log_confirmed);
 	uclm_confirmed=exp(uclm_log_confirmed);
 	lclm_confirmed=exp(lclm_log_confirmed);
+	if confirmed <= ucl_confirmed and confirmed > lcl_confirmed then plotlabel='';
 run;
+
 proc sort data=regvals; by population_estimate; run;
 options orientation=landscape papersize=(16in 16in) ;
 ods graphics on / reset width=15in height=15in  imagemap outputfmt=svg;
-*ods listing gpath="&outputpath" device=png;
 ods html close;ods rtf close;ods pdf close;ods document close; 
-ods html5 file="CountyPerCapita.html" gpath= "&outputpath" device=svg options(svg_mode="inline");
+ods html5 file="&outputpath./percapita/CountyPerCapita.html" gpath= "&outputpath/percapita/" device=svg options(svg_mode="inline");
 	title US Counties;
 	footnote 'Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19';
 *	proc sgplot data=county_Ranks(where=(confirmed > 10 and deaths > 5 and population_estimate > 0))  noautolegend;
-	proc sgplot data=regvals(where=(confirmed_rank>0))  noautolegend;
+	proc sgplot data=regvals(where=(confirmed_rank>0 ))  noautolegend;
 		bubble x=population_estimate 
 			   y=confirmed 
 			   size=deaths_rank / 
@@ -134,7 +138,7 @@ ods html5 file="CountyPerCapita.html" gpath= "&outputpath" device=svg options(sv
 			datalabelattrs=(size=6 color=CX000000) 
 			bradiusmin=5 
 			bradiusmax=20
-			tip=(plotlabel confirmed deaths population_estimate confirmed_percapita deaths_percapita);
+			tip=(plotlabel confirmed deaths population_estimate confirmed_percapita deaths_percapita lcl_confirmed ucl_confirmed);
 		series y=p_confirmed x=population_estimate  ;
 		series y=ucl_confirmed x=population_estimate  ;
 		series y=lcl_confirmed x=population_estimate  ;

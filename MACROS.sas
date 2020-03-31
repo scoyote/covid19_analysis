@@ -1,3 +1,40 @@
+
+%macro AddAdjustment(typer,date,conf,death);
+	%if &typer=1 %then %do;
+		%put Running: AddAdjustment(&typer,&date,&conf,&death);
+		if filedate = "&date" then do;
+			confirmed = &conf;
+			deaths 	  = &death;
+		end;
+		%LET adjust_note=Adjusted for &date: Confirmed = &conf Deaths = death;
+	%end;
+	%put note = &adjust_note;
+%mend AddAdjustment;
+
+/* Define a macro for offset */
+%macro offset ();
+	%if %sysevalf(&respmin eq 0) %then
+		%do;
+			offsetmin=0 %end;
+
+	%if %sysevalf(&respmax eq 0) %then
+		%do;
+			offsetmax=0 %end;
+%mend offset;
+
+
+%macro SetNote;
+	%put NOTE: Adjust_note = &adjust_note;
+	%if %length(&adjust_note)>0 %then  %do;
+		title3 "&adjust_note";
+	%end;
+	%else %do;
+		title3;
+	%end;
+%mend SetNote;
+
+
+
 %macro LoadCSV(infilepath,outdataset,typer,counter);
 
 	data JHU&outdataset    ;
@@ -60,6 +97,8 @@
 	 	filedate="&outdataset";
 	 	if province_state = "" then Location=country_region;
 		else location = cats(province_state," - ",country_region);
+		plotlabel_date = cats(location,":",substr(filedate,5,2),"/",substr(filedate,7,2));
+
 	run;  
 	%if &typer=2 %then %do;
 		%if &counter=1 %then %do;

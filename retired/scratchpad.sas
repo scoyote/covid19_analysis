@@ -46,3 +46,14 @@ proc sql;
 	select * from fips.population_estimates where stname="New York" and ctyname='Albany County';
 	select * from jhu_current where fips = '36001' order by fips,filedate;
 quit;
+
+proc sql; select * from jhu_current where upcase(location) like '%GERMA%';
+run;
+
+proc sql; 
+select _type_,count(*) as freq from allcompose_summary group by _type_ order by _type_;
+select * from allcompose_summary where _type_ = 7 and location = 'Georgia-US';
+quit;
+
+
+proc print data=allcompose_summary(where=(location in ("&usstates"))); run;
