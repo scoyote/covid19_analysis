@@ -61,9 +61,9 @@ ods html5 file="&outputpath./States/&pvs..html" gpath= "&outputpath/states/" dev
 		yaxis grid; 
 		y2axis ;
 		keylegend / location=outside;
-	run;	title "&PVS COVID-19 Situation Report";
+	run;	
 	
-	
+	title "&PVS COVID-19 Situation Report";
 	title2 "Prevalence and Deaths";
 	%SetNote;
 	footnote 'Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19';

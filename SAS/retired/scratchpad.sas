@@ -41,6 +41,14 @@ select * from fips.population_estimates where fips_join='45063';
 
 quit;
 
+proc sql;
+select province_state,country_region,location,combined_key,filedate, count(*) as frequ
+from jhu_current 
+/* where province_state='Georgia' */
+ group by province_state,country_region,location,combined_key
+ order by province_state,country_region,location,combined_key;
+quit;
+
 	
 proc sql;
 	select * from fips.population_estimates where stname="New York" and ctyname='Albany County';
@@ -53,6 +61,13 @@ run;
 proc sql; 
 select _type_,count(*) as freq from allcompose_summary group by _type_ order by _type_;
 select * from allcompose_summary where _type_ = 7 and location = 'Georgia-US';
+quit;
+
+
+proc sql; select location,filedate,count(*),sum(Confirmed),sum(deaths)
+	from jhu_all_timeseries
+	where location like 'Georgia%'
+	group by location,filedate;
 quit;
 
 
