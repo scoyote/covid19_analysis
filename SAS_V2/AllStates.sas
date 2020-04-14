@@ -1,3 +1,19 @@
+/********************************************************************/
+/***** ALLStates.sas - Run through all the graphs from load-plot*****/
+/********************************************************************/
+
+%let rc = %sysfunc(dlgcdir("/covid_analysis/SAS_V2/")); 
+%include "LoadTimeseries.sas";
+
+
+/* *You will need to rerun part of loadtimeseries.sas after this;
+proc sql; 
+	insert into US_AUGMENTEd 
+			(province_state, filedate, confirmed, deaths) 
+		values("Georgia", '14APR2020'd,14223,501)
+	;
+quit;
+*/	
 
 /********************************************************************/
 /***** Plot a single state group - just change the macvar here 	*****/
@@ -257,7 +273,7 @@ proc sgplot
 	data=_plots(where=( plotseq<=&daysback and confirmed>&minconf and deaths>&mindeath))
 	noautolegend;
 	ods proclabel " "; 
-	scatter x=CasePerhospital y=Deaths / group=cbsa_title 
+	scatter x=CasePerbed y=Deaths / group=cbsa_title 
 		datalabel=cbsa_title  
 		markerattrs=(size=7) 
 		datalabelattrs=(size=5) 
@@ -312,8 +328,8 @@ ods html5 close;
 /***** 				Plot Global Trajectories	 				*****/
 /********************************************************************/
 %let daysback=14;
-%let minconf=4000;
-%let mindeath=1000;
+%let minconf=1000;
+%let mindeath=100;
 %setgopts(12,16,12,16);
 %let plottip=country_region location filedate confirmed deaths;
 %let plottiplab="Country" "Location" "FileDate" "Confirmed" "Deaths";
@@ -338,8 +354,8 @@ proc sgplot
 		tip=(&plottip) tiplabel=(&plottiplab) ;
 	series x=Confirmed y=Deaths  / group=location
 		tip=(&plottip) tiplabel=(&plottiplab) ;
-	xaxis grid minor minorgrid type=log min=&minconf  LOGSTYLE=LOGEXPAND values=(10000 to 610000 by 100000);
-	yaxis grid minor minorgrid type=log min=&mindeath LOGSTYLE=LOGEXPAND values=(1000 to 26000 by 5000);
+	xaxis grid minor minorgrid type=log min=&minconf max=600000 LOGSTYLE=linear;* values=(1000 0 to 600000 by 100000);
+	yaxis grid minor minorgrid type=log min=&mindeath LOGSTYLE=linear;* values=(1000 to 26000 by 5000);
 run;
 ods html5 close;
 

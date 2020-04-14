@@ -85,14 +85,6 @@ data US_Augmented;
 	state_fips=fipstate(stfips_cd);
 run;
 
-/*
-proc sql; 
-	insert into US_AUGMENTEd 
-			(province_state, filedate, confirmed, deaths) 
-		values("Georgia", '13APR2020'd,13621,480)
-	;
-quit;
-*/	
 
 /*
 proc print data=us_augmented;
