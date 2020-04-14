@@ -1,5 +1,8 @@
 
-%PlotInd(,Georgia,-US);*,ta=1,dt=20200403,ac=5831,ad=184);*,jt=0,jd=0,jc=0,jd=0);
+
+%PlotInd(,Georgia,-US);
+
+
 %PlotInd(,Massachusetts,-US);
 %PlotInd(,California,-US);
 %PlotInd(,Illinois,-US);
@@ -15,7 +18,24 @@
 %PlotInd(,Pennsylvania,-US);
 
 
+%PlotInd(Nation:,United Kingdom,);
+%PlotInd(Nation:,US,);
+%PlotInd(Nation:,Spain,);
+%PlotInd(Nation:,Italy,);
+%PlotInd(Nation:,Iran,);
+%PlotInd(Nation:,France,);
+%PlotInd(Nation:,Turkey,);
+%PlotInd(Nation:,Belgium,);
+%PlotInd(Nation:,Netherlands,);
+
 %PlotInd(Nation:,Germany,);
 %PlotInd(Nation:,Russia,);
 %PlotInd(Nation:,India,);
+%PlotInd(Nation:,Japan,);
+
+
+/* proc sql; */
+/* select country_region, sum(confirmed) as confirmed from  WORK.JHU_CORE_LOC_CENSUS_ICU_SUMMARY  */
+/* group by country_region; */
+/* quit; */
 

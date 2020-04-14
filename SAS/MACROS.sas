@@ -20,7 +20,7 @@ run;
 		proc sql;
 			insert into JHU_CORE_TS
 				(location,filedate, confirmed, deaths) 
-				values ("&loca","&date",&conf,&death);
+				values ("&loca",&date,&conf,&death);
 		quit;
 		%recalculate_JHU_Summary;
 	%end;
@@ -109,15 +109,27 @@ run;
 				Recovered
 			;
 		%end;
+		
+		
+		/* Data Correction */
+		if country_region="UK" or province_state="United Kingdom" then do;
+			Country_region='United Kingdom';
+			province_state='';
+		end;
+		
+		
 	 	st_filedate="&outdataset";
 	 	filedate=mdy(substr(st_filedate,5,2),substr(st_filedate,7,2),substr(st_filedate,1,4));
 		format filedate yymmdd10.;
 	 	label filedate="File Date";
 	 	fips = put(fipstemp,fipsfive.);
 	 	drop fipstemp;
+	 	
+	 	
 	 	if province_state = "" then Location=cats("Nation:",country_region);
 		else location = cats(province_state," - ",country_region);
 		plotlabel_date = cats(location,":",substr(filedate,5,2),"/",substr(filedate,7,2));
+
 
 	run;  
 	%if &typer=2 %then %do;
@@ -213,10 +225,13 @@ run;
 		order by fips,location,filedate
 			,stname
 			,ctyname;
-
+	quit;
+%mend;
+%macro recalculate_JHU_Summary;
+	proc sql;
 		create table JHU_CORE_LOC_CENSUS_ICU_SUMMARY as	
 			select 
-			    jhu.fips label="FIPS"
+			     jhu.fips label="FIPS"
 			    ,jhu.province_state
 			    ,jhu.country_region
 				,location label="Location"
@@ -227,10 +242,9 @@ run;
 				,deaths label="Deaths"
 				,recovered label="Recovered"
 				,pop.census2010pop as population_estimate label="County Population"
-				,sum(deaths)/sum(confirmed) as emp_fatality_rate format=percent7.5 label="Fatality Rate"
-				,sum(confirmed)/max(pop.census2010pop) as confirmed_percapita format=percent7.5 label="Infections Per Capita"
-				,sum(deaths)/max(pop.census2010pop) as deaths_percapita format=percent7.5 label="Deaths Per Capita"
-
+				,deaths/confirmed as emp_fatality_rate format=percent7.5 label="Fatality Rate"
+				,confirmed/pop.census2010pop as confirmed_percapita format=percent7.5 label="Infections Per Capita"
+				,deaths/pop.census2010pop as deaths_percapita format=percent7.5 label="Deaths Per Capita"
 				,case when hospitals=. then 0 else hospitals end as county_hospitals label="County Hospitals"
 				,case when icu_beds =. then 0 else icu_beds  end as county_icu_beds  label="County ICU Beds"
 				from(
@@ -250,12 +264,7 @@ run;
 				)
 			left join fips.ICU_BEDS icu
 			on jhu.fips = icu.fips;
-	
 
-	quit;
-%mend;
-%macro recalculate_JHU_Summary;
-	proc sql;
 		create table JHU_CORE_TS_ICU_census as
 			select 
 				fips
@@ -380,7 +389,7 @@ run;
 	%put NOTE: Running &region_name [&prefix, &pvs, &suffix] for "&location";
 	
 	/* this is a stub that will add data from the runner program*/
-	%AddData(&add_typer,&location,&add_date,&add_confirmed,&add_deaths);
+/* 	%AddData(&add_typer,&location,&add_date,&add_confirmed,&add_deaths); */
 	
 	proc sql;
 		create table temp_summary as
@@ -448,11 +457,14 @@ run;
 		
 		
 		proc sgplot data=&region_name._summary nocycleattrs ;
+			format filedate mmddyy5.
+			   dif_confirmed comma10.
+			   dif_deaths comma10.;
 			vbar  filedate / response=dif_confirmed stat=sum ;
 			vline filedate / response=dif_deaths stat=sum y2axis;
 			yaxis ; 
 			y2axis ;
-			xaxis  valueattrs=(size=5);
+			xaxis  valueattrs=(size=5) fitpolicy=rotatethin;
 			keylegend / location=outside;
 		run;	
 		
@@ -463,22 +475,24 @@ run;
 		
 	
 		proc sgplot data=plotstack nocycleattrs dattrmap=attrmap;
+			format filedate mmddyy5.
+			   stack comma10.;
 			label filedate="File Date"
 				  stack="Value"
 				  lab="Measure";
-			format stack comma11.;
-			format filedate yymmdd10.;
 			vbar filedate / response=stack stat=sum group=lab transparency=.15 attrid=myid
 			tip=(filedate lab stack) 
 			tiplabel=("Date" "Type" "Value") 
 			tipformat= (yymmdd10. $20. comma10.);
 			yaxis ; 
-			xaxis  valueattrs=(size=6) ;
+			xaxis valuesformat=mmddyy5. valueattrs=(size=6) fitpolicy=rotatethin;
 			keylegend / location=outside;
 		run;
 		
-		
-		proc sgplot data=&region_name._summary nocycleattrs;
+		proc sgplot data=&region_name._summary ;
+			format filedate mmddyy5.
+			   confirmed comma10.
+			   deaths comma10.;
 			scatter y=confirmed x=filedate  /
 				FILLEDOUTLINEDMARKERS 
 				MARKERFILLATTRS=(color='CX6599C9') 
@@ -498,7 +512,7 @@ run;
 				legendlabel=" ";
 			yaxis ; 
 			y2axis ;
-			xaxis  valueattrs=(size=5);
+			xaxis type=discrete fitpolicy=rotatethin valueattrs=(size=5)	valuesformat=mmddyy5. valuesrotate=diagonal ;
 			keylegend / location=outside;
 		run;
 	ods html5 close;
@@ -531,7 +545,7 @@ run;
 		proc sql noprint; select max(timeperiod), max(filedate),min(filedate) into :maxtime,:maxdate,:mindate from PreppedForNLIN; 
 	quit; 
 	 
-	%put NOTE: We found for &region that the last filedate was [&mindate,&maxdate] and the last timeperiod was &maxtime; 
+	%put NOTE: We found for &region_name that the last filedate was [&mindate,&maxdate] and the last timeperiod was &maxtime; 
 	 
 	/* Run nonlinear curve fitting - save the model out for forecasting */ 
 	%let alphalab=%sysevalf(100*(1-&alpha)); %put [&alphalab];  
@@ -611,7 +625,6 @@ run;
 %macro cleanupds;
 	proc contents data=work._all_ out =workds ;run;
 	proc sql noprint; select distinct memname into :delds separated by ' ' from workds where substr(memname,1,5)='JHU20'; quit;
-	
 	%put NOTE: Deleteing &delds; 
 	proc delete data=&delds workds; run;
 %mend;

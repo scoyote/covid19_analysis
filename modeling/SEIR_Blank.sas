@@ -6,12 +6,13 @@
 /* %LET GAMMA					=0.2;	/* The rate an infected recovers and moves into the resistant phase. */
 /* %LET SIGMA					=0.5;	/* The rate at which an exposed person becomes infective */
 /* %LET MU						=0;		/* The natural mortality rate (this is unrelated to disease). This models a population of a constant size */
-%LET INITIAL_SUSCEPTIBLE	=10;	/* The number of susceptible individuals at the beginning of the model run.*/
+%LET INITIAL_SUSCEPTIBLE	=1000;	/* The number of susceptible individuals at the beginning of the model run.*/
 %LET INITIAL_EXPOSED		=1;		/* The number of exposed individuals at the beginning of the model run. */
-%LET INITIAL_INFECTED		=0;		/* The number of infected individuals at the beginning of the model run. */
+%LET INITIAL_INFECTED		=1;		/* The number of infected individuals at the beginning of the model run. */
 %LET INITIAL_RECOVERED		=0;		/* The number of recovered individuals at the beginning of the model run.*/
 %LET DAYS					=30; 	/* Controls how long the model will run*/
 
+/* http://gabgoh.github.io/COVID/ */
 DATA D_SCAFFOLD(Label="Initial Conditions of Simulation"); 
 	S_T = &INITIAL_SUSCEPTIBLE;	* - (&INITIAL_INFECTED/&BETA) - &GAMMA;
 	E_T = &INITIAL_EXPOSED;
@@ -25,7 +26,6 @@ RUN;
 PROC MODEL DATA = D_SCAFFOLD plots=NONE; 
 	PARAMETERS
 		N 		&INITIAL_SUSCEPTIBLE
-		NU 		&nu
 		R0		2
 		inf		3
 		lat		1

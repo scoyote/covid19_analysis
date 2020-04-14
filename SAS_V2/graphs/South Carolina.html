@@ -1,0 +1,2466 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta content="SAS 9.4" name="generator"/>
+<title>SAS Output</title>
+<style>
+/*<![CDATA[*/
+.body.c > table, .body.c > pre, .body.c div > table,
+.body.c div > pre, .body.c > table, .body.c > pre,
+.body.j > table, .body.j > pre, .body.j div > table,
+.body.j div > pre, .body.j > table, .body.j > pre,
+.body.c p.note, .body.c p.warning, .body.c p.error, .body.c p.fatal,
+.body.j p.note, .body.j p.warning, .body.j p.error, .body.j p.fatal,
+.body.c > table.layoutcontainer, .body.j > table.layoutcontainer { margin-left: auto; margin-right: auto }
+.layoutregion.l table, .layoutregion.l pre, .layoutregion.l p.note,
+.layoutregion.l p.warning, .layoutregion.l p.error, .layoutregion.l p.fatal { margin-left: 0 }
+.layoutregion.c table, .layoutregion.c pre, .layoutregion.c p.note,
+.layoutregion.c p.warning, .layoutregion.c p.error, .layoutregion.c p.fatal { margin-left: auto; margin-right: auto }
+.layoutregion.r table, .layoutregion.r pre, .layoutregion.r p.note,
+.layoutregion.r table, .layoutregion.r pre, .layoutregion.r p.note,
+.layoutregion.r p.warning, .layoutregion.r p.error, .layoutregion.r p.fatal { margin-right: 0 }
+article, aside, details, figcaption, figure, footer, header, hgroup, nav, section { display: block }
+html{ font-size: 100% }
+.body { margin: 1em; font-size: 13px; line-height: 1.231 }
+sup { position: relative; vertical-align: baseline; bottom: 0.25em; font-size: 0.8em }
+sub { position: relative; vertical-align: baseline; top: 0.25em; font-size: 0.8em }
+ul, ol { margin: 1em 0; padding: 0 0 0 40px }
+dd { margin: 0 0 0 40px }
+nav ul, nav ol { list-style: none; list-style-image: none; margin: 0; padding: 0 }
+img { border: 0; vertical-align: middle }
+svg:not(:root) { overflow: hidden }
+figure { margin: 0 }
+table { border-collapse: collapse; border-spacing: 0 }
+.layoutcontainer { border-collapse: separate; border-spacing: 0 }
+p { margin-top: 0; text-align: left }
+h1.heading1 { text-align: left }
+h2.heading2 { text-align: left }
+h3.heading3 { text-align: left }
+h4.heading4 { text-align: left }
+h5.heading5 { text-align: left }
+h6.heading6 { text-align: left }
+span { text-align: left }
+table { margin-bottom: 1em }
+td, th { text-align: left; padding: 3px 6px; vertical-align: top }
+td[class$="fixed"], th[class$="fixed"] { white-space: pre }
+section, article { padding-top: 1px; padding-bottom: 8px }
+hr.pagebreak { height: 0px; border: 0; border-bottom: 1px solid #c0c0c0; margin: 1em 0 }
+.stacked-value { text-align: left; display: block }
+.stacked-cell > .stacked-value, td.data > td.data, th.data > td.data, th.data > th.data, td.data > th.data, th.header > th.header { border: 0 }
+.stacked-cell > div.data { border-width: 0 }
+.systitleandfootercontainer { white-space: nowrap; margin-bottom: 1em }
+.systitleandfootercontainer > p { margin: 0 }
+.systitleandfootercontainer > p > span { display: inline-block; width: 100%; white-space: normal }
+.batch { display: table }
+.toc { display: none }
+.proc_note_group, .proc_title_group { margin-bottom: 1em }
+p.proctitle { margin: 0 }
+p.note, p.warning, p.error, p.fatal { display: table }
+.notebanner, .warnbanner, .errorbanner, .fatalbanner,
+.notecontent, .warncontent, .errorcontent, .fatalcontent { display: table-cell; padding: 0.5em }
+.notebanner, .warnbanner, .errorbanner, .fatalbanner { padding-right: 0 }
+.body > div > ol li { text-align: left }
+.beforecaption > h4 { margin-top: 0; margin-bottom: 0 }
+.c { text-align: center }
+.r { text-align: right }
+.l { text-align: left }
+.j { text-align: justify }
+.d { text-align: right }
+.b { vertical-align: bottom }
+.m { vertical-align: middle }
+.t { vertical-align: top }
+.accessiblecaption {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+a:active { color: #800080 }
+.aftercaption {
+    background-color: #fafbfe;
+    border-spacing: 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+    padding-top: 4pt;
+}
+.batch > colgroup {
+    border-left: 1px solid #c1c1c1;
+    border-right: 1px solid #c1c1c1;
+}
+.batch > tbody, .batch > thead, .batch > tfoot {
+    border-top: 1px solid #c1c1c1;
+    border-bottom: 1px solid #c1c1c1;
+}
+.batch { border: hidden; }
+.batch {
+    background-color: #fafbfe;
+    border: 1px solid #c1c1c1;
+    border-collapse: separate;
+    border-spacing: 1px;
+    color: #000000;
+    font-family: 'SAS Monospace', 'Courier New', Courier, monospace;
+    font-size: 14pt;
+    font-style: normal;
+    font-weight: normal;
+    padding: 7px;
+    }
+.beforecaption {
+    background-color: #fafbfe;
+    border-spacing: 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.body {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    margin-left: 8px;
+    margin-right: 8px;
+}
+.bodydate {
+    background-color: #fafbfe;
+    border-spacing: 0;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    text-align: right;
+    vertical-align: top;
+    width: 100%;
+}
+.bycontentfolder {
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: none;
+    margin-left: 6pt;
+}
+.byline {
+    background-color: #fafbfe;
+    border-spacing: 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.bylinecontainer > col, .bylinecontainer > colgroup > col, .bylinecontainer > colgroup, .bylinecontainer > tr, .bylinecontainer > * > tr, .bylinecontainer > thead, .bylinecontainer > tbody, .bylinecontainer > tfoot { border: none; }
+.bylinecontainer {
+    background-color: #fafbfe;
+    border: none;
+    border-spacing: 1px;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    width: 100%;
+}
+.caption {
+    background-color: #fafbfe;
+    border-spacing: 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.cell, .container {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.contentfolder, .contentitem {
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: none;
+    margin-left: 6pt;
+}
+.contentproclabel, .contentprocname {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.contents {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: decimal;
+    margin-left: 8px;
+    margin-right: 8px;
+}
+.contentsdate {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    width: 100%;
+}
+.contenttitle {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: bold;
+}
+.continued {
+    background-color: #fafbfe;
+    border-spacing: 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+    width: 100%;
+}
+.data, .dataemphasis {
+    background-color: #ffffff;
+    border-color: #c1c1c1;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.dataemphasisfixed {
+    background-color: #ffffff;
+    border-color: #c1c1c1;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: normal;
+}
+.dataempty {
+    background-color: #ffffff;
+    border-color: #c1c1c1;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.datafixed {
+    background-color: #ffffff;
+    border-color: #c1c1c1;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    font-family: 'Courier New', Courier;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.datastrong {
+    background-color: #ffffff;
+    border-color: #c1c1c1;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.datastrongfixed {
+    background-color: #ffffff;
+    border-color: #c1c1c1;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #000000;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.date {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    width: 100%;
+}
+.document {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.errorbanner {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.errorcontent {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.errorcontentfixed {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Courier New', Courier;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.extendedpage {
+    background-color: #fafbfe;
+    border-style: solid;
+    border-width: 1pt;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: normal;
+    text-align: center;
+}
+.fatalbanner {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.fatalcontent {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.fatalcontentfixed {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Courier New', Courier;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.folderaction {
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: none;
+    margin-left: 6pt;
+}
+.footer {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.footeremphasis {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: normal;
+}
+.footeremphasisfixed {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: normal;
+}
+.footerempty {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.footerfixed {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Courier New', Courier;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.footerstrong {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.footerstrongfixed {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.frame {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.graph > colgroup {
+    border-left: 1px solid #c1c1c1;
+    border-right: 1px solid #c1c1c1;
+}
+.graph > tbody, .graph > thead, .graph > tfoot {
+    border-top: 1px solid #c1c1c1;
+    border-bottom: 1px solid #c1c1c1;
+}
+.graph { border: hidden; }
+.graph {
+    background-color: #fafbfe;
+    border: 1px solid #c1c1c1;
+    border-collapse: separate;
+    border-spacing: 1px;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    }
+.header {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.headeremphasis {
+    background-color: #d8dbd3;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: normal;
+}
+.headeremphasisfixed {
+    background-color: #d8dbd3;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #000000;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: normal;
+}
+.headerempty {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.headerfixed {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Courier New', Courier;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.headersandfooters {
+    background-color: #edf2f9;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.headerstrong {
+    background-color: #d8dbd3;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.headerstrongfixed {
+    background-color: #d8dbd3;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #000000;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.heading1, .heading2, .heading3, .heading4, .heading5, .heading6 { font-family: Arial, Helvetica, sans-serif }
+.index {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.indexaction, .indexitem {
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: none;
+    margin-left: 6pt;
+}
+.indexprocname {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.indextitle {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: bold;
+}
+.layoutcontainer, .layoutregion {
+    border-width: 0;
+    border-spacing: 30px;
+}
+.linecontent {
+    background-color: #fafbfe;
+    border-color: #c1c1c1;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+a:link { color: #0000ff }
+.list {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: disc;
+}
+.list10 {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: square;
+}
+.list2 {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: circle;
+}
+.list3, .list4, .list5, .list6, .list7, .list8, .list9 {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: square;
+}
+.listitem {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: disc;
+}
+.listitem10 {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: square;
+}
+.listitem2 {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: circle;
+}
+.listitem3, .listitem4, .listitem5, .listitem6, .listitem7, .listitem8, .listitem9 {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: square;
+}
+.note {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.notebanner {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.notecontent {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.notecontentfixed {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Courier New', Courier;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.output > colgroup {
+    border-left: 1px solid #c1c1c1;
+    border-right: 1px solid #c1c1c1;
+}
+.output > tbody, .output > thead, .output > tfoot {
+    border-top: 1px solid #c1c1c1;
+    border-bottom: 1px solid #c1c1c1;
+}
+.output { border: hidden; }
+.output {
+    background-color: #fafbfe;
+    border: 1px solid #c1c1c1;
+    border-collapse: separate;
+    border-spacing: 1px;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    }
+.pageno {
+    background-color: #fafbfe;
+    border-spacing: 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+    text-align: right;
+    vertical-align: top;
+}
+.pages {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: decimal;
+    margin-left: 8px;
+    margin-right: 8px;
+}
+.pagesdate {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    width: 100%;
+}
+.pagesitem {
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    list-style-type: none;
+    margin-left: 6pt;
+}
+.pagesproclabel, .pagesprocname {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.pagestitle {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: bold;
+}
+.paragraph {
+    background-color: #fafbfe;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.parskip > col, .parskip > colgroup > col, .parskip > colgroup, .parskip > tr, .parskip > * > tr, .parskip > thead, .parskip > tbody, .parskip > tfoot { border: none; }
+.parskip {
+    border: none;
+    border-spacing: 0;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+    }
+.prepage {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    text-align: left;
+}
+.proctitle {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.proctitlefixed {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.rowfooter {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.rowfooteremphasis {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: normal;
+}
+.rowfooteremphasisfixed {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: normal;
+}
+.rowfooterempty {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.rowfooterfixed {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Courier New', Courier;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.rowfooterstrong {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.rowfooterstrongfixed {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.rowheader {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.rowheaderemphasis {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: normal;
+}
+.rowheaderemphasisfixed {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: normal;
+}
+.rowheaderempty {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.rowheaderfixed {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Courier New', Courier;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.rowheaderstrong {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.rowheaderstrongfixed {
+    background-color: #edf2f9;
+    border-color: #b0b7bb;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #112277;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.systemfooter, .systemfooter10, .systemfooter2, .systemfooter3, .systemfooter4, .systemfooter5, .systemfooter6, .systemfooter7, .systemfooter8, .systemfooter9 {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.systemtitle, .systemtitle10, .systemtitle2, .systemtitle3, .systemtitle4, .systemtitle5, .systemtitle6, .systemtitle7, .systemtitle8, .systemtitle9 {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: bold;
+}
+.systitleandfootercontainer > col, .systitleandfootercontainer > colgroup > col, .systitleandfootercontainer > colgroup, .systitleandfootercontainer > tr, .systitleandfootercontainer > * > tr, .systitleandfootercontainer > thead, .systitleandfootercontainer > tbody, .systitleandfootercontainer > tfoot { border: none; }
+.systitleandfootercontainer {
+    background-color: #fafbfe;
+    border: none;
+    border-spacing: 1px;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    width: 100%;
+}
+.table > col, .table > colgroup > col {
+    border-left: 1px solid #c1c1c1;
+    border-right: 0 solid #c1c1c1;
+}
+.table > tr, .table > * > tr {
+    border-top: 1px solid #c1c1c1;
+    border-bottom: 0 solid #c1c1c1;
+}
+.table { border: hidden; }
+.table {
+    border-color: #c1c1c1;
+    border-style: solid;
+    border-width: 1px 0 0 1px;
+    border-collapse: collapse;
+    border-spacing: 0;
+    }
+.titleandnotecontainer > col, .titleandnotecontainer > colgroup > col, .titleandnotecontainer > colgroup, .titleandnotecontainer > tr, .titleandnotecontainer > * > tr, .titleandnotecontainer > thead, .titleandnotecontainer > tbody, .titleandnotecontainer > tfoot { border: none; }
+.titleandnotecontainer {
+    background-color: #fafbfe;
+    border: none;
+    border-spacing: 1px;
+    color: #000000;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    width: 100%;
+}
+.titlesandfooters {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.usertext {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+a:visited { color: #800080 }
+.warnbanner {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: bold;
+}
+.warncontent {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Avenir Next for SAS', Arial, 'Albany AMT', Helvetica, Helv;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+.warncontentfixed {
+    background-color: #fafbfe;
+    color: #112277;
+    font-family: 'Courier New', Courier;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+}
+/*]]>*/
+</style>
+</head>
+<body class="c body">
+<div style="padding-bottom: 8px; padding-top: 1px">
+<div id="IDX" style="padding-bottom: 8px; padding-top: 1px">
+<map id="SGPlot" name="SGPlot"><Area shape="poly" alt=" File Date = 04/12 
+ New Deaths = 2" title=" File Date = 04/12 
+ New Deaths = 2" coords="628,243,638,294,640,294,630,243,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+ New Deaths = 8" title=" File Date = 04/11 
+ New Deaths = 8" coords="619,192,628,243,630,243,621,192,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+ New Deaths = 8" title=" File Date = 04/11 
+ New Deaths = 8" coords="609,218,619,192,621,192,611,218,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+ New Deaths = 5" title=" File Date = 04/10 
+ New Deaths = 5" coords="599,243,609,218,611,218,601,243,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+ New Deaths = 5" title=" File Date = 04/10 
+ New Deaths = 5" coords="590,150,599,243,601,243,592,150,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+ New Deaths = 16" title=" File Date = 04/09 
+ New Deaths = 16" coords="580,56,590,150,592,150,582,56,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+ New Deaths = 16" title=" File Date = 04/09 
+ New Deaths = 16" coords="571,192,580,56,582,56,573,192,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+ New Deaths = 0" title=" File Date = 04/08 
+ New Deaths = 0" coords="561,328,571,192,573,192,563,328,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+ New Deaths = 0" title=" File Date = 04/08 
+ New Deaths = 0" coords="552,302,561,328,563,328,554,302,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+ New Deaths = 3" title=" File Date = 04/07 
+ New Deaths = 3" coords="542,277,552,302,554,302,544,277,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+ New Deaths = 3" title=" File Date = 04/07 
+ New Deaths = 3" coords="533,269,542,278,544,276,535,267,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+ New Deaths = 4" title=" File Date = 04/06 
+ New Deaths = 4" coords="523,261,533,269,535,267,525,259,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+ New Deaths = 4" title=" File Date = 04/06 
+ New Deaths = 4" coords="515,259,524,259,524,261,515,261,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+ New Deaths = 4" title=" File Date = 04/05 
+ New Deaths = 4" coords="505,259,515,259,515,261,505,261,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+ New Deaths = 4" title=" File Date = 04/05 
+ New Deaths = 4" coords="495,243,504,260,506,260,497,243,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+ New Deaths = 6" title=" File Date = 04/04 
+ New Deaths = 6" coords="485,227,495,244,497,242,487,225,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+ New Deaths = 6" title=" File Date = 04/04 
+ New Deaths = 6" coords="475,251,485,226,487,226,477,251,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+ New Deaths = 3" title=" File Date = 04/03 
+ New Deaths = 3" coords="466,277,475,251,477,251,468,277,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+ New Deaths = 3" title=" File Date = 04/03 
+ New Deaths = 3" coords="456,261,466,278,468,276,458,259,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+ New Deaths = 5" title=" File Date = 04/02 
+ New Deaths = 5" coords="447,243,456,260,458,260,449,243,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+ New Deaths = 5" title=" File Date = 04/02 
+ New Deaths = 5" coords="437,250,447,242,449,244,439,252,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+ New Deaths = 4" title=" File Date = 04/01 
+ New Deaths = 4" coords="428,259,437,250,439,252,430,261,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+ New Deaths = 4" title=" File Date = 04/01 
+ New Deaths = 4" coords="419,259,429,259,429,261,419,261,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+ New Deaths = 4" title=" File Date = 03/31 
+ New Deaths = 4" coords="410,259,419,259,419,261,410,261,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+ New Deaths = 4" title=" File Date = 03/31 
+ New Deaths = 4" coords="399,276,409,259,411,261,401,278,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+ New Deaths = 2" title=" File Date = 03/30 
+ New Deaths = 2" coords="390,294,399,277,401,277,392,294,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+ New Deaths = 2" title=" File Date = 03/30 
+ New Deaths = 2" coords="380,301,390,293,392,295,382,303,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+ New Deaths = 1" title=" File Date = 03/29 
+ New Deaths = 1" coords="371,310,380,301,382,303,373,312,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+ New Deaths = 1" title=" File Date = 03/29 
+ New Deaths = 1" coords="361,303,371,312,373,310,363,301,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+ New Deaths = 2" title=" File Date = 03/28 
+ New Deaths = 2" coords="351,295,361,303,363,301,353,293,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+ New Deaths = 2" title=" File Date = 03/28 
+ New Deaths = 2" coords="342,277,351,294,353,294,344,277,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+ New Deaths = 4" title=" File Date = 03/27 
+ New Deaths = 4" coords="332,261,342,278,344,276,334,259,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+ New Deaths = 4" title=" File Date = 03/27 
+ New Deaths = 4" coords="323,277,332,260,334,260,325,277,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+ New Deaths = 2" title=" File Date = 03/26 
+ New Deaths = 2" coords="313,293,323,276,325,278,315,295,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+ New Deaths = 2" title=" File Date = 03/26 
+ New Deaths = 2" coords="305,293,314,293,314,295,305,295,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+ New Deaths = 2" title=" File Date = 03/25 
+ New Deaths = 2" coords="295,293,305,293,305,295,295,295,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+ New Deaths = 2" title=" File Date = 03/25 
+ New Deaths = 2" coords="285,311,294,294,296,294,287,311,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+ New Deaths = 0" title=" File Date = 03/24 
+ New Deaths = 0" coords="275,327,285,310,287,312,277,329,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+ New Deaths = 0" title=" File Date = 03/24 
+ New Deaths = 0" coords="266,311,275,328,277,328,268,311,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+ New Deaths = 2" title=" File Date = 03/23 
+ New Deaths = 2" coords="256,295,266,312,268,310,258,293,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+ New Deaths = 2" title=" File Date = 03/23 
+ New Deaths = 2" coords="247,311,256,294,258,294,249,311,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+ New Deaths = 0" title=" File Date = 03/22 
+ New Deaths = 0" coords="237,327,247,310,249,312,239,329,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+ New Deaths = 0" title=" File Date = 03/22 
+ New Deaths = 0" coords="228,327,238,327,238,329,228,329,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+ New Deaths = 0" title=" File Date = 03/21 
+ New Deaths = 0" coords="219,327,228,327,228,329,219,329,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+ New Deaths = 0" title=" File Date = 03/21 
+ New Deaths = 0" coords="208,312,218,329,220,327,210,310,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+ New Deaths = 2" title=" File Date = 03/20 
+ New Deaths = 2" coords="199,294,208,311,210,311,201,294,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+ New Deaths = 2" title=" File Date = 03/20 
+ New Deaths = 2" coords="189,310,199,293,201,295,191,312,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+ New Deaths = 0" title=" File Date = 03/19 
+ New Deaths = 0" coords="180,328,189,311,191,311,182,328,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+ New Deaths = 0" title=" File Date = 03/19 
+ New Deaths = 0" coords="171,327,181,327,181,329,171,329,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+ New Deaths = 0" title=" File Date = 03/18 
+ New Deaths = 0" coords="162,327,171,327,171,329,162,329,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+ New Deaths = 0" title=" File Date = 03/18 
+ New Deaths = 0" coords="152,327,162,327,162,329,152,329,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+ New Deaths = 0" title=" File Date = 03/17 
+ New Deaths = 0" coords="143,327,152,327,152,329,143,329,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+ New Deaths = 0" title=" File Date = 03/17 
+ New Deaths = 0" coords="132,320,142,329,144,327,134,318,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+ New Deaths = 1" title=" File Date = 03/16 
+ New Deaths = 1" coords="123,312,132,320,134,318,125,310,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+ New Deaths = 1" title=" File Date = 03/16 
+ New Deaths = 1" coords="113,318,123,310,125,312,115,320,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+ New Deaths = -0" title=" File Date = 03/15 
+ New Deaths = -0" coords="103,327,113,318,115,320,105,329,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+ New Deaths = -0" title=" File Date = 03/15 
+ New Deaths = -0" coords="95,327,104,327,104,329,95,329,"/>
+<Area shape="poly" alt=" File Date = 03/14 
+ New Deaths = 0" title=" File Date = 03/14 
+ New Deaths = 0" coords="85,327,95,327,95,329,85,329,"/>
+<Area shape="poly" alt=" File Date = 04/12 
+ New Confirmed = 109" title=" File Date = 04/12 
+ New Confirmed = 109" coords="631,254,648,254,648,329,631,329,631,254,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+ New Confirmed = 144" title=" File Date = 04/11 
+ New Confirmed = 144" coords="612,231,629,231,629,329,612,329,612,231,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+ New Confirmed = 274" title=" File Date = 04/10 
+ New Confirmed = 274" coords="593,142,610,142,610,329,593,329,593,142,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+ New Confirmed = 376" title=" File Date = 04/09 
+ New Confirmed = 376" coords="574,73,591,73,591,329,574,329,574,73,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+ New Confirmed = 0" title=" File Date = 04/08 
+ New Confirmed = 0" coords="555,328,572,328,572,329,555,329,555,328,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+ New Confirmed = 185" title=" File Date = 04/07 
+ New Confirmed = 185" coords="536,203,553,203,553,329,536,329,536,203,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+ New Confirmed = 183" title=" File Date = 04/06 
+ New Confirmed = 183" coords="517,204,534,204,534,329,517,329,517,204,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+ New Confirmed = 132" title=" File Date = 04/05 
+ New Confirmed = 132" coords="497,239,515,239,515,329,497,329,497,239,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+ New Confirmed = 217" title=" File Date = 04/04 
+ New Confirmed = 217" coords="478,181,496,181,496,329,478,329,478,181,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+ New Confirmed = 146" title=" File Date = 04/03 
+ New Confirmed = 146" coords="459,229,477,229,477,329,459,329,459,229,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+ New Confirmed = 261" title=" File Date = 04/02 
+ New Confirmed = 261" coords="440,151,457,151,457,329,440,329,440,151,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+ New Confirmed = 210" title=" File Date = 04/01 
+ New Confirmed = 210" coords="421,186,438,186,438,329,421,329,421,186,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+ New Confirmed = 158" title=" File Date = 03/31 
+ New Confirmed = 158" coords="402,221,419,221,419,329,402,329,402,221,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+ New Confirmed = 151" title=" File Date = 03/30 
+ New Confirmed = 151" coords="383,226,400,226,400,329,383,329,383,226,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+ New Confirmed = 114" title=" File Date = 03/29 
+ New Confirmed = 114" coords="364,251,381,251,381,329,364,329,364,251,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+ New Confirmed = 118" title=" File Date = 03/28 
+ New Confirmed = 118" coords="345,248,362,248,362,329,345,329,345,248,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+ New Confirmed = 118" title=" File Date = 03/27 
+ New Confirmed = 118" coords="326,248,343,248,343,329,326,329,326,248,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+ New Confirmed = 0" title=" File Date = 03/26 
+ New Confirmed = 0" coords="307,328,324,328,324,329,307,329,307,328,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+ New Confirmed = 82" title=" File Date = 03/25 
+ New Confirmed = 82" coords="288,273,305,273,305,329,288,329,288,273,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+ New Confirmed = 44" title=" File Date = 03/24 
+ New Confirmed = 44" coords="269,298,286,298,286,329,269,329,269,298,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+ New Confirmed = 102" title=" File Date = 03/23 
+ New Confirmed = 102" coords="249,259,267,259,267,329,249,329,249,259,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+ New Confirmed = 22" title=" File Date = 03/22 
+ New Confirmed = 22" coords="230,313,248,313,248,329,230,329,230,313,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+ New Confirmed = 48" title=" File Date = 03/21 
+ New Confirmed = 48" coords="211,296,229,296,229,329,211,329,211,296,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+ New Confirmed = 46" title=" File Date = 03/20 
+ New Confirmed = 46" coords="192,297,209,297,209,329,192,329,192,297,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+ New Confirmed = 20" title=" File Date = 03/19 
+ New Confirmed = 20" coords="173,315,190,315,190,329,173,329,173,315,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+ New Confirmed = 13" title=" File Date = 03/18 
+ New Confirmed = 13" coords="154,319,171,319,171,329,154,329,154,319,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+ New Confirmed = 17" title=" File Date = 03/17 
+ New Confirmed = 17" coords="135,317,152,317,152,329,135,329,135,317,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+ New Confirmed = 11" title=" File Date = 03/16 
+ New Confirmed = 11" coords="116,321,133,321,133,329,116,329,116,321,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+ New Confirmed = 0" title=" File Date = 03/15 
+ New Confirmed = 0" coords="97,328,114,328,114,329,97,329,97,328,"/>
+<Area shape="poly" alt=" File Date = 03/14 
+ New Confirmed = 11" title=" File Date = 03/14 
+ New Confirmed = 11" coords="78,321,95,321,95,329,78,329,78,321,"/>
+</map>
+<div class="c">
+<img style="height: 480px; width: 720px" alt="South Carolina New Cases and Deaths" src="graphs/SGPlot.png" usemap="#SGPlot"/>
+</div>
+</div>
+</div>
+<div style="padding-bottom: 8px; padding-top: 1px">
+<hr class="pagebreak"/>
+<div id="IDX1" style="padding-bottom: 8px; padding-top: 1px">
+<map id="SGPlot1" name="SGPlot1"><Area shape="poly" alt=" File Date = 04/12 
+  New Deaths: Seven Day Moving Average = 38" title=" File Date = 04/12 
+  New Deaths: Seven Day Moving Average = 38" coords="628,85,638,91,640,89,630,83,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+  New Deaths: Seven Day Moving Average = 40" title=" File Date = 04/11 
+  New Deaths: Seven Day Moving Average = 40" coords="619,78,628,85,630,83,621,76,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+  New Deaths: Seven Day Moving Average = 40" title=" File Date = 04/11 
+  New Deaths: Seven Day Moving Average = 40" coords="610,83,619,76,621,78,612,85,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+  New Deaths: Seven Day Moving Average = 38" title=" File Date = 04/10 
+  New Deaths: Seven Day Moving Average = 38" coords="600,89,610,83,612,85,602,91,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+  New Deaths: Seven Day Moving Average = 38" title=" File Date = 04/10 
+  New Deaths: Seven Day Moving Average = 38" coords="591,95,600,89,602,91,593,97,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+  New Deaths: Seven Day Moving Average = 36" title=" File Date = 04/09 
+  New Deaths: Seven Day Moving Average = 36" coords="581,101,591,95,593,97,583,103,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+  New Deaths: Seven Day Moving Average = 36" title=" File Date = 04/09 
+  New Deaths: Seven Day Moving Average = 36" coords="572,137,581,102,583,102,574,137,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+  New Deaths: Seven Day Moving Average = 25" title=" File Date = 04/08 
+  New Deaths: Seven Day Moving Average = 25" coords="563,171,572,137,574,137,565,171,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+  New Deaths: Seven Day Moving Average = 25" title=" File Date = 04/08 
+  New Deaths: Seven Day Moving Average = 25" coords="553,160,563,172,565,170,555,158,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+  New Deaths: Seven Day Moving Average = 29" title=" File Date = 04/07 
+  New Deaths: Seven Day Moving Average = 29" coords="544,147,553,160,555,158,546,145,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+  New Deaths: Seven Day Moving Average = 29" title=" File Date = 04/07 
+  New Deaths: Seven Day Moving Average = 29" coords="536,144,545,147,545,145,536,142,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+  New Deaths: Seven Day Moving Average = 30" title=" File Date = 04/06 
+  New Deaths: Seven Day Moving Average = 30" coords="526,141,536,144,536,142,526,139,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+  New Deaths: Seven Day Moving Average = 30" title=" File Date = 04/06 
+  New Deaths: Seven Day Moving Average = 30" coords="516,145,525,139,527,141,518,147,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+  New Deaths: Seven Day Moving Average = 28" title=" File Date = 04/05 
+  New Deaths: Seven Day Moving Average = 28" coords="506,151,516,145,518,147,508,153,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+  New Deaths: Seven Day Moving Average = 28" title=" File Date = 04/05 
+  New Deaths: Seven Day Moving Average = 28" coords="497,161,506,151,508,153,499,163,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+  New Deaths: Seven Day Moving Average = 25" title=" File Date = 04/04 
+  New Deaths: Seven Day Moving Average = 25" coords="488,170,497,161,499,163,490,172,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+  New Deaths: Seven Day Moving Average = 25" title=" File Date = 04/04 
+  New Deaths: Seven Day Moving Average = 25" coords="478,183,488,170,490,172,480,185,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+  New Deaths: Seven Day Moving Average = 21" title=" File Date = 04/03 
+  New Deaths: Seven Day Moving Average = 21" coords="469,195,478,183,480,185,471,197,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+  New Deaths: Seven Day Moving Average = 21" title=" File Date = 04/03 
+  New Deaths: Seven Day Moving Average = 21" coords="461,194,470,197,470,195,461,192,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+  New Deaths: Seven Day Moving Average = 22" title=" File Date = 04/02 
+  New Deaths: Seven Day Moving Average = 22" coords="451,191,461,194,461,192,451,189,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+  New Deaths: Seven Day Moving Average = 22" title=" File Date = 04/02 
+  New Deaths: Seven Day Moving Average = 22" coords="441,198,450,189,452,191,443,200,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+  New Deaths: Seven Day Moving Average = 19" title=" File Date = 04/01 
+  New Deaths: Seven Day Moving Average = 19" coords="432,208,441,198,443,200,434,210,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+  New Deaths: Seven Day Moving Average = 19" title=" File Date = 04/01 
+  New Deaths: Seven Day Moving Average = 19" coords="422,214,432,208,434,210,424,216,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+  New Deaths: Seven Day Moving Average = 17" title=" File Date = 03/31 
+  New Deaths: Seven Day Moving Average = 17" coords="413,220,422,214,424,216,415,222,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+  New Deaths: Seven Day Moving Average = 17" title=" File Date = 03/31 
+  New Deaths: Seven Day Moving Average = 17" coords="403,233,413,220,415,222,405,235,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+  New Deaths: Seven Day Moving Average = 13" title=" File Date = 03/30 
+  New Deaths: Seven Day Moving Average = 13" coords="394,245,403,233,405,235,396,247,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+  New Deaths: Seven Day Moving Average = 13" title=" File Date = 03/30 
+  New Deaths: Seven Day Moving Average = 13" coords="386,245,395,245,395,247,386,247,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+  New Deaths: Seven Day Moving Average = 13" title=" File Date = 03/29 
+  New Deaths: Seven Day Moving Average = 13" coords="376,245,386,245,386,247,376,247,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+  New Deaths: Seven Day Moving Average = 13" title=" File Date = 03/29 
+  New Deaths: Seven Day Moving Average = 13" coords="367,249,376,245,376,247,367,251,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+  New Deaths: Seven Day Moving Average = 12" title=" File Date = 03/28 
+  New Deaths: Seven Day Moving Average = 12" coords="358,252,367,249,367,251,358,254,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+  New Deaths: Seven Day Moving Average = 12" title=" File Date = 03/28 
+  New Deaths: Seven Day Moving Average = 12" coords="347,258,357,252,359,254,349,260,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+  New Deaths: Seven Day Moving Average = 10" title=" File Date = 03/27 
+  New Deaths: Seven Day Moving Average = 10" coords="338,264,347,258,349,260,340,266,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+  New Deaths: Seven Day Moving Average = 10" title=" File Date = 03/27 
+  New Deaths: Seven Day Moving Average = 10" coords="329,270,338,264,340,266,331,272,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+  New Deaths: Seven Day Moving Average = 8" title=" File Date = 03/26 
+  New Deaths: Seven Day Moving Average = 8" coords="319,277,329,270,331,272,321,279,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+  New Deaths: Seven Day Moving Average = 8" title=" File Date = 03/26 
+  New Deaths: Seven Day Moving Average = 8" coords="310,283,319,277,321,279,312,285,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+  New Deaths: Seven Day Moving Average = 6" title=" File Date = 03/25 
+  New Deaths: Seven Day Moving Average = 6" coords="300,289,310,283,312,285,302,291,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+  New Deaths: Seven Day Moving Average = 6" title=" File Date = 03/25 
+  New Deaths: Seven Day Moving Average = 6" coords="291,296,300,289,302,291,293,298,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+  New Deaths: Seven Day Moving Average = 4" title=" File Date = 03/24 
+  New Deaths: Seven Day Moving Average = 4" coords="282,302,291,296,293,298,284,304,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+  New Deaths: Seven Day Moving Average = 4" title=" File Date = 03/24 
+  New Deaths: Seven Day Moving Average = 4" coords="273,302,283,302,283,304,273,304,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+  New Deaths: Seven Day Moving Average = 4" title=" File Date = 03/23 
+  New Deaths: Seven Day Moving Average = 4" coords="264,302,273,302,273,304,264,304,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+  New Deaths: Seven Day Moving Average = 4" title=" File Date = 03/23 
+  New Deaths: Seven Day Moving Average = 4" coords="255,305,264,302,264,304,255,307,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+  New Deaths: Seven Day Moving Average = 3" title=" File Date = 03/22 
+  New Deaths: Seven Day Moving Average = 3" coords="245,308,255,305,255,307,245,310,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+  New Deaths: Seven Day Moving Average = 3" title=" File Date = 03/22 
+  New Deaths: Seven Day Moving Average = 3" coords="236,308,245,308,245,310,236,310,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+  New Deaths: Seven Day Moving Average = 3" title=" File Date = 03/21 
+  New Deaths: Seven Day Moving Average = 3" coords="227,308,236,308,236,310,227,310,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+  New Deaths: Seven Day Moving Average = 3" title=" File Date = 03/21 
+  New Deaths: Seven Day Moving Average = 3" coords="217,308,227,308,227,310,217,310,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+  New Deaths: Seven Day Moving Average = 3" title=" File Date = 03/20 
+  New Deaths: Seven Day Moving Average = 3" coords="208,308,217,308,217,310,208,310,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+  New Deaths: Seven Day Moving Average = 3" title=" File Date = 03/20 
+  New Deaths: Seven Day Moving Average = 3" coords="197,314,207,308,209,310,199,316,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+  New Deaths: Seven Day Moving Average = 1" title=" File Date = 03/19 
+  New Deaths: Seven Day Moving Average = 1" coords="188,321,197,314,199,316,190,323,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+  New Deaths: Seven Day Moving Average = 1" title=" File Date = 03/19 
+  New Deaths: Seven Day Moving Average = 1" coords="180,321,189,321,189,323,180,323,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+  New Deaths: Seven Day Moving Average = 1" title=" File Date = 03/18 
+  New Deaths: Seven Day Moving Average = 1" coords="170,321,180,321,180,323,170,323,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+  New Deaths: Seven Day Moving Average = 1" title=" File Date = 03/18 
+  New Deaths: Seven Day Moving Average = 1" coords="161,321,170,321,170,323,161,323,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+  New Deaths: Seven Day Moving Average = 1" title=" File Date = 03/17 
+  New Deaths: Seven Day Moving Average = 1" coords="152,321,161,321,161,323,152,323,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+  New Deaths: Seven Day Moving Average = 1" title=" File Date = 03/17 
+  New Deaths: Seven Day Moving Average = 1" coords="142,321,152,321,152,323,142,323,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+  New Deaths: Seven Day Moving Average = 1" title=" File Date = 03/16 
+  New Deaths: Seven Day Moving Average = 1" coords="133,321,142,321,142,323,133,323,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+  New Deaths: Seven Day Moving Average = 1" title=" File Date = 03/16 
+  New Deaths: Seven Day Moving Average = 1" coords="123,324,133,321,133,323,123,326,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+  New Deaths: Seven Day Moving Average = -0" title=" File Date = 03/15 
+  New Deaths: Seven Day Moving Average = -0" coords="114,327,123,324,123,326,114,329,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+  New Deaths: Seven Day Moving Average = -0" title=" File Date = 03/15 
+  New Deaths: Seven Day Moving Average = -0" coords="105,327,114,327,114,329,105,329,"/>
+<Area shape="poly" alt=" File Date = 03/14 
+  New Deaths: Seven Day Moving Average = 0" title=" File Date = 03/14 
+  New Deaths: Seven Day Moving Average = 0" coords="95,327,105,327,105,329,95,329,"/>
+<Area shape="poly" alt=" File Date = 04/12 
+ New Confirmed: Seven Day Moving Average = 1,271" title=" File Date = 04/12 
+ New Confirmed: Seven Day Moving Average = 1,271" coords="631,95,648,95,648,329,631,329,631,95,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+ New Confirmed: Seven Day Moving Average = 1,294" title=" File Date = 04/11 
+ New Confirmed: Seven Day Moving Average = 1,294" coords="612,91,629,91,629,329,612,329,612,91,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+ New Confirmed: Seven Day Moving Average = 1,367" title=" File Date = 04/10 
+ New Confirmed: Seven Day Moving Average = 1,367" coords="594,78,611,78,611,329,594,329,594,78,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+ New Confirmed: Seven Day Moving Average = 1,239" title=" File Date = 04/09 
+ New Confirmed: Seven Day Moving Average = 1,239" coords="575,101,592,101,592,329,575,329,575,101,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+ New Confirmed: Seven Day Moving Average = 1,124" title=" File Date = 04/08 
+ New Confirmed: Seven Day Moving Average = 1,124" coords="556,122,573,122,573,329,556,329,556,122,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+ New Confirmed: Seven Day Moving Average = 1,334" title=" File Date = 04/07 
+ New Confirmed: Seven Day Moving Average = 1,334" coords="537,84,554,84,554,329,537,329,537,84,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+ New Confirmed: Seven Day Moving Average = 1,307" title=" File Date = 04/06 
+ New Confirmed: Seven Day Moving Average = 1,307" coords="519,89,536,89,536,329,519,329,519,89,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+ New Confirmed: Seven Day Moving Average = 1,275" title=" File Date = 04/05 
+ New Confirmed: Seven Day Moving Average = 1,275" coords="500,95,517,95,517,329,500,329,500,95,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+ New Confirmed: Seven Day Moving Average = 1,257" title=" File Date = 04/04 
+ New Confirmed: Seven Day Moving Average = 1,257" coords="481,98,498,98,498,329,481,329,481,98,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+ New Confirmed: Seven Day Moving Average = 1,158" title=" File Date = 04/03 
+ New Confirmed: Seven Day Moving Average = 1,158" coords="463,116,479,116,479,329,463,329,463,116,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+ New Confirmed: Seven Day Moving Average = 1,130" title=" File Date = 04/02 
+ New Confirmed: Seven Day Moving Average = 1,130" coords="444,121,461,121,461,329,444,329,444,121,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+ New Confirmed: Seven Day Moving Average = 869" title=" File Date = 04/01 
+ New Confirmed: Seven Day Moving Average = 869" coords="425,169,442,169,442,329,425,329,425,169,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+ New Confirmed: Seven Day Moving Average = 741" title=" File Date = 03/31 
+ New Confirmed: Seven Day Moving Average = 741" coords="406,193,423,193,423,329,406,329,406,193,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+ New Confirmed: Seven Day Moving Average = 627" title=" File Date = 03/30 
+ New Confirmed: Seven Day Moving Average = 627" coords="388,213,405,213,405,329,388,329,388,213,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+ New Confirmed: Seven Day Moving Average = 578" title=" File Date = 03/29 
+ New Confirmed: Seven Day Moving Average = 578" coords="369,222,386,222,386,329,369,329,369,222,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+ New Confirmed: Seven Day Moving Average = 486" title=" File Date = 03/28 
+ New Confirmed: Seven Day Moving Average = 486" coords="350,239,367,239,367,329,350,329,350,239,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+ New Confirmed: Seven Day Moving Average = 416" title=" File Date = 03/27 
+ New Confirmed: Seven Day Moving Average = 416" coords="331,252,348,252,348,329,331,329,331,252,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+ New Confirmed: Seven Day Moving Average = 344" title=" File Date = 03/26 
+ New Confirmed: Seven Day Moving Average = 344" coords="313,265,330,265,330,329,313,329,313,265,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+ New Confirmed: Seven Day Moving Average = 364" title=" File Date = 03/25 
+ New Confirmed: Seven Day Moving Average = 364" coords="294,262,311,262,311,329,294,329,294,262,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+ New Confirmed: Seven Day Moving Average = 295" title=" File Date = 03/24 
+ New Confirmed: Seven Day Moving Average = 295" coords="275,274,292,274,292,329,275,329,275,274,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+ New Confirmed: Seven Day Moving Average = 268" title=" File Date = 03/23 
+ New Confirmed: Seven Day Moving Average = 268" coords="257,279,273,279,273,329,257,329,257,279,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+ New Confirmed: Seven Day Moving Average = 177" title=" File Date = 03/22 
+ New Confirmed: Seven Day Moving Average = 177" coords="238,296,255,296,255,329,238,329,238,296,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+ New Confirmed: Seven Day Moving Average = 155" title=" File Date = 03/21 
+ New Confirmed: Seven Day Moving Average = 155" coords="219,300,236,300,236,329,219,329,219,300,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+ New Confirmed: Seven Day Moving Average = 118" title=" File Date = 03/20 
+ New Confirmed: Seven Day Moving Average = 118" coords="200,307,217,307,217,329,200,329,200,307,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+ New Confirmed: Seven Day Moving Average = 73" title=" File Date = 03/19 
+ New Confirmed: Seven Day Moving Average = 73" coords="182,315,198,315,198,329,182,329,182,315,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+ New Confirmed: Seven Day Moving Average = 50" title=" File Date = 03/18 
+ New Confirmed: Seven Day Moving Average = 50" coords="163,319,180,319,180,329,163,329,163,319,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+ New Confirmed: Seven Day Moving Average = 40" title=" File Date = 03/17 
+ New Confirmed: Seven Day Moving Average = 40" coords="144,321,161,321,161,329,144,329,144,321,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+ New Confirmed: Seven Day Moving Average = 27" title=" File Date = 03/16 
+ New Confirmed: Seven Day Moving Average = 27" coords="125,323,142,323,142,329,125,329,125,323,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+ New Confirmed: Seven Day Moving Average = 17" title=" File Date = 03/15 
+ New Confirmed: Seven Day Moving Average = 17" coords="107,325,124,325,124,329,107,329,107,325,"/>
+<Area shape="poly" alt=" File Date = 03/14 
+ New Confirmed: Seven Day Moving Average = 17" title=" File Date = 03/14 
+ New Confirmed: Seven Day Moving Average = 17" coords="88,325,105,325,105,329,88,329,88,325,"/>
+</map>
+<div class="c">
+<img style="height: 480px; width: 720px" alt="South Carolina New Cases and Deaths" src="graphs/SGPlot1.png" usemap="#SGPlot1"/>
+</div>
+</div>
+</div>
+<div style="padding-bottom: 8px; padding-top: 1px">
+<hr class="pagebreak"/>
+<div id="IDX2" style="padding-bottom: 8px; padding-top: 1px">
+<map id="SGPlot2" name="SGPlot2"><Area shape="poly" alt=" File Date = 04/12 
+ Deaths = 82" title=" File Date = 04/12 
+ Deaths = 82" coords="629,57,639,53,639,55,629,59,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+ Deaths = 80" title=" File Date = 04/11 
+ Deaths = 80" coords="620,60,629,57,629,59,620,62,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+ Deaths = 80" title=" File Date = 04/11 
+ Deaths = 80" coords="610,73,619,60,621,62,612,75,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+ Deaths = 72" title=" File Date = 04/10 
+ Deaths = 72" coords="600,87,610,73,612,75,602,89,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+ Deaths = 72" title=" File Date = 04/10 
+ Deaths = 72" coords="591,95,600,87,602,89,593,97,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+ Deaths = 67" title=" File Date = 04/09 
+ Deaths = 67" coords="581,103,591,95,593,97,583,105,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+ Deaths = 67" title=" File Date = 04/09 
+ Deaths = 67" coords="572,131,581,104,583,104,574,131,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+ Deaths = 51" title=" File Date = 04/08 
+ Deaths = 51" coords="563,158,572,131,574,131,565,158,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+ Deaths = 51" title=" File Date = 04/08 
+ Deaths = 51" coords="554,157,564,157,564,159,554,159,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+ Deaths = 51" title=" File Date = 04/07 
+ Deaths = 51" coords="545,157,554,157,554,159,545,159,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+ Deaths = 51" title=" File Date = 04/07 
+ Deaths = 51" coords="536,162,545,157,545,159,536,164,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+ Deaths = 48" title=" File Date = 04/06 
+ Deaths = 48" coords="526,167,536,162,536,164,526,169,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+ Deaths = 48" title=" File Date = 04/06 
+ Deaths = 48" coords="516,173,525,167,527,169,518,175,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+ Deaths = 44" title=" File Date = 04/05 
+ Deaths = 44" coords="506,180,516,173,518,175,508,182,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+ Deaths = 44" title=" File Date = 04/05 
+ Deaths = 44" coords="497,187,506,180,508,182,499,189,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+ Deaths = 40" title=" File Date = 04/04 
+ Deaths = 40" coords="488,193,497,187,499,189,490,195,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+ Deaths = 40" title=" File Date = 04/04 
+ Deaths = 40" coords="478,203,488,193,490,195,480,205,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+ Deaths = 34" title=" File Date = 04/03 
+ Deaths = 34" coords="469,213,478,203,480,205,471,215,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+ Deaths = 34" title=" File Date = 04/03 
+ Deaths = 34" coords="461,218,470,213,470,215,461,220,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+ Deaths = 31" title=" File Date = 04/02 
+ Deaths = 31" coords="451,223,461,218,461,220,451,225,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+ Deaths = 31" title=" File Date = 04/02 
+ Deaths = 31" coords="441,232,450,223,452,225,443,234,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+ Deaths = 26" title=" File Date = 04/01 
+ Deaths = 26" coords="432,240,441,232,443,234,434,242,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+ Deaths = 26" title=" File Date = 04/01 
+ Deaths = 26" coords="422,247,432,240,434,242,424,249,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+ Deaths = 22" title=" File Date = 03/31 
+ Deaths = 22" coords="413,253,422,247,424,249,415,255,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+ Deaths = 22" title=" File Date = 03/31 
+ Deaths = 22" coords="403,260,413,253,415,255,405,262,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+ Deaths = 18" title=" File Date = 03/30 
+ Deaths = 18" coords="394,267,403,260,405,262,396,269,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+ Deaths = 18" title=" File Date = 03/30 
+ Deaths = 18" coords="386,270,395,267,395,269,386,272,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+ Deaths = 16" title=" File Date = 03/29 
+ Deaths = 16" coords="376,273,386,270,386,272,376,275,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+ Deaths = 16" title=" File Date = 03/29 
+ Deaths = 16" coords="367,275,376,273,376,275,367,277,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+ Deaths = 15" title=" File Date = 03/28 
+ Deaths = 15" coords="358,277,367,275,367,277,358,279,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+ Deaths = 15" title=" File Date = 03/28 
+ Deaths = 15" coords="348,280,358,277,358,279,348,282,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+ Deaths = 13" title=" File Date = 03/27 
+ Deaths = 13" coords="339,283,348,280,348,282,339,285,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+ Deaths = 13" title=" File Date = 03/27 
+ Deaths = 13" coords="329,290,338,283,340,285,331,292,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+ Deaths = 9" title=" File Date = 03/26 
+ Deaths = 9" coords="319,297,329,290,331,292,321,299,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+ Deaths = 9" title=" File Date = 03/26 
+ Deaths = 9" coords="311,300,320,297,320,299,311,302,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+ Deaths = 7" title=" File Date = 03/25 
+ Deaths = 7" coords="301,303,311,300,311,302,301,305,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+ Deaths = 7" title=" File Date = 03/25 
+ Deaths = 7" coords="292,307,301,303,301,305,292,309,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+ Deaths = 5" title=" File Date = 03/24 
+ Deaths = 5" coords="283,310,292,307,292,309,283,312,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+ Deaths = 5" title=" File Date = 03/24 
+ Deaths = 5" coords="273,310,283,310,283,312,273,312,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+ Deaths = 5" title=" File Date = 03/23 
+ Deaths = 5" coords="264,310,273,310,273,312,264,312,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+ Deaths = 5" title=" File Date = 03/23 
+ Deaths = 5" coords="255,313,264,310,264,312,255,315,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+ Deaths = 3" title=" File Date = 03/22 
+ Deaths = 3" coords="245,317,255,313,255,315,245,319,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+ Deaths = 3" title=" File Date = 03/22 
+ Deaths = 3" coords="236,317,245,317,245,319,236,319,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+ Deaths = 3" title=" File Date = 03/21 
+ Deaths = 3" coords="227,317,236,317,236,319,227,319,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+ Deaths = 3" title=" File Date = 03/21 
+ Deaths = 3" coords="217,317,227,317,227,319,217,319,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+ Deaths = 3" title=" File Date = 03/20 
+ Deaths = 3" coords="208,317,217,317,217,319,208,319,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+ Deaths = 3" title=" File Date = 03/20 
+ Deaths = 3" coords="198,320,208,317,208,319,198,322,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+ Deaths = 1" title=" File Date = 03/19 
+ Deaths = 1" coords="189,323,198,320,198,322,189,325,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+ Deaths = 1" title=" File Date = 03/19 
+ Deaths = 1" coords="180,323,189,323,189,325,180,325,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+ Deaths = 1" title=" File Date = 03/18 
+ Deaths = 1" coords="170,323,180,323,180,325,170,325,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+ Deaths = 1" title=" File Date = 03/18 
+ Deaths = 1" coords="161,323,170,323,170,325,161,325,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+ Deaths = 1" title=" File Date = 03/17 
+ Deaths = 1" coords="152,323,161,323,161,325,152,325,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+ Deaths = 1" title=" File Date = 03/17 
+ Deaths = 1" coords="142,323,152,323,152,325,142,325,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+ Deaths = 1" title=" File Date = 03/16 
+ Deaths = 1" coords="133,323,142,323,142,325,133,325,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+ Deaths = 1" title=" File Date = 03/16 
+ Deaths = 1" coords="123,325,133,323,133,325,123,327,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+ Deaths = 0" title=" File Date = 03/15 
+ Deaths = 0" coords="114,327,123,325,123,327,114,329,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+ Deaths = 0" title=" File Date = 03/15 
+ Deaths = 0" coords="105,327,114,327,114,329,105,329,"/>
+<Area shape="poly" alt=" File Date = 03/14 
+ Deaths = 0" title=" File Date = 03/14 
+ Deaths = 0" coords="95,327,105,327,105,329,95,329,"/>
+<Area shape="poly" alt=" File Date = 04/12 
+ Confirmed = 3,320" title=" File Date = 04/12 
+ Confirmed = 3,320" coords="631,55,648,55,648,329,631,329,631,55,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+ Confirmed = 3,211" title=" File Date = 04/11 
+ Confirmed = 3,211" coords="612,64,629,64,629,329,612,329,612,64,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+ Confirmed = 3,067" title=" File Date = 04/10 
+ Confirmed = 3,067" coords="594,76,611,76,611,329,594,329,594,76,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+ Confirmed = 2,793" title=" File Date = 04/09 
+ Confirmed = 2,793" coords="575,98,592,98,592,329,575,329,575,98,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+ Confirmed = 2,417" title=" File Date = 04/08 
+ Confirmed = 2,417" coords="556,129,573,129,573,329,556,329,556,129,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+ Confirmed = 2,417" title=" File Date = 04/07 
+ Confirmed = 2,417" coords="537,129,554,129,554,329,537,329,537,129,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+ Confirmed = 2,232" title=" File Date = 04/06 
+ Confirmed = 2,232" coords="519,145,536,145,536,329,519,329,519,145,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+ Confirmed = 2,049" title=" File Date = 04/05 
+ Confirmed = 2,049" coords="500,160,517,160,517,329,500,329,500,160,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+ Confirmed = 1,917" title=" File Date = 04/04 
+ Confirmed = 1,917" coords="481,170,498,170,498,329,481,329,481,170,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+ Confirmed = 1,700" title=" File Date = 04/03 
+ Confirmed = 1,700" coords="463,188,479,188,479,329,463,329,463,188,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+ Confirmed = 1,554" title=" File Date = 04/02 
+ Confirmed = 1,554" coords="444,200,461,200,461,329,444,329,444,200,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+ Confirmed = 1,293" title=" File Date = 04/01 
+ Confirmed = 1,293" coords="425,222,442,222,442,329,425,329,425,222,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+ Confirmed = 1,083" title=" File Date = 03/31 
+ Confirmed = 1,083" coords="406,239,423,239,423,329,406,329,406,239,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+ Confirmed = 925" title=" File Date = 03/30 
+ Confirmed = 925" coords="388,252,405,252,405,329,388,329,388,252,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+ Confirmed = 774" title=" File Date = 03/29 
+ Confirmed = 774" coords="369,265,386,265,386,329,369,329,369,265,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+ Confirmed = 660" title=" File Date = 03/28 
+ Confirmed = 660" coords="350,274,367,274,367,329,350,329,350,274,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+ Confirmed = 542" title=" File Date = 03/27 
+ Confirmed = 542" coords="331,284,348,284,348,329,331,329,331,284,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+ Confirmed = 424" title=" File Date = 03/26 
+ Confirmed = 424" coords="313,293,330,293,330,329,313,329,313,293,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+ Confirmed = 424" title=" File Date = 03/25 
+ Confirmed = 424" coords="294,293,311,293,311,329,294,329,294,293,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+ Confirmed = 342" title=" File Date = 03/24 
+ Confirmed = 342" coords="275,300,292,300,292,329,275,329,275,300,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+ Confirmed = 298" title=" File Date = 03/23 
+ Confirmed = 298" coords="257,304,273,304,273,329,257,329,257,304,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+ Confirmed = 196" title=" File Date = 03/22 
+ Confirmed = 196" coords="238,312,255,312,255,329,238,329,238,312,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+ Confirmed = 174" title=" File Date = 03/21 
+ Confirmed = 174" coords="219,314,236,314,236,329,219,329,219,314,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+ Confirmed = 126" title=" File Date = 03/20 
+ Confirmed = 126" coords="200,318,217,318,217,329,200,329,200,318,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+ Confirmed = 80" title=" File Date = 03/19 
+ Confirmed = 80" coords="182,322,198,322,198,329,182,329,182,322,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+ Confirmed = 60" title=" File Date = 03/18 
+ Confirmed = 60" coords="163,323,180,323,180,329,163,329,163,323,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+ Confirmed = 47" title=" File Date = 03/17 
+ Confirmed = 47" coords="144,324,161,324,161,329,144,329,144,324,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+ Confirmed = 30" title=" File Date = 03/16 
+ Confirmed = 30" coords="125,326,142,326,142,329,125,329,125,326,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+ Confirmed = 19" title=" File Date = 03/15 
+ Confirmed = 19" coords="107,327,124,327,124,329,107,329,107,327,"/>
+<Area shape="poly" alt=" File Date = 03/14 
+ Confirmed = 19" title=" File Date = 03/14 
+ Confirmed = 19" coords="88,327,105,327,105,329,88,329,88,327,"/>
+</map>
+<div class="c">
+<img style="height: 480px; width: 720px" alt="South Carolina Prevalence Bar" src="graphs/SGPlot2.png" usemap="#SGPlot2"/>
+</div>
+</div>
+</div>
+<div style="padding-bottom: 8px; padding-top: 1px">
+<hr class="pagebreak"/>
+<div id="IDX3" style="padding-bottom: 8px; padding-top: 1px">
+<map id="SGPlot3" name="SGPlot3"><Area shape="poly" alt=" File Date = 04/12 
+ Deaths = 82" title=" File Date = 04/12 
+ Deaths = 82" coords="636,60,646,56,646,58,636,62,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+ Deaths = 80" title=" File Date = 04/11 
+ Deaths = 80" coords="626,63,636,60,636,62,626,65,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+ Deaths = 80" title=" File Date = 04/11 
+ Deaths = 80" coords="616,77,625,63,627,65,618,79,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+ Deaths = 72" title=" File Date = 04/10 
+ Deaths = 72" coords="606,90,616,77,618,79,608,92,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+ Deaths = 72" title=" File Date = 04/10 
+ Deaths = 72" coords="597,99,606,90,608,92,599,101,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+ Deaths = 67" title=" File Date = 04/09 
+ Deaths = 67" coords="587,108,597,99,599,101,589,110,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+ Deaths = 67" title=" File Date = 04/09 
+ Deaths = 67" coords="577,136,587,109,589,109,579,136,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+ Deaths = 51" title=" File Date = 04/08 
+ Deaths = 51" coords="568,163,577,136,579,136,570,163,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+ Deaths = 51" title=" File Date = 04/08 
+ Deaths = 51" coords="559,162,569,162,569,164,559,164,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+ Deaths = 51" title=" File Date = 04/07 
+ Deaths = 51" coords="550,162,559,162,559,164,550,164,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+ Deaths = 51" title=" File Date = 04/07 
+ Deaths = 51" coords="540,167,550,162,550,164,540,169,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+ Deaths = 48" title=" File Date = 04/06 
+ Deaths = 48" coords="530,172,540,167,540,169,530,174,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+ Deaths = 48" title=" File Date = 04/06 
+ Deaths = 48" coords="520,179,529,172,531,174,522,181,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+ Deaths = 44" title=" File Date = 04/05 
+ Deaths = 44" coords="510,186,520,179,522,181,512,188,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+ Deaths = 44" title=" File Date = 04/05 
+ Deaths = 44" coords="500,193,510,186,512,188,502,195,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+ Deaths = 40" title=" File Date = 04/04 
+ Deaths = 40" coords="491,199,500,193,502,195,493,201,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+ Deaths = 40" title=" File Date = 04/04 
+ Deaths = 40" coords="481,210,491,199,493,201,483,212,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+ Deaths = 34" title=" File Date = 04/03 
+ Deaths = 34" coords="472,220,481,210,483,212,474,222,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+ Deaths = 34" title=" File Date = 04/03 
+ Deaths = 34" coords="463,225,473,220,473,222,463,227,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+ Deaths = 31" title=" File Date = 04/02 
+ Deaths = 31" coords="453,230,463,225,463,227,453,232,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+ Deaths = 31" title=" File Date = 04/02 
+ Deaths = 31" coords="443,239,452,230,454,232,445,241,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+ Deaths = 26" title=" File Date = 04/01 
+ Deaths = 26" coords="433,247,443,239,445,241,435,249,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+ Deaths = 26" title=" File Date = 04/01 
+ Deaths = 26" coords="424,254,433,247,435,249,426,256,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+ Deaths = 22" title=" File Date = 03/31 
+ Deaths = 22" coords="414,261,424,254,426,256,416,263,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+ Deaths = 22" title=" File Date = 03/31 
+ Deaths = 22" coords="404,268,414,261,416,263,406,270,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+ Deaths = 18" title=" File Date = 03/30 
+ Deaths = 18" coords="395,274,404,268,406,270,397,276,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+ Deaths = 18" title=" File Date = 03/30 
+ Deaths = 18" coords="386,278,396,274,396,276,386,280,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+ Deaths = 16" title=" File Date = 03/29 
+ Deaths = 16" coords="377,281,386,278,386,280,377,283,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+ Deaths = 16" title=" File Date = 03/29 
+ Deaths = 16" coords="367,283,377,281,377,283,367,285,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+ Deaths = 15" title=" File Date = 03/28 
+ Deaths = 15" coords="357,285,367,283,367,285,357,287,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+ Deaths = 15" title=" File Date = 03/28 
+ Deaths = 15" coords="348,288,357,285,357,287,348,290,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+ Deaths = 13" title=" File Date = 03/27 
+ Deaths = 13" coords="338,291,348,288,348,290,338,293,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+ Deaths = 13" title=" File Date = 03/27 
+ Deaths = 13" coords="328,298,337,291,339,293,330,300,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+ Deaths = 9" title=" File Date = 03/26 
+ Deaths = 9" coords="318,305,328,298,330,300,320,307,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+ Deaths = 9" title=" File Date = 03/26 
+ Deaths = 9" coords="309,309,319,305,319,307,309,311,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+ Deaths = 7" title=" File Date = 03/25 
+ Deaths = 7" coords="300,312,309,309,309,311,300,314,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+ Deaths = 7" title=" File Date = 03/25 
+ Deaths = 7" coords="290,315,300,312,300,314,290,317,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+ Deaths = 5" title=" File Date = 03/24 
+ Deaths = 5" coords="281,319,290,315,290,317,281,321,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+ Deaths = 5" title=" File Date = 03/24 
+ Deaths = 5" coords="271,319,281,319,281,321,271,321,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+ Deaths = 5" title=" File Date = 03/23 
+ Deaths = 5" coords="261,319,271,319,271,321,261,321,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+ Deaths = 5" title=" File Date = 03/23 
+ Deaths = 5" coords="252,322,261,319,261,321,252,324,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+ Deaths = 3" title=" File Date = 03/22 
+ Deaths = 3" coords="242,326,252,322,252,324,242,328,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+ Deaths = 3" title=" File Date = 03/22 
+ Deaths = 3" coords="232,326,242,326,242,328,232,328,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+ Deaths = 3" title=" File Date = 03/21 
+ Deaths = 3" coords="223,326,232,326,232,328,223,328,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+ Deaths = 3" title=" File Date = 03/21 
+ Deaths = 3" coords="213,326,223,326,223,328,213,328,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+ Deaths = 3" title=" File Date = 03/20 
+ Deaths = 3" coords="204,326,213,326,213,328,204,328,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+ Deaths = 3" title=" File Date = 03/20 
+ Deaths = 3" coords="194,329,204,326,204,328,194,331,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+ Deaths = 1" title=" File Date = 03/19 
+ Deaths = 1" coords="184,332,194,329,194,331,184,334,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+ Deaths = 1" title=" File Date = 03/19 
+ Deaths = 1" coords="175,332,184,332,184,334,175,334,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+ Deaths = 1" title=" File Date = 03/18 
+ Deaths = 1" coords="165,332,175,332,175,334,165,334,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+ Deaths = 1" title=" File Date = 03/18 
+ Deaths = 1" coords="156,332,165,332,165,334,156,334,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+ Deaths = 1" title=" File Date = 03/17 
+ Deaths = 1" coords="146,332,156,332,156,334,146,334,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+ Deaths = 1" title=" File Date = 03/17 
+ Deaths = 1" coords="136,332,146,332,146,334,136,334,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+ Deaths = 1" title=" File Date = 03/16 
+ Deaths = 1" coords="127,332,136,332,136,334,127,334,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+ Deaths = 1" title=" File Date = 03/16 
+ Deaths = 1" coords="117,334,127,332,127,334,117,336,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+ Deaths = 0" title=" File Date = 03/15 
+ Deaths = 0" coords="108,336,117,334,117,336,108,338,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+ Deaths = 0" title=" File Date = 03/15 
+ Deaths = 0" coords="98,336,108,336,108,338,98,338,"/>
+<Area shape="poly" alt=" File Date = 03/14 
+ Deaths = 0" title=" File Date = 03/14 
+ Deaths = 0" coords="88,336,98,336,98,338,88,338,"/>
+<Area shape="poly" alt=" File Date = 04/12 
+ Deaths = 82" title=" File Date = 04/12 
+ Deaths = 82" coords="643,55,648,55,648,60,643,60,643,55,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+ Deaths = 80" title=" File Date = 04/11 
+ Deaths = 80" coords="624,62,629,62,629,67,624,67,624,62,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+ Deaths = 72" title=" File Date = 04/10 
+ Deaths = 72" coords="605,89,610,89,610,94,605,94,605,89,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+ Deaths = 67" title=" File Date = 04/09 
+ Deaths = 67" coords="585,106,590,106,590,111,585,111,585,106,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+ Deaths = 51" title=" File Date = 04/08 
+ Deaths = 51" coords="566,161,571,161,571,166,566,166,566,161,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+ Deaths = 51" title=" File Date = 04/07 
+ Deaths = 51" coords="547,161,552,161,552,166,547,166,547,161,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+ Deaths = 48" title=" File Date = 04/06 
+ Deaths = 48" coords="528,171,533,171,533,176,528,176,528,171,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+ Deaths = 44" title=" File Date = 04/05 
+ Deaths = 44" coords="509,184,514,184,514,189,509,189,509,184,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+ Deaths = 40" title=" File Date = 04/04 
+ Deaths = 40" coords="489,198,494,198,494,203,489,203,489,198,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+ Deaths = 34" title=" File Date = 04/03 
+ Deaths = 34" coords="470,218,475,218,475,223,470,223,470,218,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+ Deaths = 31" title=" File Date = 04/02 
+ Deaths = 31" coords="451,229,456,229,456,234,451,234,451,229,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+ Deaths = 26" title=" File Date = 04/01 
+ Deaths = 26" coords="432,246,437,246,437,251,432,251,432,246,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+ Deaths = 22" title=" File Date = 03/31 
+ Deaths = 22" coords="413,259,418,259,418,264,413,264,413,259,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+ Deaths = 18" title=" File Date = 03/30 
+ Deaths = 18" coords="393,273,398,273,398,278,393,278,393,273,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+ Deaths = 16" title=" File Date = 03/29 
+ Deaths = 16" coords="374,280,379,280,379,285,374,285,374,280,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+ Deaths = 15" title=" File Date = 03/28 
+ Deaths = 15" coords="355,283,360,283,360,288,355,288,355,283,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+ Deaths = 13" title=" File Date = 03/27 
+ Deaths = 13" coords="336,290,341,290,341,295,336,295,336,290,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+ Deaths = 9" title=" File Date = 03/26 
+ Deaths = 9" coords="316,304,321,304,321,309,316,309,316,304,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+ Deaths = 7" title=" File Date = 03/25 
+ Deaths = 7" coords="297,310,302,310,302,315,297,315,297,310,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+ Deaths = 5" title=" File Date = 03/24 
+ Deaths = 5" coords="278,317,283,317,283,322,278,322,278,317,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+ Deaths = 5" title=" File Date = 03/23 
+ Deaths = 5" coords="259,317,264,317,264,322,259,322,259,317,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+ Deaths = 3" title=" File Date = 03/22 
+ Deaths = 3" coords="240,324,245,324,245,329,240,329,240,324,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+ Deaths = 3" title=" File Date = 03/21 
+ Deaths = 3" coords="220,324,225,324,225,329,220,329,220,324,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+ Deaths = 3" title=" File Date = 03/20 
+ Deaths = 3" coords="201,324,206,324,206,329,201,329,201,324,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+ Deaths = 1" title=" File Date = 03/19 
+ Deaths = 1" coords="182,331,187,331,187,336,182,336,182,331,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+ Deaths = 1" title=" File Date = 03/18 
+ Deaths = 1" coords="163,331,168,331,168,336,163,336,163,331,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+ Deaths = 1" title=" File Date = 03/17 
+ Deaths = 1" coords="144,331,149,331,149,336,144,336,144,331,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+ Deaths = 1" title=" File Date = 03/16 
+ Deaths = 1" coords="124,331,129,331,129,336,124,336,124,331,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+ Deaths = 0" title=" File Date = 03/15 
+ Deaths = 0" coords="105,334,110,334,110,339,105,339,105,334,"/>
+<Area shape="poly" alt=" File Date = 03/14 
+ Deaths = 0" title=" File Date = 03/14 
+ Deaths = 0" coords="86,334,91,334,91,339,86,339,86,334,"/>
+<Area shape="poly" alt=" File Date = 04/12 
+ Confirmed = 3,320" title=" File Date = 04/12 
+ Confirmed = 3,320" coords="636,61,646,56,646,58,636,63,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+ Confirmed = 3,211" title=" File Date = 04/11 
+ Confirmed = 3,211" coords="626,66,636,61,636,63,626,68,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+ Confirmed = 3,211" title=" File Date = 04/11 
+ Confirmed = 3,211" coords="616,72,625,66,627,68,618,74,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+ Confirmed = 3,067" title=" File Date = 04/10 
+ Confirmed = 3,067" coords="606,78,616,72,618,74,608,80,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+ Confirmed = 3,067" title=" File Date = 04/10 
+ Confirmed = 3,067" coords="597,89,606,78,608,80,599,91,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+ Confirmed = 2,793" title=" File Date = 04/09 
+ Confirmed = 2,793" coords="587,101,597,89,599,91,589,103,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+ Confirmed = 2,793" title=" File Date = 04/09 
+ Confirmed = 2,793" coords="577,117,587,101,589,103,579,119,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+ Confirmed = 2,417" title=" File Date = 04/08 
+ Confirmed = 2,417" coords="568,132,577,117,579,119,570,134,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+ Confirmed = 2,417" title=" File Date = 04/08 
+ Confirmed = 2,417" coords="559,132,569,132,569,134,559,134,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+ Confirmed = 2,417" title=" File Date = 04/07 
+ Confirmed = 2,417" coords="550,132,559,132,559,134,550,134,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+ Confirmed = 2,417" title=" File Date = 04/07 
+ Confirmed = 2,417" coords="539,140,549,132,551,134,541,142,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+ Confirmed = 2,232" title=" File Date = 04/06 
+ Confirmed = 2,232" coords="529,148,539,140,541,142,531,150,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+ Confirmed = 2,232" title=" File Date = 04/06 
+ Confirmed = 2,232" coords="520,156,529,148,531,150,522,158,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+ Confirmed = 2,049" title=" File Date = 04/05 
+ Confirmed = 2,049" coords="510,163,520,156,522,158,512,165,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+ Confirmed = 2,049" title=" File Date = 04/05 
+ Confirmed = 2,049" coords="500,169,510,163,512,165,502,171,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+ Confirmed = 1,917" title=" File Date = 04/04 
+ Confirmed = 1,917" coords="492,174,501,169,501,171,492,176,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+ Confirmed = 1,917" title=" File Date = 04/04 
+ Confirmed = 1,917" coords="481,184,491,174,493,176,483,186,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+ Confirmed = 1,700" title=" File Date = 04/03 
+ Confirmed = 1,700" coords="472,193,481,184,483,186,474,195,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+ Confirmed = 1,700" title=" File Date = 04/03 
+ Confirmed = 1,700" coords="462,199,472,193,474,195,464,201,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+ Confirmed = 1,554" title=" File Date = 04/02 
+ Confirmed = 1,554" coords="452,205,462,199,464,201,454,207,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+ Confirmed = 1,554" title=" File Date = 04/02 
+ Confirmed = 1,554" coords="443,216,452,205,454,207,445,218,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+ Confirmed = 1,293" title=" File Date = 04/01 
+ Confirmed = 1,293" coords="433,227,443,216,445,218,435,229,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+ Confirmed = 1,293" title=" File Date = 04/01 
+ Confirmed = 1,293" coords="424,236,433,227,435,229,426,238,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+ Confirmed = 1,083" title=" File Date = 03/31 
+ Confirmed = 1,083" coords="414,245,424,236,426,238,416,247,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+ Confirmed = 1,083" title=" File Date = 03/31 
+ Confirmed = 1,083" coords="404,251,414,245,416,247,406,253,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+ Confirmed = 925" title=" File Date = 03/30 
+ Confirmed = 925" coords="395,258,404,251,406,253,397,260,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+ Confirmed = 925" title=" File Date = 03/30 
+ Confirmed = 925" coords="385,264,395,258,397,260,387,266,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+ Confirmed = 774" title=" File Date = 03/29 
+ Confirmed = 774" coords="376,271,385,264,387,266,378,273,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+ Confirmed = 774" title=" File Date = 03/29 
+ Confirmed = 774" coords="367,275,377,271,377,273,367,277,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+ Confirmed = 660" title=" File Date = 03/28 
+ Confirmed = 660" coords="357,280,367,275,367,277,357,282,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+ Confirmed = 660" title=" File Date = 03/28 
+ Confirmed = 660" coords="348,285,357,280,357,282,348,287,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+ Confirmed = 542" title=" File Date = 03/27 
+ Confirmed = 542" coords="338,290,348,285,348,287,338,292,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+ Confirmed = 542" title=" File Date = 03/27 
+ Confirmed = 542" coords="329,295,338,290,338,292,329,297,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+ Confirmed = 424" title=" File Date = 03/26 
+ Confirmed = 424" coords="319,300,329,295,329,297,319,302,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+ Confirmed = 424" title=" File Date = 03/26 
+ Confirmed = 424" coords="309,300,319,300,319,302,309,302,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+ Confirmed = 424" title=" File Date = 03/25 
+ Confirmed = 424" coords="300,300,309,300,309,302,300,302,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+ Confirmed = 424" title=" File Date = 03/25 
+ Confirmed = 424" coords="290,304,300,300,300,302,290,306,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+ Confirmed = 342" title=" File Date = 03/24 
+ Confirmed = 342" coords="281,307,290,304,290,306,281,309,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+ Confirmed = 342" title=" File Date = 03/24 
+ Confirmed = 342" coords="271,309,281,307,281,309,271,311,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+ Confirmed = 298" title=" File Date = 03/23 
+ Confirmed = 298" coords="261,311,271,309,271,311,261,313,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+ Confirmed = 298" title=" File Date = 03/23 
+ Confirmed = 298" coords="252,315,261,311,261,313,252,317,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+ Confirmed = 196" title=" File Date = 03/22 
+ Confirmed = 196" coords="242,319,252,315,252,317,242,321,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+ Confirmed = 196" title=" File Date = 03/22 
+ Confirmed = 196" coords="232,320,242,319,242,321,232,322,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+ Confirmed = 174" title=" File Date = 03/21 
+ Confirmed = 174" coords="223,321,232,320,232,322,223,323,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+ Confirmed = 174" title=" File Date = 03/21 
+ Confirmed = 174" coords="213,323,223,321,223,323,213,325,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+ Confirmed = 126" title=" File Date = 03/20 
+ Confirmed = 126" coords="204,325,213,323,213,325,204,327,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+ Confirmed = 126" title=" File Date = 03/20 
+ Confirmed = 126" coords="194,327,204,325,204,327,194,329,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+ Confirmed = 80" title=" File Date = 03/19 
+ Confirmed = 80" coords="184,329,194,327,194,329,184,331,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+ Confirmed = 80" title=" File Date = 03/19 
+ Confirmed = 80" coords="175,330,184,329,184,331,175,332,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+ Confirmed = 60" title=" File Date = 03/18 
+ Confirmed = 60" coords="165,331,175,330,175,332,165,333,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+ Confirmed = 60" title=" File Date = 03/18 
+ Confirmed = 60" coords="156,331,165,331,165,333,156,333,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+ Confirmed = 47" title=" File Date = 03/17 
+ Confirmed = 47" coords="146,332,156,331,156,333,146,334,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+ Confirmed = 47" title=" File Date = 03/17 
+ Confirmed = 47" coords="136,333,146,332,146,334,136,335,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+ Confirmed = 30" title=" File Date = 03/16 
+ Confirmed = 30" coords="127,333,136,333,136,335,127,335,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+ Confirmed = 30" title=" File Date = 03/16 
+ Confirmed = 30" coords="117,334,127,333,127,335,117,336,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+ Confirmed = 19" title=" File Date = 03/15 
+ Confirmed = 19" coords="108,334,117,334,117,336,108,336,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+ Confirmed = 19" title=" File Date = 03/15 
+ Confirmed = 19" coords="98,334,108,334,108,336,98,336,"/>
+<Area shape="poly" alt=" File Date = 03/14 
+ Confirmed = 19" title=" File Date = 03/14 
+ Confirmed = 19" coords="88,334,98,334,98,336,88,336,"/>
+<Area shape="poly" alt=" File Date = 04/12 
+ Confirmed = 3,320" title=" File Date = 04/12 
+ Confirmed = 3,320" coords="643,55,648,55,648,60,643,60,643,55,"/>
+<Area shape="poly" alt=" File Date = 04/11 
+ Confirmed = 3,211" title=" File Date = 04/11 
+ Confirmed = 3,211" coords="624,64,629,64,629,69,624,69,624,64,"/>
+<Area shape="poly" alt=" File Date = 04/10 
+ Confirmed = 3,067" title=" File Date = 04/10 
+ Confirmed = 3,067" coords="605,76,610,76,610,81,605,81,605,76,"/>
+<Area shape="poly" alt=" File Date = 04/09 
+ Confirmed = 2,793" title=" File Date = 04/09 
+ Confirmed = 2,793" coords="585,99,590,99,590,104,585,104,585,99,"/>
+<Area shape="poly" alt=" File Date = 04/08 
+ Confirmed = 2,417" title=" File Date = 04/08 
+ Confirmed = 2,417" coords="566,131,571,131,571,136,566,136,566,131,"/>
+<Area shape="poly" alt=" File Date = 04/07 
+ Confirmed = 2,417" title=" File Date = 04/07 
+ Confirmed = 2,417" coords="547,131,552,131,552,136,547,136,547,131,"/>
+<Area shape="poly" alt=" File Date = 04/06 
+ Confirmed = 2,232" title=" File Date = 04/06 
+ Confirmed = 2,232" coords="528,146,533,146,533,151,528,151,528,146,"/>
+<Area shape="poly" alt=" File Date = 04/05 
+ Confirmed = 2,049" title=" File Date = 04/05 
+ Confirmed = 2,049" coords="509,162,514,162,514,167,509,167,509,162,"/>
+<Area shape="poly" alt=" File Date = 04/04 
+ Confirmed = 1,917" title=" File Date = 04/04 
+ Confirmed = 1,917" coords="489,173,494,173,494,178,489,178,489,173,"/>
+<Area shape="poly" alt=" File Date = 04/03 
+ Confirmed = 1,700" title=" File Date = 04/03 
+ Confirmed = 1,700" coords="470,191,475,191,475,196,470,196,470,191,"/>
+<Area shape="poly" alt=" File Date = 04/02 
+ Confirmed = 1,554" title=" File Date = 04/02 
+ Confirmed = 1,554" coords="451,204,456,204,456,209,451,209,451,204,"/>
+<Area shape="poly" alt=" File Date = 04/01 
+ Confirmed = 1,293" title=" File Date = 04/01 
+ Confirmed = 1,293" coords="432,225,437,225,437,230,432,230,432,225,"/>
+<Area shape="poly" alt=" File Date = 03/31 
+ Confirmed = 1,083" title=" File Date = 03/31 
+ Confirmed = 1,083" coords="413,243,418,243,418,248,413,248,413,243,"/>
+<Area shape="poly" alt=" File Date = 03/30 
+ Confirmed = 925" title=" File Date = 03/30 
+ Confirmed = 925" coords="393,256,398,256,398,261,393,261,393,256,"/>
+<Area shape="poly" alt=" File Date = 03/29 
+ Confirmed = 774" title=" File Date = 03/29 
+ Confirmed = 774" coords="374,269,379,269,379,274,374,274,374,269,"/>
+<Area shape="poly" alt=" File Date = 03/28 
+ Confirmed = 660" title=" File Date = 03/28 
+ Confirmed = 660" coords="355,279,360,279,360,284,355,284,355,279,"/>
+<Area shape="poly" alt=" File Date = 03/27 
+ Confirmed = 542" title=" File Date = 03/27 
+ Confirmed = 542" coords="336,289,341,289,341,294,336,294,336,289,"/>
+<Area shape="poly" alt=" File Date = 03/26 
+ Confirmed = 424" title=" File Date = 03/26 
+ Confirmed = 424" coords="316,299,321,299,321,304,316,304,316,299,"/>
+<Area shape="poly" alt=" File Date = 03/25 
+ Confirmed = 424" title=" File Date = 03/25 
+ Confirmed = 424" coords="297,299,302,299,302,304,297,304,297,299,"/>
+<Area shape="poly" alt=" File Date = 03/24 
+ Confirmed = 342" title=" File Date = 03/24 
+ Confirmed = 342" coords="278,306,283,306,283,311,278,311,278,306,"/>
+<Area shape="poly" alt=" File Date = 03/23 
+ Confirmed = 298" title=" File Date = 03/23 
+ Confirmed = 298" coords="259,309,264,309,264,314,259,314,259,309,"/>
+<Area shape="poly" alt=" File Date = 03/22 
+ Confirmed = 196" title=" File Date = 03/22 
+ Confirmed = 196" coords="240,318,245,318,245,323,240,323,240,318,"/>
+<Area shape="poly" alt=" File Date = 03/21 
+ Confirmed = 174" title=" File Date = 03/21 
+ Confirmed = 174" coords="220,320,225,320,225,325,220,325,220,320,"/>
+<Area shape="poly" alt=" File Date = 03/20 
+ Confirmed = 126" title=" File Date = 03/20 
+ Confirmed = 126" coords="201,324,206,324,206,329,201,329,201,324,"/>
+<Area shape="poly" alt=" File Date = 03/19 
+ Confirmed = 80" title=" File Date = 03/19 
+ Confirmed = 80" coords="182,328,187,328,187,333,182,333,182,328,"/>
+<Area shape="poly" alt=" File Date = 03/18 
+ Confirmed = 60" title=" File Date = 03/18 
+ Confirmed = 60" coords="163,329,168,329,168,334,163,334,163,329,"/>
+<Area shape="poly" alt=" File Date = 03/17 
+ Confirmed = 47" title=" File Date = 03/17 
+ Confirmed = 47" coords="144,330,149,330,149,335,144,335,144,330,"/>
+<Area shape="poly" alt=" File Date = 03/16 
+ Confirmed = 30" title=" File Date = 03/16 
+ Confirmed = 30" coords="124,332,129,332,129,337,124,337,124,332,"/>
+<Area shape="poly" alt=" File Date = 03/15 
+ Confirmed = 19" title=" File Date = 03/15 
+ Confirmed = 19" coords="105,333,110,333,110,338,105,338,105,333,"/>
+<Area shape="poly" alt=" File Date = 03/14 
+ Confirmed = 19" title=" File Date = 03/14 
+ Confirmed = 19" coords="86,333,91,333,91,338,86,338,86,333,"/>
+</map>
+<div class="c">
+<img style="height: 480px; width: 720px" alt="South Carolina Prevalence Line" src="graphs/SGPlot3.png" usemap="#SGPlot3"/>
+</div>
+</div>
+</div>
+</body>
+</html>

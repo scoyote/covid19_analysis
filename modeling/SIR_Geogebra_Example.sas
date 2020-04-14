@@ -25,7 +25,9 @@ PROC MODEL data=d_scaffold plots=all outmodel=sir;
 	SOLVE S_T  I_T  R_T    / out=SIR_SOLVE ; 	
 RUN;QUIT;
 
-ods graphics / reset width=7in height=5in imagemap;	
+
+ods html close;ods rtf close;ods pdf close;ods document close; 
+ods graphics / reset width=7in height=5in imagemap imagename="SIRModel"  outputfmt=png;	
 	proc sgplot data=sir_solve;
 		series x=time y=S_T / lineattrs=(color="blue") smoothconnect;
 		series x=time y=I_T / lineattrs=(color="red") smoothconnect;

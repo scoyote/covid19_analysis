@@ -2,7 +2,7 @@
 /* https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/2018/delineation-files/list1_Sep_2018.xls */
 data WORK.CBSA_County_Crosswalk   ;
 	
-	infile "&progpath./data/MSA_CountyFipsCrosswalk.csv" 
+	infile "/covid_analysis/data/MSA_CountyFipsCrosswalk.csv" 
 		delimiter = ',' 
 		MISSOVER 
 		DSD  

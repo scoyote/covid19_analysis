@@ -18,9 +18,9 @@ times      <- seq(0, maxT, by = 1)
 ## Create an SIR function (adapted from deSolve Examples)
 sir <- function(time, state, parameters) {
   with(as.list(c(state, parameters)), {
-    dS <- -beta * S * I
-    dI <-  beta * S * I - gamma * I
-    dR <-                 gamma * I
+    dS <- -transm * S * I
+    dI <-  transm * S * I - recov * I
+    dR <-                   recov * I
     return(list(c(dS, dI, dR)))
   })
 }
