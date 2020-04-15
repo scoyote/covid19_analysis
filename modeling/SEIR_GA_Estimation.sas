@@ -15,18 +15,23 @@ proc datasets library=work;
 		US_AUGMENTED
 		US_JOINED
 		US_STACKED
-		
-		CBSA_TRAJECTORIES 
-		FIPS_TRAJECTORIES
+	
 		GLOBAL_TRAJECTORIES
 	;
 quit;
 */
+data _mdlData;
+	set cbsa_trajectories(rename=(confirmed=cases filedate=date) 
+							where=(cbsa_title="Atlanta-Sandy Springs-Alpharetta, GA" 
+							and cases>0 and date <= &enddate)) end=eof;
+		if eof then call symput("popest",census2010pop);
+		
+run;	
 
-%let N=10e6;
-%let tau=5.1;
-%let Rho0=2.5;
-%let sigma=0.9;
+%let N		=&popest;
+%let tau	=5.1;
+%let Rho0	=2.5;
+%let sigma	=0.9;
 %let enddate='13APR2020'd;
 
 PROC MODEL outmodel=_model; 
@@ -61,7 +66,7 @@ PROC MODEL outmodel=_model;
         covout 
         outest		= gaprmcov
 /*         optimizer=ormp(opttol=1e-5) ltebound=1e-10  */
-        data=state_trajectories(rename=(confirmed=cases filedate=date) where=(Province_State="Georgia" and cases>0 and date <= &enddate));
+        data=_mdlData;
 RUN;
 QUIT;
 
@@ -152,6 +157,7 @@ proc model data=_scaffold model=_model;
    quasi=sobol 
    estdata=mccov 
    sdata=s;
+run;
 quit;
 
 proc sort data=_forecast; by _rep_ date; run;

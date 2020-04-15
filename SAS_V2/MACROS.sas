@@ -423,3 +423,293 @@ PULLING...;
 	%end;
 %mend plotstate;
 
+
+
+%MACRO CREATE_TRAJECTORIES;
+	/*
+	proc print data=us_augmented;
+	var fips province_state country_region combined_key confirmed deaths dif_confirmed dif_deaths;
+	where  Province_State='Georgia'
+	and filedate='08apr2020'd;
+	run;
+	*/
+	/********************************************************************/
+	/***** 					STATE ROLLUP BLOCK						*****/
+	/********************************************************************/
+	proc sql; select max(filedate) into :filedate from us_augmented; quit;
+	
+	proc sql;
+		create table state_totals as	
+			select 
+				 Province_State 
+				,count(*) as freq
+				,sum(confirmed) as total_confirmed
+				,sum(deaths) as total_deaths
+			from us_augmented
+			where filedate=&filedate
+			group by 
+				Province_State 	
+			order by 	
+				Province_State 	
+			;
+	quit;
+	
+	/********************************************************************/
+	/***** 					FIPS TRAJECTORIES BLOCK					*****/
+	/********************************************************************/
+	/*
+	proc sql; 
+		select fips, country_region, province_state, cbsa_title, csa_title, msa_title, county_equivalent, state
+		,count(*) as freq, sum(confirmed) as conf,sum(deaths) as deaths
+		from us_augmented
+		group by fips, country_region, province_state, cbsa_title, csa_title, msa_title, county_equivalent, state
+		order by fips, country_region, province_state, cbsa_title, csa_title, msa_title, county_equivalent, state
+		;
+	run;
+	
+	*/
+	
+			proc sql;
+				create table _fips_trajectories as	
+					select
+						 fips
+						,country_region 
+						,Province_State
+						,cbsa_title
+						,combined_key
+						,filedate 
+						,count(*) 			as freq 			label = "Rollup Count"
+						,sum(confirmed) 	as confirmed 		label="Confirmed"
+						,sum(deaths) 		as deaths			label="Deaths"
+						,sum(census2010pop) as census2010pop	label="2010 Populaton"
+						,sum(hospitals)		as hospitals		label="Hospitals"
+						,sum(icu_beds)		as icu_beds			label="ICU Beds"
+					from us_augmented
+					group by
+						 fips					
+						,country_region 
+						,Province_State
+						,cbsa_title	
+						,combined_key
+						,filedate
+					order by
+						 fips					
+						,country_region 
+						,Province_State
+						,cbsa_title
+						,combined_key
+						,filedate
+					;
+			quit;
+	
+			proc expand data=_fips_trajectories out=fips_trajectories;
+				by fips country_region province_state cbsa_title combined_key;
+				convert confirmed	= dif1_confirmed / transout=(dif 1);
+				convert confirmed	= dif7_confirmed / transout=(dif 7);
+				convert deaths		= dif1_deaths 	 / transout=(dif 1);
+				convert deaths		= dif7_deaths	 / transout=(dif 7);	
+			run;
+			/* add in a countdown from most recent to oldest for plotting */
+			proc sort data=fips_trajectories; by fips country_region province_state cbsa_title combined_key descending filedate; run;
+			data fips_trajectories;
+				set fips_trajectories;
+				by fips descending filedate;
+				if first.fips then do;
+					plotseq=0;
+				end;
+				plotseq+1;
+				fd_weekday = put(filedate,DOWNAME3.);
+				if census2010pop>0 then CasePerCapita = confirmed/census2010pop; else casepercapita=.;
+				
+				if icu_beds>0 then Caseperbed = confirmed/icu_beds; else caseperbed=.;
+				if hospitals>0 then caseperhospital	= confirmed/hospitals; else caseperhospital=.;
+				format casepercapita caseperbed caseperhospital 12.6;
+			run;
+			proc sort data=fips_trajectories ; by  fips country_region province_state cbsa_title combined_key filedate; run;
+	
+			proc datasets library=work; delete _fips_trajectories ; quit;
+	/********************************************************************/
+	/***** 					CBSA TRAJECTORIES BLOCK					*****/
+	/********************************************************************/
+			proc sql;
+				create table _cbsa_trajectories as
+					select
+						 cbsa_title 
+						,filedate 
+						,count(*) 			as freq 		format=comma10.	label="Rollup Count"
+						,sum(confirmed) 	as confirmed 	format=comma10.	label="Confirmed"
+						,sum(deaths) 		as deaths		format=comma10.	label="Deaths"
+						,sum(census2010pop) as census2010pop format=comma10.	label="2010 Populaton"
+						,sum(hospitals)		as hospitals	format=comma10.	label="Hospitals"
+						,sum(icu_beds)		as icu_beds		format=comma10.	label="ICU Beds"
+					from fips_trajectories
+					where ~missing(cbsa_title)
+					group by
+						 cbsa_title  	
+						,filedate
+					order by
+						 cbsa_title 
+						,filedate
+					;
+			quit;
+			proc expand data=_cbsa_trajectories out=cbsa_trajectories;
+				by cbsa_title;
+				convert confirmed	= dif1_confirmed / transout=(dif 1);
+				convert confirmed	= dif7_confirmed / transout=(dif 7);
+				convert deaths		= dif1_deaths 	 / transout=(dif 1);
+				convert deaths		= dif7_deaths	 / transout=(dif 7);	
+			run;
+			/* add in a countdown from most recent to oldest for plotting */
+			proc sort data=cbsa_trajectories; by cbsa_title descending filedate; run;
+			data cbsa_trajectories;
+				set cbsa_trajectories;
+				by cbsa_title descending filedate;
+				if first.cbsa_title then do;
+					plotseq=0;
+				end;
+				plotseq+1;
+				fd_weekday = put(filedate,DOWNAME3.);
+				if census2010pop>0 then CasePerCapita = confirmed/census2010pop; else casepercapita=.;
+				if icu_beds>0 then Caseperbed = confirmed/icu_beds; else caseperbed=.;
+				if hospitals>0 then caseperhospital	= confirmed/hospitals; else caseperhospital=.;
+				format casepercapita caseperbed caseperhospital 12.6;
+	
+			run;
+			proc sort data=cbsa_trajectories ; by cbsa_title filedate; run;
+	
+			
+			proc datasets library=work; delete _cbsa_trajectories ; quit;
+	
+	/********************************************************************/
+	/***** 			STATE TRAJECTORIES BLOCK						*****/
+	/********************************************************************/
+			proc sql;
+				create table _state_trajectories as
+					select
+						 Province_State 
+						,filedate 
+						,count(*) 		as freq 		format=comma10.	label="Rollup Count"
+						,sum(confirmed) as confirmed 	format=comma10.	label="Confirmed"
+						,sum(deaths) as deaths			format=comma10.	label="Deaths"
+					from fips_trajectories
+			
+					group by
+						 Province_State 	
+						,filedate
+					order by
+						 Province_State
+						,filedate
+					;
+			quit;
+			proc expand data=_state_trajectories out=state_trajectories;
+				by province_state;
+				convert confirmed	= dif1_confirmed / transout=(dif 1);
+				convert confirmed	= dif7_confirmed / transout=(dif 7);
+				convert deaths		= dif1_deaths 	 / transout=(dif 1);
+				convert deaths		= dif7_deaths	 / transout=(dif 7);	
+			run;
+			/* add in a countdown from most recent to oldest for plotting */
+			proc sort data=state_trajectories; by province_state descending filedate; run;
+			data state_trajectories;
+				set state_trajectories;
+				by province_state descending filedate;
+				if first.province_state then do;
+					plotseq=0;
+				end;
+				plotseq+1;
+				fd_weekday = put(filedate,DOWNAME3.);
+			run;
+			proc sort data=state_trajectories; by province_state filedate; run;
+	
+			
+			proc datasets library=work; delete _state_trajectories _fips_trajectories ; quit;
+	
+	
+	/********************************************************************/
+	/***** 			Global TRAJECTORIES BLOCK						*****/
+	/********************************************************************/
+	
+			proc sql;
+				create table _global_trajectories as	
+					select
+						 country_region
+						,province_state
+						,cats(Country_region," ",Province_State) as Location 
+						,filedate 
+						,count(*) as freq				format=comma12.	label = "Rollup Count"
+						,sum(confirmed) as confirmed 	format=comma12.	label="Confirmed"
+						,sum(deaths) as deaths			format=comma12.	label="Deaths"
+					from global_joined
+					group by 
+						  country_region
+						,province_state
+						,cats(Country_region," ",Province_State)
+						,filedate
+					order by 	
+						 country_region
+						,province_state
+						,cats(Country_region," ",Province_State)
+						,filedate
+					;
+			quit;
+			
+			/* add in a countdown from most recent to oldest for plotting */
+			proc sort data=_global_trajectories; 
+				by  country_region province_state location descending filedate; 
+				run;
+			data _global_trajectories;
+				set _global_trajectories;
+				by country_region province_state location descending filedate;
+				if first.location then plotseq=0;
+				plotseq+1;
+				fd_weekday = put(filedate,DOWNAME3.);
+			run;
+			proc sort data=_global_trajectories; by country_region province_state filedate; run;
+			proc expand data=_global_trajectories out=global_trajectories;
+				by country_region province_state;
+				convert confirmed	= dif1_confirmed / transout=(dif 1);
+				convert confirmed	= dif7_confirmed / transout=(dif 7);
+				convert deaths		= dif1_deaths 	 / transout=(dif 1);
+				convert deaths		= dif7_deaths	 / transout=(dif 7);	
+			run;
+			
+			
+			
+	%let bulkformat=format confirmed deaths dif1_confirmed--dif7_deaths comma12. filedate mmddyy5.;
+	%let bulklabel=label dif1_confirmed = "New Confirmed"
+				    	 dif1_deaths = "New Deaths"
+				    	 dif7_confirmed ="New Confirmed: Seven Day Moving Average"
+				    	 dif7_deaths =" New Deaths: Seven Day Moving Average"
+				    	 plotseq="Days"
+				    	 fd_weekday="Weekday of File Date";
+				  
+	proc datasets library=work; 
+		delete _global_trajectories; 
+		modify fips_trajectories; 	&bulkformat; &bulklabel;
+		modify cbsa_trajectories;	&bulkformat; &bulklabel;
+		modify state_trajectories;	&bulkformat; &bulklabel;
+		modify global_trajectories;	&bulkformat; &bulklabel;
+	quit;
+%MEND CREATE_TRAJECTORIES;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

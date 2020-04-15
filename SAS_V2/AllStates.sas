@@ -10,9 +10,11 @@
 proc sql; 
 	insert into US_AUGMENTEd 
 			(province_state, filedate, confirmed, deaths) 
-		values("Georgia", '14APR2020'd,14223,501)
+		values("Georgia", '14APR2020'd,14578,524)
 	;
 quit;
+
+%create_trajectories;
 */	
 
 /********************************************************************/
