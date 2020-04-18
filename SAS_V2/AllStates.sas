@@ -6,55 +6,47 @@
 %include "LoadTimeseries.sas";
 
 
-/* *You will need to rerun part of loadtimeseries.sas after this;
+*You will need to rerun part of loadtimeseries.sas after this;
 proc sql; 
 	insert into US_AUGMENTEd 
 			(province_state, filedate, confirmed, deaths) 
-		values("Georgia", '14APR2020'd,14578,524)
+		values("Georgia", '17APR2020'd,17194,650)
 	;
 quit;
 
 %create_trajectories;
-*/	
 
 /********************************************************************/
 /***** Plot a single state group - just change the macvar here 	*****/
 /********************************************************************/
-%let plot_state=Georgia; %let daysback=30;
-options orientation=landscape papersize=(7.5in 5in) ;
-ods graphics on /  width=7.5in height=5in  imagemap outputfmt=PNG ;
-ods html5 close; ods html close; ODS Listing close;
-ODS HTML5 gpath="&outputpath/graphs"(URL='graphs/') 
-		 path="&outputpath"(URL=NONE)
-		 file="&plot_state..html"
-		 device=PNG;* options(svg_mode="inline");
-	%plotstate(state=&plot_state,level=state,plotback=30);
-ods html5 close;
 
+%plotstate(state=Georgia,level=state,plotback=45);
+%plotstate(state=all,level=state,plotback=30);
 
 /********************************************************************/
 /***** Plot ALL states			 								*****/
 /********************************************************************/
-options orientation=landscape papersize=(7.5in 5in) ;
-ods graphics on /  width=7.5in height=5in  imagemap outputfmt=svg ;
-ods html5 close; ods html close; ODS Listing close;
-ODS HTML gpath="&outputpath/graphs"(URL='graphs/') 
-		 path="&outputpath"(URL=NONE)
-		 contents="contents.html"
-		 frame="AllStates_Individual.html"
-		 body="body.html"
-		 
-		 device=svg;
-
-%plotstate;
-ods html close;
+/* options orientation=landscape papersize=(7.5in 5in) ; */
+/* ods graphics on /  width=7.5in height=5in  imagemap outputfmt=svg ; */
+/* ods html5 close; ods html close; ODS Listing close; */
+/* ODS HTML gpath="&outputpath/graphs"(URL='graphs/')  */
+/* 		 path="&outputpath"(URL=NONE) */
+/* 		 contents="contents.html" */
+/* 		 frame="AllStates_Individual.html" */
+/* 		 body="body.html" */
+/* 		  */
+/* 		 device=svg; */
+/*  */
+/* %plotstate; */
+/* ods html close; */
 
 /********************************************************************/
 /***** 				Plot FIPS Trajectories						*****/
 /********************************************************************/
 %let daysback=30;
-%let minconf=1000;
-%let mindeath=100;
+%let minconf=2000;
+%let mindeath=200;
+%let yvals=(200 to 1200 by 200);
 %let plottip=combined_key FIPS  filedate confirmed deaths;
 %let plottiplab="Location" "FIPS" "FileDate" "Confirmed" "Deaths";
 	
@@ -88,9 +80,9 @@ ods html5 file="&outputpath./AllFIPS.html"
 		gpath= "&outputpath." 
 		device=svg 
 		options(svg_mode="inline");
-	title US FIPS COVID-19 Trajectories;
+	title US FIPS SARS-CoV-2 Trajectories;
 	title2 h=0.95 "New York 36061 Removed";
-	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
+	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 	footnote2  h=1 "Showing the Last &daysback Days";
 	footnote3  h=0.5 justify=right "Samuel T. Croker - &sysdate9";
 	ods proclabel " "; 
@@ -104,13 +96,13 @@ proc sgplot
 		transparency=0.25
 		tip=(&plottip) tiplabel=(&plottiplab) ;
 	series x=Confirmed y=Deaths  / group=fips ;
-	xaxis grid minor minorgrid type=log min=&minconf  LOGSTYLE=logexpand  fitpolicy=rotatethin ;
-	yaxis grid minor minorgrid type=log min=&mindeath LOGSTYLE=logexpand  fitpolicy=thin ;
+	xaxis grid minor minorgrid type=log values=(2000 to 30000 by 2000)  LOGSTYLE=logexpand  fitpolicy=rotatethin ;
+	yaxis grid minor minorgrid type=log values=&yvals LOGSTYLE=logexpand  fitpolicy=thin ;
 run;
 
-	title US FIPS COVID-19 Trajectories Cases Per Capita;
+	title US FIPS SARS-CoV-2 Trajectories Cases Per Capita;
 	title2 h=0.95 "New York 36061 Removed";
-	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
+	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 	footnote2  h=1 "Showing the Last &daysback Days";
 	footnote3  h=0.5 justify=right "Samuel T. Croker - &sysdate9";
 	ods proclabel " "; 
@@ -125,11 +117,11 @@ proc sgplot
 		tip=(&plottip) tiplabel=(&plottiplab) ;
 	series x=casepercapita y=Deaths  / group=fips ;
 	xaxis grid minor minorgrid type=log LOGSTYLE=logexpand  fitpolicy=rotatethin ;
-	yaxis grid minor minorgrid type=log LOGSTYLE=logexpand  fitpolicy=thin ;
+	yaxis grid minor minorgrid values=&yvals type=log LOGSTYLE=logexpand  fitpolicy=thin ;
 run;
-	title US FIPS COVID-19 Trajectories Cases Per Hospital;
+	title US FIPS SARS-CoV-2 Trajectories Cases Per Hospital;
 	title2 h=0.95 "New York 36061 Removed";
-	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
+	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 	footnote2  h=1 "Showing the Last &daysback Days";
 	footnote3  h=0.5 justify=right "Samuel T. Croker - &sysdate9";
 	ods proclabel " "; 
@@ -144,11 +136,11 @@ proc sgplot
 		tip=(&plottip) tiplabel=(&plottiplab) ;
 	series x=caseperhospital y=Deaths  / group=fips ;
 	xaxis grid minor minorgrid type=log LOGSTYLE=logexpand  fitpolicy=rotatethin ;
-	yaxis grid minor minorgrid type=log LOGSTYLE=logexpand  fitpolicy=thin ;
+	yaxis grid minor minorgrid values=&yvals type=log LOGSTYLE=logexpand  fitpolicy=thin ;
 run;
-	title US FIPS COVID-19 Trajectories Cases Per ICU Bed;
+	title US FIPS SARS-CoV-2 Trajectories Cases Per ICU Bed;
 	title2 h=0.95 "New York 36061 Removed";
-	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
+	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 	footnote2  h=1 "Showing the Last &daysback Days";
 	footnote3  h=0.5 justify=right "Samuel T. Croker - &sysdate9";
 	ods proclabel " "; 
@@ -163,17 +155,22 @@ proc sgplot
 		tip=(&plottip) tiplabel=(&plottiplab) ;
 	series x=caseperbed y=Deaths  / group=fips ;
 	xaxis grid minor minorgrid type=log LOGSTYLE=logexpand  fitpolicy=rotatethin ;
-	yaxis grid minor minorgrid type=log LOGSTYLE=logexpand  fitpolicy=thin ;
+	yaxis grid minor minorgrid values=&yvals type=log LOGSTYLE=logexpand  fitpolicy=thin ;
 run;
 ods html5 close;
 
-proc datasets lib=work; delete _plots _fipsranks; quit;
+proc datasets lib=work nolist; delete _plots _fipsranks; quit;
+
+
+
+
 /********************************************************************/
 /***** 				Plot CBSA Trajectories						*****/
 /********************************************************************/
-%let daysback=30;
-%let minconf=1000;
-%let mindeath=100;
+%let daysback=15;
+%let minconf=2000;
+%let mindeath=200;
+%let yvals=(200 to 2000 by 200);
 %let plottip=cbsa_title filedate confirmed deaths;
 %let plottiplab="CBSA" "FileDate" "Confirmed" "Deaths";
 	
@@ -202,11 +199,11 @@ quit;
 %setgopts(12,16,12,16);
 ods html5 file="&outputpath./AllCBSA.html" 
 		gpath= "&outputpath." 
-		device=svg 
+		device=png 
 		options(svg_mode="inline");
-	title US CBSA COVID-19 Trajectories;
+	title US CBSA SARS-CoV-2 Trajectories;
 	title2 h=0.95 "Removed: New York-Newark-Jersey City, NY-NJ-PA";
-	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
+	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 	footnote2  h=1 "Showing the Last &daysback Days";
 	footnote3  h=0.5 justify=right "Samuel T. Croker - &sysdate9";
 
@@ -221,13 +218,13 @@ proc sgplot
 		transparency=0.25
 		tip=(&plottip) tiplabel=(&plottiplab) ;
 	series x=Confirmed y=Deaths  / group=cbsa_title ;
-	xaxis grid minor minorgrid type=log min=&minconf  LOGSTYLE=logexpand ;
-	yaxis grid minor minorgrid type=log min=&mindeath LOGSTYLE=LOGEXPAND ;
+	xaxis grid minor minorgrid values=(2500 to 30000 by 5000)type=log min=&minconf  LOGSTYLE=logexpand ;
+	yaxis grid minor minorgrid values=&yvals type=log min=&mindeath LOGSTYLE=LOGEXPAND ;
 run;
 
 
-title US CBSA COVID-19 Trajectories Per Capita;
-footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
+title US CBSA SARS-CoV-2 Trajectories Per Capita;
+footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 footnote2  h=1 "Showing the Last &daysback Days";
 footnote3  h=0.5 justify=right "Samuel T. Croker - &sysdate9";
 
@@ -243,11 +240,11 @@ proc sgplot
 		tip=(&plottip) tiplabel=(&plottiplab) ;
 	series x=CasePerCapita y=Deaths  / group=cbsa_title ;
 	xaxis grid minor minorgrid type=log  LOGSTYLE=logexpand ;
-	yaxis grid minor minorgrid type=log  LOGSTYLE=LOGEXPAND ;
+	yaxis grid minor values=&yvals minorgrid type=log  LOGSTYLE=LOGEXPAND ;
 run;
 
-title US CBSA COVID-19 Trajectories Per Hospital;
-footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
+title US CBSA SARS-CoV-2 Trajectories Per Hospital;
+footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 footnote2  h=1 "Showing the Last &daysback Days";
 footnote3  h=0.5 justify=right "Samuel T. Croker - &sysdate9";
 
@@ -263,11 +260,11 @@ proc sgplot
 		tip=(&plottip) tiplabel=(&plottiplab) ;
 	series x=CasePerhospital y=Deaths  / group=cbsa_title ;
 	xaxis grid minor minorgrid type=log  LOGSTYLE=logexpand ;
-	yaxis grid minor minorgrid type=log  LOGSTYLE=LOGEXPAND ;
+	yaxis grid minor values=&yvals minorgrid type=log  LOGSTYLE=LOGEXPAND ;
 run;
 
-title US CBSA COVID-19 Trajectories Per ICU Bed;
-footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
+title US CBSA SARS-CoV-2 Trajectories Per ICU Bed;
+footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 footnote2  h=1 "Showing the Last &daysback Days";
 footnote3  h=0.5 justify=right "Samuel T. Croker - &sysdate9";
 
@@ -281,12 +278,14 @@ proc sgplot
 		datalabelattrs=(size=5) 
 		transparency=0.25
 		tip=(&plottip) tiplabel=(&plottiplab) ;
-	series x=CasePerhospital y=Deaths  / group=cbsa_title ;
-	xaxis grid minor minorgrid type=log  LOGSTYLE=logexpand ;
-	yaxis grid minor minorgrid type=log  LOGSTYLE=LOGEXPAND ;
+	series x=CasePerbed y=Deaths  / group=cbsa_title ;
+	xaxis grid type=log  LOGSTYLE=logexpand ;
+	yaxis grid type=log  LOGSTYLE=LOGEXPAND ;
 run;
 ods html5 close;
-proc datasets library=work; delete _plots _cbsaranks; quit;
+
+
+proc datasets library=work nolist; delete _plots _cbsaranks; quit;
 
 /********************************************************************/
 /***** Plot State Trajectories	 								*****/
@@ -294,6 +293,7 @@ proc datasets library=work; delete _plots _cbsaranks; quit;
 %let daysback=30;
 %let minconf=5000;
 %let mindeath=200;
+%let yvals=(200 to 1200 by 200);
 %let plottip=province_state filedate confirmed deaths;
 %let plottiplab="State" "FileDate" "Confirmed" "Deaths";
 	
@@ -301,12 +301,12 @@ proc datasets library=work; delete _plots _cbsaranks; quit;
 ods html5 file="AllStates.html" 
 		 gpath="&outputpath/graphs"(URL='graphs/') 
 		  path="&outputpath"(URL=NONE)
-		device=PNG ;
-/* 		options(svg_mode="inline") */
+		device=svg 
+		options(svg_mode="inline")
 		;
-	title US State COVID-19 Trajectories;
+	title US State SARS-CoV-2 Trajectories;
 	title2 h=0.95 "Removed: New York, New Jersey";
-	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
+	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 	footnote2  h=1 "Showing the Last &daysback Days";
 	footnote3  h=0.5 justify=right "Samuel T. Croker - &sysdate9";
 	ods proclabel " "; 
@@ -341,7 +341,7 @@ ods html5 file="&outputpath./AllCountries.html"
 		device=svg 
 		options(svg_mode="inline");
 	title Global National Trajectories;
-	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
+	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 	footnote2  h=1 "Showing the Last &daysback Days";
 	footnote3  justify=right  height=0.5 "Samuel T. Croker - &sysdate9";
 	ods proclabel " "; 

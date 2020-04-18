@@ -90,6 +90,7 @@
 	run;
 
 	data t_import_ts;
+		informat fipsjoin $5.;
 		set t_import_ts;
 		by fips;
 
@@ -177,14 +178,15 @@
 		informat Metropolitan_Division_Code best32.;
 		informat CSA_Code best32.;
 		informat CBSA_Title $100.;
-		informat MSA $29.;
-		informat MSA_Title $51.;
-		informat CSA_Title $62.;
-		informat County_Equivalent $28.;
+		informat MSA $100.;
+		informat MSA_Title $100.;
+		informat CSA_Title $100.;
+		informat County_Equivalent $100.;
 		informat State_Name $20.;
 		informat FIPS_State_Code $2.;
 		informat FIPS_County_Code $3.;
 		informat Central_Outlying_County $8.;
+		informat fipsjoin $5.;
 		format CBSA_Code $234.;
 		format Metropolitan_Division_Code best12.;
 		format CSA_Code best12.;
@@ -272,8 +274,7 @@
 		%do;
 
 			data _null_;
-				%put NOTE:
-PULLING...;
+				%put NOTE: PULLING...;
 				rc1=GITFN_PULL("/covid19data");
 				put "NOTE: GIT PULL Return Code " rc1=;
 				rc2=GITFN_STATUS("/covid19data");
@@ -325,7 +326,7 @@ PULLING...;
 
 %macro setgopts(h,w,ph,pw);
 	options orientation=landscape papersize=(&h.in &w.in) ;
-	ods graphics on / reset width=&pw.in height=&ph.in  imagemap outputfmt=svg;
+	ods graphics on / reset width=&pw.in height=&ph.in  imagemap outputfmt=svg ;
 	ods html close;ods rtf close;ods pdf close;ods document close; 
 %mend setgopts;
 
@@ -350,50 +351,68 @@ PULLING...;
 		%let state1=&state;
 	%end;
 	
-	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
-	footnote2  h=1 "Showing the Last &daysback Days";
+
+	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19 Data Updated: &sysdate";
+	footnote2  h=1 "Showing the Last &plotback Days";
 	footnote3  justify=right  height=0.5 "Samuel T. Croker - &sysdate9";
 	ods proclabel " "; 
-	
 	%do st = 1 %to &stcount;
-		title "&&state&st COVID-19 Situation Report";
+		options orientation=landscape papersize=(7.5in 5in);
+		ods graphics on /  width=7.5in height=5in  imagemap outputfmt=SVG imagename="&&state&st" imagefmt=SVG ;
+		ods html5 close; ods html close; ODS Listing close;
+		ODS HTML5 gpath="&outputpath/graphs"(URL='graphs/') 
+				 path="&outputpath"(URL=NONE)
+				 file="&&state&st...html"
+				 device=SVG options(svg_mode="inline");
+
+		title "&&state&st SARS-CoV-2 Situation Report";
 		title2 "Prevalence and Deaths";
 		title2 "New Cases and New Deaths";
+
 		ods proclabel "&&state&st";
+		ods graphics /imagename="G1_&&state&st" imagefmt=png imagemap;
 		proc sgplot data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+	
+			symbolchar name=death char='268A'x ;
 			vbar  filedate / response=dif1_confirmed stat=sum datalabel=fd_weekday datalabelfitpolicy= rotate datalabelattrs=(size=2);
-			vline filedate / response=dif1_deaths stat=sum y2axis lineattrs=(thickness=1 );
+			vline filedate / response=dif1_deaths stat=sum y2axis lineattrs=(thickness=0) markers markerattrs=(symbol=death size=20 color='darkred');
 			yaxis ; 
 			y2axis ;
 			xaxis  valueattrs=(size=7) fitpolicy=rotatethin;
 			keylegend / location=outside;
 			format filedate mmddyy5.;
 		run;	
-		title3 "Seven Day Moving Average";
+		title3 "Seven Day Moving Averages";
+		
+		ods graphics /imagename="G2_&&state&st" imagefmt=png imagemap;
 		proc sgplot data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			vbar  filedate / response=dif7_confirmed stat=sum datalabel=fd_weekday datalabelfitpolicy= rotate datalabelattrs=(size=2);
-			vline filedate / response=dif7_deaths stat=sum y2axis lineattrs=(thickness=1 );
+			symbolchar name=death char='268A'x ;
+			vbar  filedate / response=dif7_confirmed stat=sum ;
+			vline filedate / response=dif7_deaths stat=sum y2axis lineattrs=(thickness=0 ) markers markerattrs=(symbol=death size=20 color='darkred');
 			yaxis ; 
 			y2axis ;
 			xaxis  valueattrs=(size=7) fitpolicy=rotatethin;
 			keylegend / location=outside;
-			
 			format filedate mmddyy5.;
 		run;	
 		title2 "Prevalence and Deaths";
 		title3;
-		ods proclabel " ";
+		ods proclabel " ";		
+		
+		ods graphics / imagename="G3_&&state&st" imagefmt=png imagemap;
 		proc sgplot data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st Prevalence Bar";
+			symbolchar name=death char='268A'x ;
 			vbar  filedate / response=confirmed stat=sum ;
-			vline filedate / response=deaths stat=sum y2axis lineattrs=(thickness=1 );
+			vline filedate / response=deaths stat=sum y2axis lineattrs=(thickness=0 ) markers markerattrs=(symbol=death size=20 color='darkred');
 			yaxis ; 
 			y2axis ;
 			xaxis  valueattrs=(size=7) fitpolicy=rotatethin;
 			keylegend / location=outside;
-			
 			format filedate mmddyy5.;
 		run;
 		ods proclabel " ";
+		
+		ods graphics / imagename="G4_&&state&st" imagefmt=png imagemap;
 		proc sgplot data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) description="&&state&st Prevalence Line";
 			scatter y=confirmed x=filedate  / 
 				FILLEDOUTLINEDMARKERS 
@@ -416,10 +435,9 @@ PULLING...;
 			y2axis ;
 			xaxis type=discrete fitpolicy=rotatethin valueattrs=(size=5)	valuesformat=mmddyy5. valuesrotate=diagonal ;
 			keylegend / location=outside;
-			
 			format filedate mmddyy5.;
 		run;
-
+		ods html5 close;
 	%end;
 %mend plotstate;
 

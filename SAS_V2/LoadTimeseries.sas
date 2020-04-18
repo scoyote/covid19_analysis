@@ -57,10 +57,10 @@ data US_Augmented;
 		Filedate 			yymmdd10.
 		confirmed 			comma12.
 		deaths 				comma12.
-		CBSA_Title 			$50.
-		MSA_Title 			$25.
-		CSA_Title 			$25.
-		County_equivalent 	$25.
+		CBSA_Title 			$100.
+		MSA_Title 			$100.
+		CSA_Title 			$100.
+		County_equivalent 	$100.
 		State  				$25.
 		State_Name 			$25.
 		census2010pop 		comma12.
@@ -82,7 +82,7 @@ data US_Augmented;
 	else if substr(fipsjoin,1,2) ~= 'f1' then stfips_cd=25;
 	else if substr(fipsjoin,1,2) ~= 'f2' then stfips_cd=29;
 	else stfips_cd=substr(fipsjoin,1,2);
-	state_fips=fipstate(stfips_cd);
+	if stfips_cd ~= '99' then state_fips=fipstate(stfips_cd);
 run;
 
 
