@@ -324,14 +324,14 @@
 
 %mend jhuxw;
 
-%macro setgopts(h,w,ph,pw,gfmt=svg);
+%macro setgopts(h,w,ph,pw);
 	options orientation=landscape papersize=(&h.in &w.in) ;
-	ods graphics on / reset width=&pw.in height=&ph.in  imagemap outputfmt=&gfmt ;
+	ods graphics on / reset width=&pw.in height=&ph.in  imagemap outputfmt=svg ;
 	ods html close;ods rtf close;ods pdf close;ods document close; 
 %mend setgopts;
 
 
-%macro plotstate(state=all,level=state,plotback=30,gfmt=svg);
+%macro plotstate(state=all,level=state,plotback=30);
 	%if &state=all %then %do;
 		%if &level=state %then %do;
 			proc sql noprint; 
@@ -351,38 +351,31 @@
 		%let state1=&state;
 	%end;
 	
-	%if &gfmt=svg %then %do;
-		%let gsym=symbol=death;
-		%let gsize=20;
-	%end;
-	%else %do;
-		%let gsym=circlefilled;
-		%let gsize = 5;
-	%end;
 
 	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19 Data Updated: &sysdate";
 	footnote2  h=1 "Showing the Last &plotback Days";
 	footnote3  justify=right  height=0.5 "Samuel T. Croker - &sysdate9";
+	ods proclabel " "; 
 	%do st = 1 %to &stcount;
-	
 		options orientation=landscape papersize=(7.5in 5in);
-		ods graphics on /  width=7.5in height=5in  imagemap outputfmt=&gfmt imagename="&&state&st" imagefmt=&gfmt ;
+		ods graphics on /  width=7.5in height=5in  imagemap outputfmt=SVG imagename="&&state&st" imagefmt=SVG ;
 		ods html5 close; ods html close; ODS Listing close;
 		ODS HTML5 gpath="&outputpath/graphs"(URL='graphs/') 
 				 path="&outputpath"(URL=NONE)
 				 file="&&state&st...html"
-				 device=&gfmt ;*options(svg_mode="inline");
+				 device=SVG options(svg_mode="inline");
 
 		title "&&state&st SARS-CoV-2 Situation Report";
 		title2 "Prevalence and Deaths";
 		title2 "New Cases and New Deaths";
 
-		ods proclabel "&&state&st New";
-		ods graphics /imagename="&&state&st.._New" imagefmt=&gfmt imagemap;
+		ods proclabel "&&state&st";
+		ods graphics /imagename="G1_&&state&st" imagefmt=png imagemap;
 		proc sgplot data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+	
 			symbolchar name=death char='268A'x ;
 			vbar  filedate / response=dif1_confirmed stat=sum datalabel=fd_weekday datalabelfitpolicy= rotate datalabelattrs=(size=2);
-			vline filedate / response=dif1_deaths stat=sum y2axis lineattrs=(thickness=0) markers markerattrs=(symbol=&gsym size=&gsize color='darkred');
+			vline filedate / response=dif1_deaths stat=sum y2axis lineattrs=(thickness=0) markers markerattrs=(symbol=death size=20 color='darkred');
 			yaxis ; 
 			y2axis ;
 			xaxis  valueattrs=(size=7) fitpolicy=rotatethin;
@@ -391,11 +384,11 @@
 		run;	
 		title3 "Seven Day Moving Averages";
 		
-		ods graphics /imagename="&&state&st.._7MA" imagefmt=&gfmt imagemap;
+		ods graphics /imagename="G2_&&state&st" imagefmt=png imagemap;
 		proc sgplot data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
 			symbolchar name=death char='268A'x ;
 			vbar  filedate / response=dif7_confirmed stat=sum ;
-			vline filedate / response=dif7_deaths stat=sum y2axis lineattrs=(thickness=0 ) markers markerattrs=(symbol=&gsym size=&gsize  color='darkred');
+			vline filedate / response=dif7_deaths stat=sum y2axis lineattrs=(thickness=0 ) markers markerattrs=(symbol=death size=20 color='darkred');
 			yaxis ; 
 			y2axis ;
 			xaxis  valueattrs=(size=7) fitpolicy=rotatethin;
@@ -404,22 +397,22 @@
 		run;	
 		title2 "Prevalence and Deaths";
 		title3;
-		ods proclabel "&&State&st Profile";		
+		ods proclabel " ";		
 		
-		ods graphics / imagename="&&state&st.._Profile" imagefmt=&gfmt imagemap;
+		ods graphics / imagename="G3_&&state&st" imagefmt=png imagemap;
 		proc sgplot data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st Prevalence Bar";
 			symbolchar name=death char='268A'x ;
 			vbar  filedate / response=confirmed stat=sum ;
-			vline filedate / response=deaths stat=sum y2axis lineattrs=(thickness=0 ) markers markerattrs=(symbol=&gsym size=&gsize  color='darkred');
+			vline filedate / response=deaths stat=sum y2axis lineattrs=(thickness=0 ) markers markerattrs=(symbol=death size=20 color='darkred');
 			yaxis ; 
 			y2axis ;
 			xaxis  valueattrs=(size=7) fitpolicy=rotatethin;
 			keylegend / location=outside;
 			format filedate mmddyy5.;
 		run;
-		ods proclabel "&&State&st Phase";
+		ods proclabel " ";
 		
-		ods graphics / imagename="&&state&st.._Phase" imagefmt=&gfmt imagemap;
+		ods graphics / imagename="G4_&&state&st" imagefmt=png imagemap;
 		proc sgplot data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) description="&&state&st Prevalence Line";
 			scatter y=confirmed x=filedate  / 
 				FILLEDOUTLINEDMARKERS 
@@ -717,51 +710,21 @@
 	quit;
 %MEND CREATE_TRAJECTORIES;
 
-/* https://documentation.sas.com/?docsetId=mcrolref&docsetTarget=n108rtvqj4uf7tn13tact6ggb6uf.htm&docsetVersion=9.4&locale=en */
-%macro checkDeleteFile(file);
-	%if %sysfunc(fileexist(&file)) ge 1 %then %do;
-	   %let rc=%sysfunc(filename(temp,&file));
-	   %let rc=%sysfunc(fdelete(&temp));
-	   %put NOTE: Delete RC=&rc &file;
-	%end; 
-	%else %put NOTE: The file &file does not exist;
-%mend checkDeleteFile; 
 
-%macro rmPathFiles(fpath,extension); 
-	%let ct=0;
-	%if %sysfunc(fileexist(&fpath)) ge 1 %then %do;
-		filename _delpath "&fpath";
-	    %put NOTE: Proceeding with listing files in &fpath;
-		data _null_;
-			legacy_count=0;
-			current_count=0;
-			handle=dopen("_delpath");
-			if handle > 0 then do;
-				count=dnum(handle);
-				ct=0;
-				do i=1 to count;
-					memname=dread(handle,i);
-					filepref = scan(memname,1,'.');
-					fileext  = scan(memname,2,".");
-					if fileext = "&extension" then do;
-						ct+1;
-						call symput(cats("file",ct),cats("&fpath./",memname));
-						call symput("ct",ct);
-					end;
-				end;
-			end;
-			rc=dclose(handle);
-		run;
-		filename _delpath clear;
-	%end;
-	%else %do;
-		%put NOTE: &fpath Does Not Exist RC=&rc;
-	%end;
-	%do j=1 %to &ct;
-		%checkDeleteFile(&&file&j);
-	%end;
-	
-%mend rmPathFiles;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
