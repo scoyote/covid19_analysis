@@ -7,21 +7,25 @@
 
 
 *You will need to rerun part of loadtimeseries.sas after this;
-proc sql; 
-	insert into US_AUGMENTEd 
-			(province_state, filedate, confirmed, deaths) 
-		values("Georgia", '17APR2020'd,17194,650)
-	;
-quit;
-
-%create_trajectories;
+/* proc sql;  */
+/* 	insert into US_AUGMENTEd  */
+/* 			(province_state, filedate, confirmed, deaths)  */
+/* 		values("Georgia", '17APR2020'd,17194,650) */
+/* 	; */
+/* quit; */
+/*  */
+/* %create_trajectories; */
 
 /********************************************************************/
 /***** Plot a single state group - just change the macvar here 	*****/
 /********************************************************************/
 
-%plotstate(state=Georgia,level=state,plotback=45);
-%plotstate(state=all,level=state,plotback=30);
+%rmPathFiles(/covid_analysis/SAS_V2/graphs/graphs,png);
+
+%plotstate(state=Georgia,level=state,plotback=30,gfmt=png);
+
+
+%plotstate(state=all,level=state,plotback=30,gfmt=png);
 
 /********************************************************************/
 /***** Plot ALL states			 								*****/

@@ -13,9 +13,13 @@ ods graphics / reset width=7in height=5in imagemap imagefmt=png;
 
 /*********************************************************************************************************
 *Diagnostic tools - look up regions. ; 
-%lookupregion(fips_trajectories,combined_key,michigan);
+%lookupregion(fips_trajectories,cbsa_title,idaho);
+proc sql;
+	select cbsa_title, filedate, confirmed,  census2010pop from cbsa_trajectories where cbsa_title="&titlestring";
+	quit;
 **********************************************************************************************************/	
-
+%let titlestring=Idaho Falls, ID;
+%CreateModelData(cbsa,cbsa_title,%str(Idaho Falls, ID),enddate=17APR2020);
 /* %CreateModelData(cbsa,cbsa_title,%str(San Antonio-New Braunfels, TX),enddate=14APR2020); */
 /* %CreateModelData(fips,fips,13057, enddate=14APR2020); * Cherokee county ga; */
 /* %CreateModelData(cbsa,cbsa_title,%str(Atlanta-Sandy Springs-Alpharetta, GA), enddate=16APR2020); */
@@ -36,10 +40,14 @@ Initial recovered	The number of recovered individuals at the beginning of the mo
 Days	Controls how long the model will run.
 **********************************************************************************************************/
 /* Georgia */
+title "SEIR Estimation for &titlestring";
+
 %tsimulate(N=10214860,tau=5.081846,Rho0=2.5,sigma=0.9);
+
 
 %tsimulate(N=&popest,tau=5.081846,Rho0=2.5,sigma=0.9);
 
+title "SEIR Forecasting for &titlestring";
 
 proc Tmodel data=_scaffold model=_model;
    solve s_t e_t i_t r_t / 
@@ -55,8 +63,12 @@ run;
 quit;
 
 proc sort data=_forecast; by _rep_ date; run;
-
-ods graphics / reset width=7in height=5in imagemap imagefmt=svg;	
+ods html5 file="/covid_analysis/modeling/graphs/&titlestring._forecast.html" 
+		gpath= "/covid_analysis/modeling/graphs/" 
+		device=svg 
+		options(svg_mode="inline");
+ods graphics / reset width=7in height=5in imagemap imagefmt=svg imagename="&titlestring._forecast";	
+	title "SEIR Forecast for &titlestring";
 	footnote "Susceptable and Removed Components on Right Axis";
 	proc sgplot data=_forecast des="SEIR Compartment Phase";
 		where _rep_=0;
@@ -90,6 +102,6 @@ ods graphics / reset width=7in height=5in imagemap imagefmt=svg;
 	run;
 ods graphics / reset;
 
-
+ods html5 close;
 
    
