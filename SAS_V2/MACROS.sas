@@ -332,19 +332,30 @@
 
 
 %macro plotstate(state=all,level=state,plotback=30,gfmt=svg);
+
 	%if &state=all %then %do;
 		%if &level=state %then %do;
+			%let ff=province_state;
 			proc sql noprint; 
 				select count(distinct province_state) into :stcount from &level._trajectories;
 				select distinct province_state into :state1 - :state%cmpres(&stcount) from &level._trajectories; 
 			quit;
 		%end;
-		%else %do;
+		%else %if level=global %then %do;
+			%let ff=country_region;
 			proc sql noprint; 
 				select count(distinct country_region) into :stcount from &level._trajectories;
 				select distinct country_region into :state1 - :state%cmpres(&stcount) from &level._trajectories; 
 			quit;
 		%end;
+		%else %if level=cbsa %then %do;
+			%let ff=cbsa_title;
+			proc sql noprint; 
+				select count(distinct cbsa_title) into :stcount from &level._trajectories;
+				select distinct cbsa_title into :state1 - :state%cmpres(&stcount) from &level._trajectories; 
+			quit;
+		%end;
+		
 	%end;
 	%else %do;
 		%let stcount=1;
@@ -364,13 +375,14 @@
 	footnote2  h=1 "Showing the Last &plotback Days";
 	footnote3  justify=right  height=0.5 "Samuel T. Croker - &sysdate9";
 	%do st = 1 %to &stcount;
-	
+		%let stlab=%SYSFUNC(compress("&&STATE&ST",' ",.<>;:`~!@#$%^&&*()-_=+'));
+
 		options orientation=landscape papersize=(7.5in 5in);
-		ods graphics on /  width=7.5in height=5in  imagemap outputfmt=&gfmt imagename="&&state&st" imagefmt=&gfmt ;
+		ods graphics on / reset width=7.5in height=5in  imagemap outputfmt=&gfmt imagename="&stlab" imagefmt=&gfmt ;
 		ods html5 close; ods html close; ODS Listing close;
 		ODS HTML5 gpath="&outputpath/graphs"(URL='graphs/') 
 				 path="&outputpath"(URL=NONE)
-				 file="&&state&st...html"
+				 file="&stlab..html"
 				 device=&gfmt ;*options(svg_mode="inline");
 
 		title "&&state&st SARS-CoV-2 Situation Report";
@@ -378,8 +390,17 @@
 		title2 "New Cases and New Deaths";
 
 		ods proclabel "&&state&st New";
-		ods graphics /imagename="&&state&st.._New" imagefmt=&gfmt imagemap;
-		proc sgplot data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+		ods graphics /imagename="&stlab._New" imagefmt=&gfmt imagemap;
+		proc sgplot 
+			%if &level=state %then %do;
+				data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+			%end;
+			%else %if &level=global %then %DO;
+				data=&level._trajectories(where=(country_region="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+			%end;
+			%else %if &level=cbsa %then %DO;
+				data=&level._trajectories(where=(cbsa_title="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+			%end;
 			symbolchar name=death char='268A'x ;
 			vbar  filedate / response=dif1_confirmed stat=sum datalabel=fd_weekday datalabelfitpolicy= rotate datalabelattrs=(size=2);
 			vline filedate / response=dif1_deaths stat=sum y2axis lineattrs=(thickness=0) markers markerattrs=(symbol=&gsym size=&gsize color='darkred');
@@ -389,13 +410,21 @@
 			keylegend / location=outside;
 			format filedate mmddyy5.;
 		run;	
-		title3 "Seven Day Moving Averages";
+		title3 "Seven Day Moving Average";
 		
-		ods graphics /imagename="&&state&st.._7MA" imagefmt=&gfmt imagemap;
-		proc sgplot data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			symbolchar name=death char='268A'x ;
-			vbar  filedate / response=dif7_confirmed stat=sum ;
-			vline filedate / response=dif7_deaths stat=sum y2axis lineattrs=(thickness=0 ) markers markerattrs=(symbol=&gsym size=&gsize  color='darkred');
+		ods graphics /imagename="&stlab._7MA" imagefmt=&gfmt imagemap;
+		proc sgplot
+			%if &level=state %then %do;
+				data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+			%end;
+			%else %if &level=global %then %DO;
+				data=&level._trajectories(where=(country_region="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+			%end;
+			%else %if &level=cbsa %then %DO;
+				data=&level._trajectories(where=(cbsa_title="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+			%end;			symbolchar name=death char='268A'x ;
+			vbar  filedate / response=ma7_new_confirmed stat=sum ;
+			vline filedate / response=ma7_new_deaths stat=sum y2axis lineattrs=(thickness=0 ) markers markerattrs=(symbol=&gsym size=&gsize  color='darkred');
 			yaxis ; 
 			y2axis ;
 			xaxis  valueattrs=(size=7) fitpolicy=rotatethin;
@@ -404,11 +433,20 @@
 		run;	
 		title2 "Prevalence and Deaths";
 		title3;
-		ods proclabel "&&State&st Profile";		
+		ods proclabel "&stlab Profile";		
 		
-		ods graphics / imagename="&&state&st.._Profile" imagefmt=&gfmt imagemap;
-		proc sgplot data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st Prevalence Bar";
-			symbolchar name=death char='268A'x ;
+		ods graphics / imagename="&stlab._Profile" imagefmt=&gfmt imagemap;
+			
+		proc sgplot
+			%if &level=state %then %do;
+				data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+			%end;
+			%else %if &level=global %then %DO;
+				data=&level._trajectories(where=(country_region="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+			%end;
+			%else %if &level=cbsa %then %DO;
+				data=&level._trajectories(where=(cbsa_title="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+			%end;			symbolchar name=death char='268A'x ;
 			vbar  filedate / response=confirmed stat=sum ;
 			vline filedate / response=deaths stat=sum y2axis lineattrs=(thickness=0 ) markers markerattrs=(symbol=&gsym size=&gsize  color='darkred');
 			yaxis ; 
@@ -419,8 +457,18 @@
 		run;
 		ods proclabel "&&State&st Phase";
 		
-		ods graphics / imagename="&&state&st.._Phase" imagefmt=&gfmt imagemap;
-		proc sgplot data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) description="&&state&st Prevalence Line";
+		ods graphics / imagename="&stlab._Phase" imagefmt=&gfmt imagemap;
+			
+		proc sgplot
+			%if &level=state %then %do;
+				data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+			%end;
+			%else %if &level=global %then %DO;
+				data=&level._trajectories(where=(country_region="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+			%end;
+			%else %if &level=cbsa %then %DO;
+				data=&level._trajectories(where=(cbsa_title="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
+			%end;
 			scatter y=confirmed x=filedate  / 
 				FILLEDOUTLINEDMARKERS 
 				MARKERFILLATTRS=(color='CX6599C9') 
@@ -527,12 +575,19 @@
 					;
 			quit;
 	
-			proc expand data=_fips_trajectories out=fips_trajectories;
+			proc expand data=_fips_trajectories out=_t1;
 				by fips country_region province_state cbsa_title combined_key;
 				convert confirmed	= dif1_confirmed / transout=(dif 1);
 				convert confirmed	= dif7_confirmed / transout=(dif 7);
+				convert confirmed	= MA7_confirmed  / transout=(movave 7);
 				convert deaths		= dif1_deaths 	 / transout=(dif 1);
 				convert deaths		= dif7_deaths	 / transout=(dif 7);	
+				convert deaths		= MA7_deaths 	 / transout=(movave 7);
+			run;
+			proc expand data=_t1 out=fips_trajectories;
+				by fips;
+				convert dif1_confirmed	= MA7_new_confirmed  / transout=(movave 7);
+				convert dif1_deaths		= ma7_new_deaths 	 / transout=(movave 7);
 			run;
 			/* add in a countdown from most recent to oldest for plotting */
 			proc sort data=fips_trajectories; by fips country_region province_state cbsa_title combined_key descending filedate; run;
@@ -552,7 +607,7 @@
 			run;
 			proc sort data=fips_trajectories ; by  fips country_region province_state cbsa_title combined_key filedate; run;
 	
-			proc datasets library=work; delete _fips_trajectories ; quit;
+			proc datasets library=work; delete _t1 _fips_trajectories ; quit;
 	/********************************************************************/
 	/***** 					CBSA TRAJECTORIES BLOCK					*****/
 	/********************************************************************/
@@ -577,12 +632,19 @@
 						,filedate
 					;
 			quit;
-			proc expand data=_cbsa_trajectories out=cbsa_trajectories;
+			proc expand data=_cbsa_trajectories out=_t1;
 				by cbsa_title;
 				convert confirmed	= dif1_confirmed / transout=(dif 1);
 				convert confirmed	= dif7_confirmed / transout=(dif 7);
+				convert confirmed	= MA7_confirmed  / transout=(movave 7);
 				convert deaths		= dif1_deaths 	 / transout=(dif 1);
 				convert deaths		= dif7_deaths	 / transout=(dif 7);	
+				convert deaths		= MA7_deaths  	 / transout=(movave 7);
+			run;
+			proc expand data=_t1 out=cbsa_trajectories;
+				by cbsa_title;
+				convert dif1_confirmed	= MA7_new_confirmed  / transout=(movave 7);
+				convert dif1_deaths		= ma7_new_deaths 	 / transout=(movave 7);
 			run;
 			/* add in a countdown from most recent to oldest for plotting */
 			proc sort data=cbsa_trajectories; by cbsa_title descending filedate; run;
@@ -603,7 +665,7 @@
 			proc sort data=cbsa_trajectories ; by cbsa_title filedate; run;
 	
 			
-			proc datasets library=work; delete _cbsa_trajectories ; quit;
+			proc datasets library=work; delete _t1 _cbsa_trajectories ; quit;
 	
 	/********************************************************************/
 	/***** 			STATE TRAJECTORIES BLOCK						*****/
@@ -626,12 +688,19 @@
 						,filedate
 					;
 			quit;
-			proc expand data=_state_trajectories out=state_trajectories;
+			proc expand data=_state_trajectories out=_t1;
 				by province_state;
 				convert confirmed	= dif1_confirmed / transout=(dif 1);
 				convert confirmed	= dif7_confirmed / transout=(dif 7);
+				convert confirmed	= MA7_confirmed  / transout=(movave 7);
 				convert deaths		= dif1_deaths 	 / transout=(dif 1);
-				convert deaths		= dif7_deaths	 / transout=(dif 7);	
+				convert deaths		= dif7_deaths	 / transout=(dif 7);
+				convert deaths		= MA7_deaths  	 / transout=(movave 7);
+			run;
+			proc expand data=_t1 out=state_trajectories;
+				by province_state;
+				convert dif1_confirmed	= MA7_new_confirmed  / transout=(movave 7);
+				convert dif1_deaths		= ma7_new_deaths 	 / transout=(movave 7);
 			run;
 			/* add in a countdown from most recent to oldest for plotting */
 			proc sort data=state_trajectories; by province_state descending filedate; run;
@@ -647,7 +716,7 @@
 			proc sort data=state_trajectories; by province_state filedate; run;
 	
 			
-			proc datasets library=work; delete _state_trajectories _fips_trajectories ; quit;
+			proc datasets library=work; delete _t1 _state_trajectories _fips_trajectories ; quit;
 	
 	
 	/********************************************************************/
@@ -690,26 +759,36 @@
 				fd_weekday = put(filedate,DOWNAME3.);
 			run;
 			proc sort data=_global_trajectories; by country_region province_state filedate; run;
-			proc expand data=_global_trajectories out=global_trajectories;
+			proc expand data=_global_trajectories out=_t1;
 				by country_region province_state;
 				convert confirmed	= dif1_confirmed / transout=(dif 1);
 				convert confirmed	= dif7_confirmed / transout=(dif 7);
 				convert deaths		= dif1_deaths 	 / transout=(dif 1);
-				convert deaths		= dif7_deaths	 / transout=(dif 7);	
+				convert deaths		= dif7_deaths	 / transout=(dif 7);
+				convert confirmed	= MA7_confirmed  / transout=(movave 7);
+				convert deaths		= MA7_deaths  	 / transout=(movave 7);
 			run;
-			
+			proc expand data=_t1 out=global_trajectories;
+				by country_region province_state;
+				convert dif1_confirmed	= MA7_new_confirmed  / transout=(movave 7);
+				convert dif1_deaths		= ma7_new_deaths 	 / transout=(movave 7);
+			run;
 			
 			
 	%let bulkformat=format confirmed deaths dif1_confirmed--dif7_deaths comma12. filedate mmddyy5.;
 	%let bulklabel=label dif1_confirmed = "New Confirmed"
 				    	 dif1_deaths = "New Deaths"
-				    	 dif7_confirmed ="New Confirmed: Seven Day Moving Average"
-				    	 dif7_deaths =" New Deaths: Seven Day Moving Average"
+				    	 dif7_confirmed ="Confirmed: Seven Day Difference"
+				    	 dif7_deaths ="Deaths: Seven Day Difference"
+				    	 ma7_confirmed ="Cumulative Confirmed: Seven Day Moving Average"
+				    	 ma7_deaths ="Cumulative Deaths: Seven Day Moving Average"
+				    	 ma7_new_confirmed ="Seven Day Average of New Confirmed"
+				    	 ma7_new_deaths ="Seven Day Average of New Deaths"
 				    	 plotseq="Days"
 				    	 fd_weekday="Weekday of File Date";
 				  
 	proc datasets library=work; 
-		delete _global_trajectories; 
+		delete _global_trajectories _t1; 
 		modify fips_trajectories; 	&bulkformat; &bulklabel;
 		modify cbsa_trajectories;	&bulkformat; &bulklabel;
 		modify state_trajectories;	&bulkformat; &bulklabel;

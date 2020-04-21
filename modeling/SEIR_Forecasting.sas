@@ -19,10 +19,10 @@ proc sql;
 	quit;
 **********************************************************************************************************/	
 %let titlestring=Idaho Falls, ID;
-%CreateModelData(cbsa,cbsa_title,%str(Idaho Falls, ID),enddate=17APR2020);
+/* %CreateModelData(cbsa,cbsa_title,%str(Idaho Falls, ID),enddate=17APR2020); */
 /* %CreateModelData(cbsa,cbsa_title,%str(San Antonio-New Braunfels, TX),enddate=14APR2020); */
 /* %CreateModelData(fips,fips,13057, enddate=14APR2020); * Cherokee county ga; */
-/* %CreateModelData(cbsa,cbsa_title,%str(Atlanta-Sandy Springs-Alpharetta, GA), enddate=16APR2020); */
+%CreateModelData(cbsa,cbsa_title,%str(Atlanta-Sandy Springs-Alpharetta, GA), enddate=16APR2020);
 /* %CreateModelData(state,province_state,Georgia, enddate=14APR2020); */
 
 /**********************************************************************************************************	

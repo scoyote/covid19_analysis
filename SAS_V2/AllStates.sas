@@ -4,28 +4,57 @@
 
 %let rc = %sysfunc(dlgcdir("/covid_analysis/SAS_V2/")); 
 %include "LoadTimeseries.sas";
+%let graphFormat=png;
 
-
-*You will need to rerun part of loadtimeseries.sas after this;
+/* *You will need to rerun part of loadtimeseries.sas after this; */
 /* proc sql;  */
 /* 	insert into US_AUGMENTEd  */
 /* 			(province_state, filedate, confirmed, deaths)  */
-/* 		values("Georgia", '17APR2020'd,17194,650) */
+/* 		values("Georgia", '20APR2020'd,19399,775) */
 /* 	; */
 /* quit; */
-/*  */
+
 /* %create_trajectories; */
+
+proc sql;
+	select distinct cbsa_title from cbsa_trajectories 
+	where lowcase(cbsa_title) contains "new york";
+quit;
+proc print data=state_trajectories;
+	where province_state='Georgia';
+	var filedate confirmed dif1_confirmed ma7_new_confirmed ma7_confirmed ;
+run;
 
 /********************************************************************/
 /***** Plot a single state group - just change the macvar here 	*****/
 /********************************************************************/
 
-%rmPathFiles(/covid_analysis/SAS_V2/graphs/graphs,png);
+%rmPathFiles(/covid_analysis/SAS_V2/graphs/graphs,&graphFormat);
+%rmPathFiles(/covid_analysis/SAS_V2/graphs/,html);
 
-%plotstate(state=Georgia,level=state,plotback=30,gfmt=png);
+/* CBSAs */
+%plotstate(state=%str(Atlanta-Sandy Springs-Alpharetta, GA),level=cbsa,plotback=30,gfmt=&graphFormat);
+%plotstate(state=%str(San Antonio-New Braunfels, TX),level=cbsa,plotback=30,gfmt=&graphFormat);
+%plotstate(state=%str(Albany, GA),level=cbsa,plotback=30,gfmt=&graphFormat);
+%plotstate(state=%str(Charleston-North Charleston, SC),level=cbsa,plotback=30,gfmt=&graphFormat);
+%plotstate(state=%str(New York-Newark-Jersey City, NY-NJ-PA),level=cbsa,plotback=30,gfmt=&graphFormat);
 
+/* States */
+/* %plotstate(state=Georgia,level=state,plotback=30,gfmt=&graphFormat); */
 
-%plotstate(state=all,level=state,plotback=30,gfmt=png);
+%plotstate(state=all,level=state,plotback=30,gfmt=&graphFormat);
+
+/* Countries */
+%plotstate(state=US,level=global,plotback=30,gfmt=&graphFormat);
+%plotstate(state=Italy,level=global,plotback=30,gfmt=&graphFormat);
+%plotstate(state=Germany,level=global,plotback=30,gfmt=&graphFormat);
+%plotstate(state=United Kingdom,level=global,plotback=30,gfmt=&graphFormat);
+%plotstate(state=Russia,level=global,plotback=30,gfmt=&graphFormat);
+%plotstate(state=India,level=global,plotback=30,gfmt=&graphFormat);
+
+%plotstate(state=Mexico,level=global,plotback=30,gfmt=&graphFormat);
+%plotstate(state=Brazil,level=global,plotback=30,gfmt=&graphFormat);
+
 
 /********************************************************************/
 /***** Plot ALL states			 								*****/
@@ -79,7 +108,11 @@ proc datasets lib=work;
 			  caseperbed 	  comma12.6	
 			  caseperhospital comma12.6;
 quit;
-%setgopts(12,16,12,16);
+	
+options orientation=landscape papersize=(12in 12in) ;
+	ods graphics on / reset width=12in height=12in  imagemap imagename="AllFIPS" outputfmt=&graphFormat ;
+	ods html close;ods rtf close;ods pdf close;ods document close;
+
 ods html5 file="&outputpath./AllFIPS.html" 
 		gpath= "&outputpath." 
 		device=svg 
@@ -199,11 +232,15 @@ proc datasets lib=work;
 			  casepercapita   comma12.6
 			  caseperbed 	  comma12.6	
 			  caseperhospital comma12.6;
-quit;	
-%setgopts(12,16,12,16);
+quit;
+	
+options orientation=landscape papersize=(12in 12in) ;
+	ods graphics on / reset width=12in height=12in  imagemap imagename="AllCBSA" outputfmt=&graphFormat ;
+	ods html close;ods rtf close;ods pdf close;ods document close;
+
 ods html5 file="&outputpath./AllCBSA.html" 
 		gpath= "&outputpath." 
-		device=png 
+		device=&graphFormat 
 		options(svg_mode="inline");
 	title US CBSA SARS-CoV-2 Trajectories;
 	title2 h=0.95 "Removed: New York-Newark-Jersey City, NY-NJ-PA";
@@ -294,38 +331,41 @@ proc datasets library=work nolist; delete _plots _cbsaranks; quit;
 /********************************************************************/
 /***** Plot State Trajectories	 								*****/
 /********************************************************************/
-%let daysback=30;
+%let daysback=14;
 %let minconf=5000;
 %let mindeath=200;
 %let yvals=(200 to 1200 by 200);
 %let plottip=province_state filedate confirmed deaths;
 %let plottiplab="State" "FileDate" "Confirmed" "Deaths";
-	
-%setgopts(12,16,12,16);
+
+
+options orientation=landscape papersize=(12in 12in) ;
+	ods graphics on / reset width=12in height=12in  imagemap imagename="AllStates" outputfmt=&graphFormat ;
+	ods html close;ods rtf close;ods pdf close;ods document close;
 ods html5 file="AllStates.html" 
 		 gpath="&outputpath/graphs"(URL='graphs/') 
 		  path="&outputpath"(URL=NONE)
-		device=svg 
-		options(svg_mode="inline")
+		device=&graphFormat 
+		options(svg_mode="inline") 
 		;
-	title US State SARS-CoV-2 Trajectories;
-	title2 h=0.95 "Removed: New York, New Jersey";
-	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
-	footnote2  h=1 "Showing the Last &daysback Days";
-	footnote3  h=0.5 justify=right "Samuel T. Croker - &sysdate9";
+	title h=2 US State SARS-CoV-2 Trajectories;
+	title2 h=1.5 "Removed: New York, New Jersey";
+	footnote   h=1.5 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
+	footnote2  h=1.5 "Showing the Last &daysback Days";
+	footnote3  h=0.9 justify=right "Samuel T. Croker - &sysdate9";
 	ods proclabel " "; 
 proc sgplot 
 	data=state_trajectories(where=(province_state not in ("New York" "New Jersey") and plotseq<=&daysback and confirmed>&minconf and deaths>&mindeath))
 	noautolegend;
 	scatter x=Confirmed y=Deaths / group=province_state 
 		datalabel=province_state
-		markerattrs=(size=7) 
-		datalabelattrs=(size=5) 
+		markerattrs=(size=12) 
+		datalabelattrs=(size=12) 
 		transparency=0.25
 		tip=(&plottip) tiplabel=(&plottiplab) ;
 	series x=Confirmed y=Deaths  / group=province_state;
-	xaxis grid minor minorgrid type=log min=&minconf  LOGSTYLE=LOGEXPAND values = (5000 to 35000 by 5000);
-	yaxis grid minor minorgrid type=log min=&mindeath LOGSTYLE=LOGEXPAND values = (200 500 1000 1500 2000 ) ;
+	xaxis grid minor minorgrid type=log min=&minconf  labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND values = (5000 to 40000 by 5000);
+	yaxis grid minor minorgrid type=log min=&mindeath labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND values = (200 500 1000 1500 2000 2500 ) ;
 run;
 ods html5 close;
 
@@ -336,7 +376,10 @@ ods html5 close;
 %let daysback=14;
 %let minconf=1000;
 %let mindeath=100;
-%setgopts(12,16,12,16);
+options orientation=landscape papersize=(12in 12in) ;
+	ods graphics on / reset width=12in height=12in  imagemap imagename="AllNations" outputfmt=&graphFormat ;
+	ods html close;ods rtf close;ods pdf close;ods document close;
+
 %let plottip=country_region location filedate confirmed deaths;
 %let plottiplab="Country" "Location" "FileDate" "Confirmed" "Deaths";
 
