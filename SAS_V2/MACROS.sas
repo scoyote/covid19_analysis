@@ -331,162 +331,6 @@
 %mend setgopts;
 
 
-%macro plotstate(state=all,level=state,plotback=30,gfmt=svg);
-
-	%if &state=all %then %do;
-		%if &level=state %then %do;
-			%let ff=province_state;
-			proc sql noprint; 
-				select count(distinct province_state) into :stcount from &level._trajectories;
-				select distinct province_state into :state1 - :state%cmpres(&stcount) from &level._trajectories; 
-			quit;
-		%end;
-		%else %if level=global %then %do;
-			%let ff=country_region;
-			proc sql noprint; 
-				select count(distinct country_region) into :stcount from &level._trajectories;
-				select distinct country_region into :state1 - :state%cmpres(&stcount) from &level._trajectories; 
-			quit;
-		%end;
-		%else %if level=cbsa %then %do;
-			%let ff=cbsa_title;
-			proc sql noprint; 
-				select count(distinct cbsa_title) into :stcount from &level._trajectories;
-				select distinct cbsa_title into :state1 - :state%cmpres(&stcount) from &level._trajectories; 
-			quit;
-		%end;
-		
-	%end;
-	%else %do;
-		%let stcount=1;
-		%let state1=&state;
-	%end;
-	
-	%if &gfmt=svg %then %do;
-		%let gsym=symbol=death;
-		%let gsize=20;
-	%end;
-	%else %do;
-		%let gsym=circlefilled;
-		%let gsize = 5;
-	%end;
-
-	footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19 Data Updated: &sysdate";
-	footnote2  h=1 "Showing the Last &plotback Days";
-	footnote3  justify=right  height=0.5 "Samuel T. Croker - &sysdate9";
-	%do st = 1 %to &stcount;
-		%let stlab=%SYSFUNC(compress("&&STATE&ST",' ",.<>;:`~!@#$%^&&*()-_=+'));
-		%put Region=&&state&st STLAB=&stlab;
-
-		title "&&state&st SARS-CoV-2 Situation Report";
-		title2 "Prevalence and Deaths";
-		title2 "New Cases and New Deaths";
-
-		ods proclabel "&&state&st New";
-		ods graphics /reset=imagename imagename="&stlab._New" ;
-		proc sgplot 
-			%if &level=state %then %do;
-				data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			%end;
-			%else %if &level=global %then %DO;
-				data=&level._trajectories(where=(country_region="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			%end;
-			%else %if &level=cbsa %then %DO;
-				data=&level._trajectories(where=(cbsa_title="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			%end;
-			symbolchar name=death char='268A'x ;
-			vbar  filedate / response=dif1_confirmed stat=sum datalabel=fd_weekday datalabelfitpolicy= rotate datalabelattrs=(size=2);
-			vline filedate / response=dif1_deaths stat=sum y2axis lineattrs=(thickness=0) markers markerattrs=(symbol=&gsym size=&gsize color='darkred');
-			yaxis ; 
-			y2axis ;
-			xaxis  valueattrs=(size=7) fitpolicy=rotatethin;
-			keylegend / location=outside;
-			format filedate mmddyy5.;
-		run;	
-		title3 "Seven Day Moving Average";
-		
-		ods graphics /reset=imagename imagename="&stlab._7MA";
-		proc sgplot
-			%if &level=state %then %do;
-				data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			%end;
-			%else %if &level=global %then %DO;
-				data=&level._trajectories(where=(country_region="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			%end;
-			%else %if &level=cbsa %then %DO;
-				data=&level._trajectories(where=(cbsa_title="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			%end;			symbolchar name=death char='268A'x ;
-			vbar  filedate / response=ma7_new_confirmed stat=sum ;
-			vline filedate / response=ma7_new_deaths stat=sum y2axis lineattrs=(thickness=0 ) markers markerattrs=(symbol=&gsym size=&gsize  color='darkred');
-			yaxis ; 
-			y2axis ;
-			xaxis  valueattrs=(size=7) fitpolicy=rotatethin;
-			keylegend / location=outside;
-			format filedate mmddyy5.;
-		run;	
-		title2 "Prevalence and Deaths";
-		title3;
-		ods proclabel "&stlab Profile";		
-		
-		ods graphics /reset=imagename imagename="&stlab._Profile";
-			
-		proc sgplot
-			%if &level=state %then %do;
-				data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			%end;
-			%else %if &level=global %then %DO;
-				data=&level._trajectories(where=(country_region="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			%end;
-			%else %if &level=cbsa %then %DO;
-				data=&level._trajectories(where=(cbsa_title="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			%end;			symbolchar name=death char='268A'x ;
-			vbar  filedate / response=confirmed stat=sum ;
-			vline filedate / response=deaths stat=sum y2axis lineattrs=(thickness=0 ) markers markerattrs=(symbol=&gsym size=&gsize  color='darkred');
-			yaxis ; 
-			y2axis ;
-			xaxis  valueattrs=(size=7) fitpolicy=rotatethin;
-			keylegend / location=outside;
-			format filedate mmddyy5.;
-		run;
-		ods proclabel "&&State&st Phase";
-		
-		ods graphics /reset=imagename imagename="&stlab._Phase";
-			
-		proc sgplot
-			%if &level=state %then %do;
-				data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			%end;
-			%else %if &level=global %then %DO;
-				data=&level._trajectories(where=(country_region="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			%end;
-			%else %if &level=cbsa %then %DO;
-				data=&level._trajectories(where=(cbsa_title="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
-			%end;
-			scatter y=confirmed x=filedate  / 
-				FILLEDOUTLINEDMARKERS 
-				MARKERFILLATTRS=(color='CX6599C9') 
-				MARKEROUTLINEATTRS=(color='CX6599C9') 
-				markerattrs=(symbol=CircleFilled color='CX6599C9');
-			series y=confirmed x=filedate  	/ 
-				lineattrs=(color='blue') 
-				legendlabel=" ";
-			scatter  y=deaths x=filedate 	/  
-				FILLEDOUTLINEDMARKERS 
-				MARKERFILLATTRS=(color='CXEDAF64') 
-				MARKEROUTLINEATTRS=(color='CXEDAF64')  
-				markerattrs=(symbol=CircleFilled color='cxedaf64' ) 
-				y2axis ;
-			series y=deaths x=filedate 		/ 
-				y2axis lineattrs=(color='red') 
-				legendlabel=" ";
-			yaxis ; 
-			y2axis ;
-			xaxis type=discrete fitpolicy=rotatethin valueattrs=(size=5)	valuesformat=mmddyy5. valuesrotate=diagonal ;
-			keylegend / location=outside;
-			format filedate mmddyy5.;
-		run;
-	%end;
-%mend plotstate;
 
 
 
@@ -843,8 +687,225 @@
 	
 %mend rmPathFiles;
 
+%macro plotNations(numback=30,maxplots=5);
+
+	proc sort data= global_trajectories(where=(plotseq=1)) out = _s;
+		by country_region Province_state;
+	run;
+	data _s1 _s2; set _s;
+		by country_region Province_state;
+		mflag=0;
+		if first.country_region then do;
+			total_confirmed=confirmed;
+			total_deaths=deaths;
+		end;
+		else if ~missing(province_state) then do;
+			total_confirmed+confirmed;
+			total_deaths+deaths;
+		end;
+		output _s1;
+		if last.country_region then do;
+			if missing(province_state) then do;
+				total_confirmed	= confirmed;
+				total_deaths	= deaths;
+			end;
+			output _s2;
+		end;
+	run;
+
+	proc sort data= _s2;	by country_region Province_state;
+		by descending ma7_new_confirmed;
+	run;
+	data _s2; set _s2;
+		plotset=_n_;
+		if plotset <= &maxplots;
+	run;
+	proc sql noprint;
+		select distinct country_region into :creg1-:creg&maxplots 
+		from _s2 
+		order by country_region;
+	run;
+	%do nat=1 %to &maxplots;
+			%put Working on &nat of &maxplots: From PLOTNations: "&&creg&nat" ;
+		%plotstate(state="&&creg&nat",level=global,plotback=&numback);
+	%end;
+%mend plotNations;
 
 
 
 
+		
+%macro plotCBSAs(numback=30,maxplots=5);
+
+	proc sort data=cbsa_trajectories(where=(plotseq=1)) out=_c;
+		by descending ma7_new_confirmed;
+	run;
+	data _c; set _c;
+		by descending  ma7_new_confirmed;
+		plotset=_n_;
+		if _n_ <= &maxplots then output;
+	run;
+
+	proc sql noprint;
+			select distinct cbsa_title into :cbsa1-:cbsa&maxplots 
+			from _c 
+			order by cbsa_title;
+	quit;
+	%do cb=1 %to &maxplots;
+		%put Working on &cb of &maxplots: From PLOTCBSAs: "&&cbsa&cb";
+ 		%plotstate(state="&&cbsa&cb",level=cbsa,plotback=&numback); 
+	%end;
+%mend plotCBSAs;
+
+
+
+
+
+
+%macro plotUSStates(numback=30,maxplots=5);
+
+	proc sort data=state_trajectories(where=(plotseq=1)) out=_us;
+		by descending ma7_new_confirmed;
+	run;
+	data _us; set _us;
+		by descending  ma7_new_confirmed;
+		plotset=_n_;
+		if _n_ <= &maxplots then output;
+	run;
+
+	proc sql noprint;
+			select distinct province_state into :usState1-:usState&maxplots 
+			from _us 
+			order by province_state;
+	quit;
+	%do st=1 %to &maxplots;
+		%put Working on &st of &maxplots: From PLOTUSSTATES: "&&USSTATE&st";
+ 		%plotstate(state="&&USSTATE&st",level=state,plotback=&numback); 
+	%end;
+%mend plotUSStates;
+
+
+
+%macro plotstate(state=all,level=state,plotback=30,gfmt=svg);
+
+/* 	%if &state="all" %then %do; */
+/* 		%if &level=state %then %do; */
+/* 			%let ff=province_state; */
+/* 			proc sql noprint;  */
+/* 				select count(distinct province_state) into :stcount from &level._trajectories; */
+/* 				select distinct province_state into :state1 - :state%cmpres(&stcount) from &level._trajectories;  */
+/* 			quit; */
+/* 		%end; */
+/* 		%else %if level=global %then %do; */
+/* 			%let ff=country_region; */
+/* 			proc sql noprint;  */
+/* 				select count(distinct country_region) into :stcount from &level._trajectories; */
+/* 				select distinct country_region into :state1 - :state%cmpres(&stcount) from &level._trajectories;  */
+/* 			quit; */
+/* 		%end; */
+/* 		%else %if level=cbsa %then %do; */
+/* 			%let ff=cbsa_title; */
+/* 			proc sql noprint;  */
+/* 				select count(distinct cbsa_title) into :stcount from &level._trajectories; */
+/* 				select distinct cbsa_title into :state1 - :state%cmpres(&stcount) from &level._trajectories;  */
+/* 			quit; */
+/* 		%end; */
+/* 		 */
+/* 	%end; */
+/* 	%else %do; */
+/* 		%let stcount=1; */
+/* 		%let state1=&state; */
+/* 	%end; */
+	
+/* 	%if &gfmt=svg %then %do; */
+/* 		%let gsym=symbol=death; */
+/* 		%let gsize=20; */
+/* 	%end; */
+/* 	%else %do; */
+/* 		%let gsym=circlefilled; */
+/* 		%let gsize = 5; */
+/* 	%end; */
+
+	%if &level=state %then %do;
+		%let datastatement=&level._trajectories(where=(province_state;
+	%end;
+	%else %if &level=global %then %DO;
+		%let datastatement=&level._trajectories(where=(country_region;
+	%end;
+	%else %if &level=cbsa %then %DO;
+		%let datastatement=&level._trajectories(where=(cbsa_title;
+	%end;
+
+
+/* 	%do st = 1 %to &stcount; */
+		%let stlab=%SYSFUNC(compress(&STATE,' ",.<>;:`~!@#$%^&&*()-_=+'));
+		%put Region=&state STLAB=&stlab;
+		proc sql noprint;
+			select trim(left(put(max(filedate),worddate32.))) into :maxdate from &datastatement.=&state and plotseq<=&plotback));
+		quit;
+/* 		data _null_; call symput("maxdate",put(&md,worddate32.)); run; */
+		%let gsym		=circlefilled; 
+		%let gsize		=5;
+		
+		%let confirmline=%str( yaxis=y lineattrs=(thickness=2 color=darkblue) );
+		%let confirmmarker=%str( yaxis=y markerattrs=(size=10 color=darkblue) FILLEDOUTLINEDMARKERS=TRUE MARKERFILLATTRS=(color=darkblue) MARKEROUTLINEATTRS=(color=darkblue) );
+		%let deathline	=%str( yaxis=y2 lineattrs=(thickness=2 color=darkred) );
+		%let deathmarker=%str( yaxis=y2 markerattrs=(size=10 color=darkred) FILLEDOUTLINEDMARKERS=TRUE MARKERFILLATTRS=(color=darkred) MARKEROUTLINEATTRS=(color=darkred) );
+		%let overlayopts=%str(height=4.5in width=7.5in xaxisopts=(label=" " timeopts=(tickvalueformat=mmddyy5.)) yaxisopts=(label="Confirmed") y2axisopts=(label="Deaths"));
+		%let xaxisopts  =%str( xaxisopts=(griddisplay=Off gridattrs=(color=BWH ) type=time timeopts=(interval=day tickvaluerotation=diagonal tickvaluefitpolicy=rotatealways splittickvalue=FALSE) ));
+		%let yaxisopts  =%str( yaxisopts=(griddisplay=ON gridattrs=(color=BWH)));
+		proc template;
+			define statgraph lattice;
+			begingraph / designwidth=1632px designheight=960px ;
+				entrytitle textattrs=(size=15)  &state;
+				entrytitle  "SARS-CoV-2 Situation Report as of &maxdate";
+				entryfootnote "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19 Data Updated: &sysdate";
+				entryfootnote  "Showing the Last &plotback Days" ;
+				entryfootnote  textattrs=(size=7) halign=right "Samuel T. Croker - &sysdate9" ;
+
+				layout lattice / border=false pad=3 opaque=true rows=2 columns=2 columngutter=3;
+					cell; 
+						cellheader; entry "  Cumulative Infections and Deaths  ." / textattrs=(size=12); endcellheader;
+				      	layout overlay / &overlayopts &yaxisopts;
+				      		barchart  category=filedate response=confirmed 	/ stat=sum datatransparency=0.75;
+							linechart category=filedate response=deaths 	/ stat=sum &deathline ;
+				      	endlayout;
+				    endcell;
+				    
+					cell; 
+						cellheader; entry "  Cumulative Infections and Deaths  ." / textattrs=(size=12); endcellheader;
+				      	layout overlay / &overlayopts &xaxisopts &yaxisopts;
+				      		scatterplot	y=confirmed x=filedate / &confirmmarker	;
+							seriesplot	y=confirmed x=filedate / &confirmline	;
+							scatterplot	y=deaths 	x=filedate / &deathmarker	;
+							seriesplot	y=deaths 	x=filedate / &deathline		;
+				      	endlayout;						 
+				    endcell;
+				    
+					cell; 
+						cellheader; entry "  New Infections and Deaths - Seasonality Is Problematic  ." / textattrs=(size=12); endcellheader;
+				      	layout overlay / &overlayopts &yaxisopts;
+				      		barchart    category=filedate 	response=dif1_confirmed / stat=sum datatransparency=0.75;
+							scatterplot x		=filedate 	y		=dif1_deaths 	/ &deathmarker;
+						endlayout; 
+					endcell;
+				    
+					cell; 
+						cellheader; entry "  New Infections and Deaths - Seasonality Smoothed with Seven Day Moving Average    ." / textattrs=(size=12); endcellheader;
+				      	layout overlay / &overlayopts  &yaxisopts;
+				      		barchart  category=filedate response=ma7_new_confirmed 	/ stat=sum datatransparency=0.75;
+							linechart category=filedate response=ma7_new_deaths 	/ stat=sum &deathline;
+				      	endlayout;	
+			      	endcell;
+				endlayout;
+			endgraph;
+			end;
+		run;
+		ods graphics /reset=imagename imagename="&stlab" ;
+		proc sgrender 
+			 data=&datastatement.=&state and plotseq<=&plotback)) template=lattice des="State/Regional Panel for &stlab";
+		run;
+      
+/* 	%end; */
+%mend plotstate;
 

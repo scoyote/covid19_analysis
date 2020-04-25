@@ -42,7 +42,7 @@ run;
 /********************************************************************/
 ods html close;ods rtf close;ods pdf close;ods document close;
 
-options orientation=landscape papersize=letter ;
+options orientation=landscape papersize=tabloid  nomprint nomlogic;
 
 ods graphics on / reset  
 	width=16in 
@@ -50,56 +50,24 @@ ods graphics on / reset
 	imagemap 
 	outputfmt=&graphFormat 
 	imagefmt=&graphFormat;
-	
+
+ods pdf file="&outputpath./AllStatesAndCountries.pdf"; 
 ods html5 file="&outputpath./AllStatesAndCountries.html" 
 		gpath= "&outputpath./graphs/" (URL='graphs/')
 		device=&graphFormat
 		;*options(svg_mode="inline");
-%plotstate(state=Georgia,level=state,plotback=30,gfmt=&graphFormat);
 
-		
-%plotstate(state=%str(Atlanta-Sandy Springs-Alpharetta, GA),level=cbsa,plotback=30,gfmt=&graphFormat);
-%plotstate(state=%str(San Antonio-New Braunfels, TX),level=cbsa,plotback=30,gfmt=&graphFormat);
-%plotstate(state=%str(Albany, GA),level=cbsa,plotback=30,gfmt=&graphFormat);
-%plotstate(state=%str(Charleston-North Charleston, SC),level=cbsa,plotback=30,gfmt=&graphFormat);
-%plotstate(state=%str(New York-Newark-Jersey City, NY-NJ-PA),level=cbsa,plotback=30,gfmt=&graphFormat);
-
-/* States */
 /* %plotstate(state=Georgia,level=state,plotback=30,gfmt=&graphFormat); */
 
-%plotstate(state=all,level=state,plotback=30,gfmt=&graphFormat);
-
+		
 /* Countries */
-%plotstate(state=US,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=Italy,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=Germany,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=United Kingdom,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=Russia,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=India,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=Mexico,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=Brazil,level=global,plotback=30,gfmt=&graphFormat);
+%plotNations;
+/* States */
+%plotUSStates;
+/*  CBSAs  */
+%plotCBSAs;
 
-%plotstate(state=Sweden,level=global,plotback=30,gfmt=&graphFormat);
-
-%plotstate(state=Spain,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=Iran,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=Saudi Arabia,level=global,plotback=30,gfmt=&graphFormat);
-
-%plotstate(state=Singapore,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=Belgium,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=Netherlands,level=global,plotback=30,gfmt=&graphFormat);
-
-%plotstate(state=Qatar,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=Portugal,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=Germany,level=global,plotback=30,gfmt=&graphFormat);
-
-%plotstate(state=Belarus,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=Pakistan,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=Canada,level=global,plotback=30,gfmt=&graphFormat);
-%plotstate(state=UAE,level=global,plotback=30,gfmt=&graphFormat);
-
-
-
+/* trajectories */
 
 options orientation=landscape papersize=tabloid ;
 ods graphics on / reset width=16in height=10in;
@@ -408,9 +376,9 @@ proc sgplot
 	xaxis grid minor minorgrid type=log min=&minconf max=600000 LOGSTYLE=linear;* values=(1000 0 to 600000 by 100000);
 	yaxis grid minor minorgrid type=log min=&mindeath LOGSTYLE=linear;* values=(1000 to 26000 by 5000);
 run;
-ods html5 close;
 
 
+ods html5 close; ods pdf close;
 
 
 
