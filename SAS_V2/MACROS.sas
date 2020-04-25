@@ -750,6 +750,7 @@
 				convert deaths		= dif7_deaths	 / transout=(dif 7);
 				convert deaths		= MA7_deaths  	 / transout=(movave 7);
 			run;
+			/*adding a comment */
 			proc expand data=_t1 out=state_trajectories;
 				by province_state;
 				id filedate;
