@@ -376,21 +376,14 @@
 	footnote3  justify=right  height=0.5 "Samuel T. Croker - &sysdate9";
 	%do st = 1 %to &stcount;
 		%let stlab=%SYSFUNC(compress("&&STATE&ST",' ",.<>;:`~!@#$%^&&*()-_=+'));
-
-		options orientation=landscape papersize=(7.5in 5in);
-		ods graphics on / reset width=7.5in height=5in  imagemap outputfmt=&gfmt imagename="&stlab" imagefmt=&gfmt ;
-		ods html5 close; ods html close; ODS Listing close;
-		ODS HTML5 gpath="&outputpath/graphs"(URL='graphs/') 
-				 path="&outputpath"(URL=NONE)
-				 file="&stlab..html"
-				 device=&gfmt ;*options(svg_mode="inline");
+		%put Region=&&state&st STLAB=&stlab;
 
 		title "&&state&st SARS-CoV-2 Situation Report";
 		title2 "Prevalence and Deaths";
 		title2 "New Cases and New Deaths";
 
 		ods proclabel "&&state&st New";
-		ods graphics /imagename="&stlab._New" imagefmt=&gfmt imagemap;
+		ods graphics /reset=imagename imagename="&stlab._New" ;
 		proc sgplot 
 			%if &level=state %then %do;
 				data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
@@ -412,7 +405,7 @@
 		run;	
 		title3 "Seven Day Moving Average";
 		
-		ods graphics /imagename="&stlab._7MA" imagefmt=&gfmt imagemap;
+		ods graphics /reset=imagename imagename="&stlab._7MA";
 		proc sgplot
 			%if &level=state %then %do;
 				data=&level._trajectories(where=(province_state="&&state&st" and plotseq<=&plotback)) nocycleattrs des="&&state&st New Cases and Deaths" ;
@@ -435,7 +428,7 @@
 		title3;
 		ods proclabel "&stlab Profile";		
 		
-		ods graphics / imagename="&stlab._Profile" imagefmt=&gfmt imagemap;
+		ods graphics /reset=imagename imagename="&stlab._Profile";
 			
 		proc sgplot
 			%if &level=state %then %do;
@@ -457,7 +450,7 @@
 		run;
 		ods proclabel "&&State&st Phase";
 		
-		ods graphics / imagename="&stlab._Phase" imagefmt=&gfmt imagemap;
+		ods graphics /reset=imagename imagename="&stlab._Phase";
 			
 		proc sgplot
 			%if &level=state %then %do;
@@ -492,7 +485,6 @@
 			keylegend / location=outside;
 			format filedate mmddyy5.;
 		run;
-		ods html5 close;
 	%end;
 %mend plotstate;
 
@@ -577,6 +569,7 @@
 	
 			proc expand data=_fips_trajectories out=_t1;
 				by fips country_region province_state cbsa_title combined_key;
+				id filedate;
 				convert confirmed	= dif1_confirmed / transout=(dif 1);
 				convert confirmed	= dif7_confirmed / transout=(dif 7);
 				convert confirmed	= MA7_confirmed  / transout=(movave 7);
@@ -585,7 +578,8 @@
 				convert deaths		= MA7_deaths 	 / transout=(movave 7);
 			run;
 			proc expand data=_t1 out=fips_trajectories;
-				by fips;
+				by fips country_region province_state cbsa_title combined_key;
+				id filedate;
 				convert dif1_confirmed	= MA7_new_confirmed  / transout=(movave 7);
 				convert dif1_deaths		= ma7_new_deaths 	 / transout=(movave 7);
 			run;
@@ -593,7 +587,7 @@
 			proc sort data=fips_trajectories; by fips country_region province_state cbsa_title combined_key descending filedate; run;
 			data fips_trajectories;
 				set fips_trajectories;
-				by fips descending filedate;
+				by fips country_region province_state cbsa_title combined_key descending filedate;
 				if first.fips then do;
 					plotseq=0;
 				end;
@@ -634,6 +628,7 @@
 			quit;
 			proc expand data=_cbsa_trajectories out=_t1;
 				by cbsa_title;
+				id filedate;
 				convert confirmed	= dif1_confirmed / transout=(dif 1);
 				convert confirmed	= dif7_confirmed / transout=(dif 7);
 				convert confirmed	= MA7_confirmed  / transout=(movave 7);
@@ -643,6 +638,7 @@
 			run;
 			proc expand data=_t1 out=cbsa_trajectories;
 				by cbsa_title;
+				id filedate;
 				convert dif1_confirmed	= MA7_new_confirmed  / transout=(movave 7);
 				convert dif1_deaths		= ma7_new_deaths 	 / transout=(movave 7);
 			run;
@@ -690,6 +686,7 @@
 			quit;
 			proc expand data=_state_trajectories out=_t1;
 				by province_state;
+				id filedate;
 				convert confirmed	= dif1_confirmed / transout=(dif 1);
 				convert confirmed	= dif7_confirmed / transout=(dif 7);
 				convert confirmed	= MA7_confirmed  / transout=(movave 7);
@@ -699,6 +696,7 @@
 			run;
 			proc expand data=_t1 out=state_trajectories;
 				by province_state;
+				id filedate;
 				convert dif1_confirmed	= MA7_new_confirmed  / transout=(movave 7);
 				convert dif1_deaths		= ma7_new_deaths 	 / transout=(movave 7);
 			run;
@@ -760,6 +758,7 @@
 			run;
 			proc sort data=_global_trajectories; by country_region province_state filedate; run;
 			proc expand data=_global_trajectories out=_t1;
+				id filedate;
 				by country_region province_state;
 				convert confirmed	= dif1_confirmed / transout=(dif 1);
 				convert confirmed	= dif7_confirmed / transout=(dif 7);
@@ -769,6 +768,7 @@
 				convert deaths		= MA7_deaths  	 / transout=(movave 7);
 			run;
 			proc expand data=_t1 out=global_trajectories;
+				id filedate;
 				by country_region province_state;
 				convert dif1_confirmed	= MA7_new_confirmed  / transout=(movave 7);
 				convert dif1_deaths		= ma7_new_deaths 	 / transout=(movave 7);
