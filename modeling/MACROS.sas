@@ -1,4 +1,4 @@
-%macro TSimulate(N=N,tau=tau,Rho0=Rho0,sigma=sigma,enddate=&sysdate);
+%macro TSimulate(N=N,tau=tau,Rho0=Rho0,sigma=sigma,enddate=&sysdate,forecastvar=cases);
 
 	ods graphics on / reset width=7.5in height=5in imagemap outputfmt=svg;
 
@@ -7,10 +7,8 @@
 		PARAMETERS
 			R0		&Rho0
 			i0		1
-/* 			sigma	&sigma */
 		;
 		bounds 0.5 <= R0 <= 13;
-/* 			   0.1 <= sigma <= 5; */
 		control
 			N 		= &N
 			sigma	= &sigma
@@ -25,11 +23,11 @@
 		DERT.I_T =                     sigma * E_T - gamma * I_T;
 		DERT.R_T =                                   gamma * I_T ;		       
 	
-		cases = I_T + R_T;
+		&forecastvar = I_T + R_T;
 	
-		outvars S_T  E_T  I_T  R_T;
+		outvars S_T  E_T  I_T  R_T beta gamma;
 	
-		fit cases init=(S_T=&N E_T=0 I_T=i0 R_T=0 ) / 
+		fit &forecastvar init=(S_T=&N E_T=0 I_T=i0 R_T=0 ) / 
 			time		= date 
 			dynamic 
 			outpredict 
@@ -57,11 +55,11 @@
 
 	proc sgplot data=_outpred des="&region In-Sample Prediction";
 		where _type_ ne 'RESIDUAL';
-		series x=date y=cases / group=_type_ markers legendlabel="Actual/Predict"
-								name="Cases" 
+		series x=date y=&forecastvar / group=_type_ markers legendlabel="Actual/Predict"
+								name="&forecastvar" 
 								lineattrs=(thickness=3)   
 								markerattrs=(symbol=CircleFilled ) 
-								tip=(date cases i_T r_t) 
+								tip=(date &forecastvar i_T r_t) 
 								tipformat=(mmddyy5. comma12.);
 		series x=date y=i_t / group=_type_ markers  legendlabel="Infected SEIR"
 								name="I" 
@@ -73,8 +71,8 @@
 								transparency=0.5
 								lineattrs=(thickness=3 color='bibg') 
 								markerattrs=(color='bibg' symbol=CircleFilled );
-		format cases comma10.;
-		label cases='Cumulative Incidence';
+		format &forecastvar comma10.;
+		label &forecastvar='Cumulative Incidence';
 	run;
 	title;footnote;
 	/***** 	MCOV SCAFFOLD 	*****/
@@ -123,14 +121,14 @@
 	         e_t = .;
 	         i_t = .;
 	         r_t = .;
-	         cases = .;
+	         &forecastvar = .;
 	         output;
 	      end;
 	   end;
 	run;
 %mend tsimulate;
 
-%macro CreateModelData(database,region_field,region,enddate=&sysdate);
+%macro CreateModelData(database,region_field,region,enddate=&sysdate,populationestimate=10E6);
 	data _null_; 
 		*call symput("enddate",left(put("&enddate"d,8.))); 
 		put "NOTE: Building _model dataset ending on &enddate ";
@@ -145,15 +143,25 @@
 									and date <= "&enddate"d))end=eof;
 			if eof then call symput('popest',census2010pop);
 	run;
-	%if &popest=. %then %do;
-		%put WARNING: **************************************************************************;	
-		%PUT WARNING: POPEST IS MISSING. Please provide a value for N.                     *****;
-		%put WARNING: Setting POPEST to default of 10e6. This is likely not what you want. *****;
-		%put WARNING: **************************************************************************;
-		%let popest=10e6;
+	%if &populationEstimate ~= 10E6 %then %do;
+		%put NOTE: **************************************************************************;	
+		%PUT NOTE: Population Estimate was provide in the macro call.;;
+		%put NOTE: Setting POPEST to the provided value = %sysfunc(putn(&populationestimate,comma12.)).;
+		%put NOTE: **************************************************************************;
+		%let popest=&populationestimate;
 	%end;
-	%else %do;
-		%put NOTE: POPEST is %sysfunc(putn(&popest,comma12.));
+	%else %if &popest=. %then %do;
+		%put NOTE: **************************************************************************;	
+		%PUT WARNING: POPEST IS MISSING. Please provide a value for N. ;
+		%put NOTE:    Setting POPEST to default of %sysfunc(putn(&populationestimate,comma12.)). ;
+		%put NOTE:    This value is likely not what you want so please check. ;
+		%put NOTE: **************************************************************************;
+		%let popest=&populationestimate;
+	%end;
+	%else %do;		
+		%put NOTE: **************************************************************************;	
+		%PUT NOTE: POPEST pulled from 2010 Census Information %sysfunc(putn(&popest,comma12.));
+		%put NOTE: **************************************************************************;
 	%end;
 %mend CreateModelData;
 
@@ -175,7 +183,6 @@
 			US_AUGMENTED
 			US_JOINED
 			US_STACKED
-			GLOBAL_TRAJECTORIES
 		;
 	quit;
 %mend thinDS;

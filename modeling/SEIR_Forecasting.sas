@@ -9,6 +9,7 @@ ods graphics / reset width=7in height=5in imagemap imagefmt=png;
 %thinDS;
 %global popest enddate region;
 %let popest=.;
+%let rundate=20APR2020;
 
 
 /*********************************************************************************************************
@@ -17,9 +18,16 @@ ods graphics / reset width=7in height=5in imagemap imagefmt=png;
 **********************************************************************************************************/	
 
 /* %CreateModelData(cbsa,cbsa_title,%str(San Antonio-New Braunfels, TX),enddate=14APR2020); */
+
+%let titlestring=Atlanta-Sandy Springs-Alpharetta, GA;
+
+/* %CreateModelData(cbsa,cbsa_title,%str(Idaho Falls, ID),enddate=&rundate); */
+/* %CreateModelData(cbsa,cbsa_title,%str(San Antonio-New Braunfels, TX),enddate=&rundate); */
 /* %CreateModelData(fips,fips,13057, enddate=14APR2020); * Cherokee county ga; */
-/* %CreateModelData(cbsa,cbsa_title,%str(Atlanta-Sandy Springs-Alpharetta, GA), enddate=16APR2020); */
-/* %CreateModelData(state,province_state,Georgia, enddate=14APR2020); */
+%CreateModelData(cbsa,cbsa_title,%str(Atlanta-Sandy Springs-Alpharetta, GA), enddate=&rundate);
+/* %CreateModelData(state,province_state,Georgia, enddate=&rundate); */
+
+/* %CreateModelData(global,country_region,US,enddate=&rundate,populationEstimate=331002651); */
 
 /**********************************************************************************************************	
 Beta	The parameter controlling how often a susceptible-infected contact results in a new exposure.
@@ -35,10 +43,16 @@ Initial infected	The number of infected individuals at the beginning of the mode
 Initial recovered	The number of recovered individuals at the beginning of the model run.
 Days	Controls how long the model will run.
 **********************************************************************************************************/
+
 /* Georgia */
 %tsimulate(N=10214860,tau=5.081846,Rho0=2.5,sigma=0.9);
-
 %tsimulate(N=&popest,tau=5.081846,Rho0=2.5,sigma=0.9);
+
+title "SEIR Estimation for &titlestring";
+
+%tsimulate(N=&popest,tau=5.1,Rho0=2.5,sigma=0.9,forecastvar=Cases);
+
+/* %tsimulate(N=&popest,tau=5.081846,Rho0=2.5,sigma=0.9); */
 
 
 proc Tmodel data=_scaffold model=_model;
