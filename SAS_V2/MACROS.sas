@@ -1286,10 +1286,11 @@ run;
 /********************************************************************************************************************************/
 
 
-%macro plotPaths(level,procvar,title,maxplots=10,style=styles.htmlblue);
+%macro plotPaths(level,procvar,title,maxplots=10,plotvariable=ma7_new_deaths,style=styles.htmlblue);
 	proc sort data=&level._trajectories; by &procvar filedate; run;
+
 	data _trajectories;
-		set &level._trajectories;
+		set &level._trajectories;;
 		label days_since_death1 = "Days Since First Death";
 		by &procvar filedate;
 		array ddflag[2]  _temporary_;
@@ -1304,6 +1305,20 @@ run;
 		else do;
 			 days_since_death1 + 1;
 		end;
+	
+		/* PER CAPITA, BEDS, HOSPITALS CALC */
+		%local i next_var vars;
+		%let vars= census2010pop icu_beds hospitals;	
+		%do i=1 %to %sysfunc(countw(&vars));
+			%let next_var = %scan(&vars, &i);
+			if  &next_var > 0 then do;
+				&plotvariable._per_&next_var = &plotvariable / &next_var;
+			end;
+			else &plotvariable._per_&next_var=.;
+			format &plotvariable._per_&next_var percent8.5;
+		%end;
+		/* END PER CAPITA */
+		
 		if ddflag[1] then output;
 	run;
 	proc sort data=_trajectories; by &procvar descending filedate; run;
@@ -1319,10 +1334,10 @@ run;
 	run;
 	
 		proc sort data=_trajectories(where=(plotseq=1)) out=_t ;
-			by descending ma7_new_confirmed;
+			by descending &plotvariable;
 		run;
 		data _t; set _t;
-			by descending  ma7_new_confirmed;
+			by descending  &plotvariable;
 			plotset=_n_;
 		run;
 		proc sort data=_t ;by descending deaths;run;
@@ -1330,15 +1345,24 @@ run;
 			by descending  deaths;
 			plotdeathset=_n_;
 		run;
+		proc sort data=_t ;by descending &plotvariable._per_census2010pop;run;
+		data _t; set _t;
+			by descending  &plotvariable._per_census2010pop;
+			plotpercapita=_n_;
+		run;
 		proc sql noprint;
 			create table Death_trajectories as	
-				select a.*,b.plotset,b.plotdeathset, 
-				case when a.plotseq=1 or a.lastdeath=1 then a.&procvar else "" end as plot_label
+				select a.*
+				,b.plotset
+				,b.plotdeathset
+				,b.plotpercapita
+				,case when a.plotseq=1 or a.lastdeath=1 then a.&procvar else "" end as plot_label
 				from _trajectories a
 				inner join _t b
 				on a.&procvar=b.&procvar
 				order by &procvar, filedate;
 		quit;
+	
 	%if &maxplots=0 %then %do;
 		proc sql noprint;
 			select ceil((max(days_since_death1)+.01)/10)*10 into :deathmax from death_trajectories;
@@ -1349,12 +1373,12 @@ run;
 			title 	  h=1 "All &title SARS-CoV-2 Trajectories";
 			footnote  h=1"Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 			footnote3 h=0.9 justify=right "Samuel T. Croker - &sysdate9";
-			ods proclabel "Top &maxplots &title Trajectories"; 
+			ods proclabel "Top &maxplots &title Death Paths"; 
 			proc sgplot 
-				data=death_trajectories(where=(ma7_new_deaths>0 ))
+				data=death_trajectories(where=(&plotvariable>0 ))
 				noautolegend nocycleattrs noborder
 				des="&title Paths Since Death One";
-				series x=days_since_death1 y=ma7_new_deaths  / group=&procvar 
+				series x=days_since_death1 y=&plotvariable  / group=&procvar 
 					datalabel=plot_label datalabelpos=top
 					datalabelattrs=(size=10  ) 
 					lineattrs =(thickness=2 pattern=solid )
@@ -1372,20 +1396,33 @@ run;
 			title 	  h=1 "Top &maxplots &title Deaths SARS-CoV-2 Trajectories";
 			footnote  h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 			footnote3 h=0.9 justify=right "Samuel T. Croker - &sysdate9";
-			ods proclabel "Top &maxplots &title Trajectories"; 
+			ods proclabel "Top &maxplots &title Death Paths"; 
 			proc sgplot 
-				data=death_trajectories(where=(ma7_new_deaths>0 and plotdeathset<=abs(&maxplots)))
+				data=death_trajectories(where=(&plotvariable>0 and plotdeathset<=abs(&maxplots)))
 				noautolegend nocycleattrs noborder
 				des="&title Deaths Paths Since Death One";
-				series x=days_since_death1 y=ma7_New_deaths  / group=&procvar 
+				series x=days_since_death1 y=&plotvariable  / group=&procvar 
 					datalabel=plot_label datalabelpos=top
 					datalabelattrs=(size=10 ) 
 					lineattrs =(thickness=2 pattern=solid ) 
 					transparency=0.25;
 				xaxis minor  /*grid minorgrid*/display=(noline)   max=%eval(&deathmax) offsetmax=0 offsetmin=0        labelattrs=(size=10) valueattrs=(size=12) values=(0 to &deathmax by 20 ) ;
 				yaxis minor /*grid minorgrid*/display=(noline)  type=log labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
-			run;
-
+			run;			
+			%if "&level" = "cbsa" %then %do;
+				proc sgplot 
+					data=death_trajectories(where=(&plotvariable>0 and plotpercapita<=abs(&maxplots)))
+					noautolegend nocycleattrs noborder
+					des="&title Deaths Per Capita Paths Since Death One";
+					series x=days_since_death1 y=&plotvariable._per_census2010pop  / group=&procvar 
+						datalabel=plot_label datalabelpos=top
+						datalabelattrs=(size=10 ) 
+						lineattrs =(thickness=2 pattern=solid ) 
+						transparency=0.25;
+					xaxis minor  /*grid minorgrid*/display=(noline)   max=%eval(&deathmax) offsetmax=0 offsetmin=0        labelattrs=(size=10) valueattrs=(size=12) values=(0 to &deathmax by 20 ) ;
+					yaxis minor /*grid minorgrid*/display=(noline)  type=log labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
+				run;
+			%end;
 	%end;
 	%else %do;
 		proc sql noprint;
@@ -1395,12 +1432,12 @@ run;
 			title 	  h=1 "&title - Top &maxplots SARS-CoV-2 Trajectories";
 			footnote  h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 			footnote3 h=0.9 justify=right "Samuel T. Croker - &sysdate9";
-			ods proclabel "Top &maxplots &title Trajectories"; 
+			ods proclabel "Top &maxplots &title Death Paths"; 
 			proc sgplot noborder
-				data=death_trajectories(where=(ma7_new_deaths>0 and plotset<=abs(&maxplots)))
+				data=death_trajectories(where=(&plotvariable>0 and plotset<=abs(&maxplots)))
 				noautolegend nocycleattrs
 				des="&title Paths Since Death One";
-				series x=days_since_death1 y=ma7_new_deaths  / group=&procvar 
+				series x=days_since_death1 y=&plotvariable  / group=&procvar 
 					datalabel=plot_label datalabelpos=top
 					datalabelattrs=(size=10 ) 
 					lineattrs =(thickness=2 pattern=solid )
@@ -1408,6 +1445,19 @@ run;
 				xaxis minor /*grid minorgrid*/display=(noline)  max=%eval(&deathmax) offsetmax=0 offsetmin=0        labelattrs=(size=15) valueattrs=(size=12) values=(0 to &deathmax by 10 ) ;
 				yaxis minor /*grid minorgrid*/display=(noline) type=log labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
 			run;
-
+			%if "&level" = "cbsa" %then %do;
+				proc sgplot noborder
+					data=death_trajectories(where=(&plotvariable>0 and plotpercapita<=abs(&maxplots) ))
+					noautolegend nocycleattrs
+					des="&title Paths Since Death One";
+					series x=days_since_death1 y=&plotvariable._per_census2010pop  / group=&procvar 
+						datalabel=plot_label datalabelpos=top
+						datalabelattrs=(size=10 ) 
+						lineattrs =(thickness=2 pattern=solid )
+						transparency=0.25;
+					xaxis minor /*grid minorgrid*/display=(noline)  max=%eval(&deathmax) offsetmax=0 offsetmin=0        labelattrs=(size=15) valueattrs=(size=12) values=(0 to &deathmax by 10 ) ;
+					yaxis minor /*grid minorgrid*/display=(noline) type=log labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
+				run;
+			%end;
 	%end;
 %mend PlotPaths;

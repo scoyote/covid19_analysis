@@ -32,13 +32,13 @@ ods graphics on / reset width=16in height=10in imagemap outputfmt=&graphFormat i
 /* ods html5 file="&outputpath./AllStatesAndCountries.html" gpath= "&outputpath./graphs/" (URL='graphs/') device=&graphFormat; *options(svg_mode="inline"); */
 /* Countries */ 
 	%plotNations(maxplots=30,stplot=Y);
-	%plotpaths(global,location,title=Nations,maxplots=-20,style=stcstyle);
+	%plotpaths(global,location,title=Nations,maxplots=-20);
 /* States */ 	
-	%plotUSStates(maxplots=30,stplot=Y,minconf=5000,mindeath=200,xvalues=(5000 to 60000 by 5000),	yvalues=(200 to 4200 by 1000));
+	%plotUSStates(maxplots=30,stplot=Y,minconf=5000,mindeath=200,xvalues=(5000 to 70000 by 5000),	yvalues=(200 to 4800 by 1000));
 	%plotpaths(state,province_state,title=US States,maxplots=0);
 	%plotpaths(state,province_state,title=US States,maxplots=10);
 /* CBSAs */		
-	%plotCBSAs(maxplots=30,stplot=Y, minconf=3000,mindeath=200,xvalues=(5000 to 50000 by 5000), 	yvalues=(200 to 3200 by 1000));	
+	%plotCBSAs(maxplots=30,stplot=Y, minconf=3000,mindeath=200,xvalues=(5000 to 60000 by 5000), 	yvalues=(200 to 4200 by 1000));	
 	%plotpaths(cbsa,cbsa_title,title=US CBSAs,maxplots=10);
 /* ods html5 close;  */
 ods pdf close;
