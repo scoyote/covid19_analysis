@@ -424,7 +424,7 @@ run;
 
 %macro setgopts(h,w,ph,pw,gfmt=svg);
 	options orientation=landscape papersize=(&h.in &w.in) ;
-	ods graphics on / reset width=&pw.in height=&ph.in  imagemap outputfmt=&gfmt ;
+	ods graphics on / reset width=&pw.in height=&ph.in  imagemap outputfmt=svg ;
 	ods html close;ods rtf close;ods pdf close;ods document close; 
 %mend setgopts;
 
