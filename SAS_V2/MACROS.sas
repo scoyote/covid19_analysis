@@ -585,6 +585,11 @@ run;
 				convert dif1_confirmed	= MA7_new_confirmed  / transout=(movave 7);
 				convert dif1_deaths		= ma7_new_deaths 	 / transout=(movave 7);
 			run;
+			data cbsa_trajectories;
+				set cbsa_trajectories;
+				ma7_new_confirmed=sum(int(ma7_new_confirmed),0);
+				ma7_new_deaths=sum(int(ma7_new_deaths),0);
+			run;
 			/* add in a countdown from most recent to oldest for plotting */
 			proc sort data=cbsa_trajectories; by cbsa_title descending filedate; run;
 			data cbsa_trajectories;
@@ -647,6 +652,12 @@ run;
 				convert dif1_confirmed	= MA7_new_confirmed  / transout=(movave 7);
 				convert dif1_deaths		= ma7_new_deaths 	 / transout=(movave 7);
 			run;
+			
+			data state_trajectories;
+				set state_trajectories;
+				ma7_new_confirmed=sum(int(ma7_new_confirmed),0);
+				ma7_new_deaths=sum(int(ma7_new_deaths),0);
+			run;
 			/* add in a countdown from most recent to oldest for plotting */
 			proc sort data=state_trajectories; by province_state descending filedate; run;
 			data state_trajectories;
@@ -674,43 +685,49 @@ run;
 	
 			proc sql;
 				create table _global_trajectories as	
-					select
-						 country_region
-						,province_state
-						,cats(Country_region," ",Province_State) as Location 
-						,filedate 
+					select 
+						 location
+						,filedate
 						,count(*) as freq				format=comma12.	label = "Rollup Count"
 						,sum(confirmed) as confirmed 	format=comma12.	label="Confirmed"
 						,sum(deaths) as deaths			format=comma12.	label="Deaths"
-					from global_joined
-					group by 
-						  country_region
-						,province_state
-						,cats(Country_region," ",Province_State)
-						,filedate
-					order by 	
+					from (
+						select 
 						 country_region
 						,province_state
-						,cats(Country_region," ",Province_State)
+						,case when country_region = "China" then "China"
+						      else cats(Country_region," ",Province_State) 
+						      end as Location
+						,filedate 
+						,confirmed
+						,deaths
+						from global_joined
+					)
+
+					group by 
+						 location
+						 ,filedate
+					order by 	
+						 location
 						,filedate
 					;
 			quit;
 			
 			/* add in a countdown from most recent to oldest for plotting */
 			proc sort data=_global_trajectories; 
-				by  country_region province_state location descending filedate; 
+				by  location descending filedate; 
 				run;
 			data _global_trajectories;
 				set _global_trajectories;
-				by country_region province_state location descending filedate;
+				by location descending filedate;
 				if first.location then plotseq=0;
 				plotseq+1;
 				fd_weekday = put(filedate,DOWNAME3.);
 			run;
-			proc sort data=_global_trajectories; by country_region province_state filedate; run;
+			proc sort data=_global_trajectories; by location filedate; run;
 			proc expand data=_global_trajectories out=_t1;
 				id filedate;
-				by country_region province_state;
+				by location;
 				convert confirmed	= dif1_confirmed / transout=(dif 1);
 				convert confirmed	= dif7_confirmed / transout=(dif 7);
 				convert deaths		= dif1_deaths 	 / transout=(dif 1);
@@ -720,12 +737,16 @@ run;
 			run;
 			proc expand data=_t1 out=global_trajectories;
 				id filedate;
-				by country_region province_state;
+				by location;
 				convert dif1_confirmed	= MA7_new_confirmed  / transout=(movave 7);
 				convert dif1_deaths		= ma7_new_deaths 	 / transout=(movave 7);
 			run;
-			
-			
+			data global_trajectories;
+				set global_trajectories;
+				ma7_new_confirmed=sum(int(ma7_new_confirmed),0);
+				ma7_new_deaths=sum(int(ma7_new_deaths),0);
+			run;
+			proc sort data=global_trajectories; by location filedate; run;
 	%let bulkformat=format confirmed deaths dif1_confirmed--dif7_deaths comma12. filedate mmddyy5.;
 	%let bulklabel=label dif1_confirmed = "New Confirmed"
 				    	 dif1_deaths = "New Deaths"
@@ -814,30 +835,30 @@ run;
 				,stplot=Y
 				);
 	proc sort data= global_trajectories(where=(plotseq=1)) out = _s;
-		by country_region Province_state;
+		by location;
 	run;
-	data _s1 _s2; set _s;
-		by country_region Province_state;
+	data _s2; set _s;
+		by location;
 		mflag=0;
-		if first.country_region then do;
-			total_confirmed=confirmed;
-			total_deaths=deaths;
-		end;
-		else if ~missing(province_state) then do;
-			total_confirmed+confirmed;
-			total_deaths+deaths;
-		end;
-		output _s1;
-		if last.country_region then do;
-			if missing(province_state) then do;
-				total_confirmed	= confirmed;
-				total_deaths	= deaths;
-			end;
+/* 		if first.location then do; */
+/* 			total_confirmed=confirmed; */
+/* 			total_deaths=deaths; */
+/* 		end; */
+/* 		else if ~missing(province_state) then do; */
+/* 			total_confirmed+confirmed; */
+/* 			total_deaths+deaths; */
+/* 		end; */
+/* 		output _s1; */
+		if last.location then do;
+/* 			if missing(province_state) then do; */
+/* 				total_confirmed	= confirmed; */
+/* 				total_deaths	= deaths; */
+/* 			end; */
 			output _s2;
 		end;
 	run;
 
-	proc sort data= _s2;	by country_region Province_state;
+	proc sort data= _s2;	by location;
 		by descending ma7_new_confirmed;
 	run;
 	data _s2; set _s2;
@@ -845,9 +866,9 @@ run;
 		if plotset <= &maxplots;
 	run;
 	proc sql noprint;
-		select distinct country_region into :creg1-:creg&maxplots 
+		select distinct location into :creg1-:creg&maxplots 
 		from _s2 
-		order by country_region;
+		order by location;
 	run;	
 	%if &stplot=Y %then %do;
 		%do nat=1 %to &maxplots;
@@ -862,8 +883,8 @@ run;
 
 	ods graphics / reset=imagename imagename="AllNations" Height=10in width=16in;
 	
-	%let plottip=country_region location filedate confirmed deaths;
-	%let plottiplab="Country" "Location" "FileDate" "Confirmed" "Deaths";
+	%let plottip= location filedate confirmed deaths;
+	%let plottiplab="Location" "FileDate" "Confirmed" "Deaths";
 	proc sql noprint;
 		create table _globalplot as	
 			select a.*,b.plotset from global_trajectories(where=(plotseq<=&numback and confirmed>&minconf and deaths>&mindeath)) a
@@ -900,7 +921,7 @@ run;
 	ods proclabel "Top &maxplots Nation Trajectories"; 
 	proc sgplot 
 		data=_globalplot(where=(plotset<=30)) 
-		noautolegend 
+		noautolegend noborder 
 		nocycleattrs 
 		dattrmap=_attribset
 		des="National Trajectories";
@@ -911,8 +932,8 @@ run;
 			datalabelattrs=(size=10) 
 			tip=(&plottip) 
 			tiplabel=(&plottiplab);
-		xaxis grid minor minorgrid type=log min=&minconf  LOGSTYLE=linear;
-		yaxis grid minor minorgrid type=log min=&mindeath LOGSTYLE=linear;
+		xaxis grid minor minorgrid display=(noline)  type=log min=&minconf  LOGSTYLE=linear;
+		yaxis grid minor minorgrid display=(noline)  type=log min=&mindeath LOGSTYLE=linear;
 	run;
 
 	proc datasets library=work nodetails nolist; delete _s2 _attribset _globalplot; quit;
@@ -1006,7 +1027,7 @@ run;
 	ods proclabel "Top &maxplots US CBSA Trajectories"; 
 	proc sgplot 
 		data=_cbsaplot(where=(plotset<=&numback))
-		noautolegend 
+		noautolegend noborder 
 		dattrmap=_attribset
 		des="CBSA Trajectories";
 		series x=Confirmed y=Deaths  / group=cbsa_title attrid=myid
@@ -1015,8 +1036,8 @@ run;
 			markers
 			transparency=0.25
 			tip=(&plottip) tiplabel=(&plottiplab) ;
-		xaxis grid minor minorgrid type=log values=&xvalues	LOGSTYLE=LOGEXPAND min=&minconf;
-		yaxis grid minor minorgrid type=log values=&yvalues	LOGSTYLE=LOGEXPAND min=&mindeath;
+		xaxis grid minor minorgrid display=(noline)  type=log values=&xvalues	LOGSTYLE=LOGEXPAND min=&minconf;
+		yaxis grid minor minorgrid display=(noline)  type=log values=&yvalues	LOGSTYLE=LOGEXPAND min=&mindeath;
 	run;
 
 	proc datasets library=work nodetails nolist; delete _c _cbsaplot _attribset; quit;
@@ -1111,7 +1132,7 @@ run;
 	ods proclabel "Top &maxplots US States Trajectories"; 
 	proc sgplot 
 		data=_stateplot(where=(plotset<=&numback))
-		noautolegend 
+		noautolegend noborder 
 		dattrmap=_attribset
 		des="State Trajectories";
 		series x=Confirmed y=Deaths  / group=province_state attrid=myid
@@ -1121,8 +1142,8 @@ run;
 			transparency=0.25
 			tip=(&plottip) 
 			tiplabel=(&plottiplab) ;
-		xaxis grid minor minorgrid type=log min=&minconf  values=&xvalues labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
-		yaxis grid minor minorgrid type=log min=&mindeath values=&yvalues labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
+		xaxis grid minor minorgrid display=(noline)  type=log min=&minconf  values=&xvalues labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
+		yaxis grid minor minorgrid display=(noline)  type=log min=&mindeath values=&yvalues labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
 	run;
 
 	proc datasets library=work nodetails nolist; delete _us _stateplot _attribset; quit;
@@ -1139,7 +1160,7 @@ run;
 		%let datastatement=&level._trajectories(where=(province_state;
 	%end;
 	%else %if &level=global %then %DO;
-		%let datastatement=&level._trajectories(where=(country_region;
+		%let datastatement=&level._trajectories(where=(location;
 	%end;
 	%else %if &level=cbsa %then %DO;
 		%let datastatement=&level._trajectories(where=(cbsa_title;
@@ -1155,12 +1176,12 @@ run;
 
 		title;footnote;
 		%let confirmline=%str( yaxis=y lineattrs=(thickness=2 color=darkblue) );
-		%let confirmmarker=%str( yaxis=y markerattrs=(size=10 color=darkblue) FILLEDOUTLINEDMARKERS=TRUE MARKERFILLATTRS=(color=darkblue) MARKEROUTLINEATTRS=(color=darkblue) );
+		%let confirmmarker=%str( yaxis=y markerattrs=(size=8 color=darkblue symbol=circlefilled) FILLEDOUTLINEDMARKERS=TRUE MARKERFILLATTRS=(color=darkblue) MARKEROUTLINEATTRS=(color=darkblue) );
 		%let deathline	=%str( yaxis=y2 lineattrs=(thickness=2 color=darkred) );
-		%let deathmarker=%str( yaxis=y2 markerattrs=(size=10 color=darkred) FILLEDOUTLINEDMARKERS=TRUE MARKERFILLATTRS=(color=darkred) MARKEROUTLINEATTRS=(color=darkred) );
-		%let overlayopts=%str(height=4.5in width=7.5in xaxisopts=(label=" " timeopts=(tickvalueformat=mmddyy5.)) yaxisopts=(label="Confirmed") y2axisopts=(label="Deaths"));
-		%let xaxisopts  =%str( xaxisopts=(griddisplay=Off gridattrs=(color=BWH ) type=time timeopts=(interval=day tickvaluerotation=diagonal tickvaluefitpolicy=rotatealways splittickvalue=FALSE) ));
-		%let yaxisopts  =%str( yaxisopts=(griddisplay=ON gridattrs=(color=BWH)));
+		%let deathmarker=%str( yaxis=y2 markerattrs=(size=8 color=darkred symbol=circlefilled) FILLEDOUTLINEDMARKERS=TRUE MARKERFILLATTRS=(color=darkred) MARKEROUTLINEATTRS=(color=darkred) );
+		%let overlayopts=%str( border=FALSE walldisplay=NONE height=4.5in width=7.5in xaxisopts=(label=" " timeopts=(tickvalueformat=mmddyy5.)) yaxisopts=(label="Confirmed") y2axisopts=(label="Deaths"));
+		%let xaxisopts  =%str( xaxisopts=(griddisplay=Off display=(label ticks tickvalues) gridattrs=(color=BWH )  type=time timeopts=(interval=day tickvaluerotation=diagonal tickvaluefitpolicy=rotatealways splittickvalue=FALSE) ));
+		%let yaxisopts  =%str( yaxisopts=(griddisplay=Off display=(label ticks tickvalues) gridattrs=(color=BWH)));
 		ODS PROCLABEL "&stateunquote Profile";
 		proc template;
 			define statgraph lattice;
@@ -1171,36 +1192,36 @@ run;
 				entryfootnote  "Showing the Last &numback Days" ;
 				entryfootnote  textattrs=(size=7) halign=right "Samuel T. Croker - &sysdate9" ;
 
-				layout lattice / border=false pad=3 opaque=true rows=2 columns=2 columngutter=3;
+				layout lattice / border=FALSE pad=3 opaque=true rows=2 columns=2 columngutter=3;
 					cell; 
-						cellheader; entry "  Cumulative Infections and Deaths  ." / textattrs=(size=12); endcellheader;
-				      	layout overlay / &overlayopts &yaxisopts;
+						cellheader; entry "Cumulative Infections and Deaths" / textattrs=(size=12); endcellheader;
+				      	layout overlay / &overlayopts &yaxisopts xaxisopts=(display=(label ticks tickvalues)) y2axisopts=(display=(label ticks tickvalues));
 				      		barchart  category=filedate response=confirmed 	/ stat=sum datatransparency=0.75;
 							linechart category=filedate response=deaths 	/ stat=sum &deathline ;
 				      	endlayout;
 				    endcell;
 				    
 					cell; 
-						cellheader; entry "  Cumulative Infections and Deaths  ." / textattrs=(size=12); endcellheader;
-				      	layout overlay / &overlayopts &xaxisopts &yaxisopts;
+						cellheader; entry "  Cumulative Infections and Deaths" / textattrs=(size=10); endcellheader;
+				      	layout overlay /&overlayopts &xaxisopts &yaxisopts y2axisopts=(display=(label ticks tickvalues));
 				      		scatterplot	y=confirmed x=filedate / &confirmmarker	;
 							seriesplot	y=confirmed x=filedate / &confirmline	;
-							scatterplot	y=deaths 	x=filedate / &deathmarker	;
+							scatterplot	y=deaths 	x=filedate / &deathmarker 	;
 							seriesplot	y=deaths 	x=filedate / &deathline		;
 				      	endlayout;						 
 				    endcell;
 				    
 					cell; 
-						cellheader; entry "  New Infections and Deaths - Seasonality Is Problematic  ." / textattrs=(size=12); endcellheader;
-				      	layout overlay / &overlayopts &yaxisopts;
+						cellheader; entry "New Infections and Deaths" / textattrs=(size=10); endcellheader;
+				      	layout overlay /&overlayopts &yaxisopts xaxisopts=(display=(label ticks tickvalues)) y2axisopts=(display=(label ticks tickvalues));
 				      		barchart    category=filedate 	response=dif1_confirmed / stat=sum datatransparency=0.75;
 							scatterplot x		=filedate 	y		=dif1_deaths 	/ &deathmarker;
 						endlayout; 
 					endcell;
 				    
 					cell; 
-						cellheader; entry "  New Infections and Deaths - Seasonality Smoothed with Seven Day Moving Average    ." / textattrs=(size=12); endcellheader;
-				      	layout overlay / &overlayopts  &yaxisopts;
+						cellheader; entry "New Infections and Deaths - Seven Day Moving Average" / textattrs=(size=10); endcellheader;
+				      	layout overlay /&overlayopts  &yaxisopts xaxisopts=(display=(label ticks tickvalues)) y2axisopts=(display=(label ticks tickvalues));
 				      		barchart  category=filedate response=ma7_new_confirmed 	/ stat=sum datatransparency=0.75;
 							linechart category=filedate response=ma7_new_deaths 	/ stat=sum &deathline;
 				      	endlayout;	
@@ -1220,7 +1241,7 @@ run;
 /***** INSERTPDFREPORTHEADER Macro - Inserts title frame and preps for the rest of the pdf report							*****/
 /********************************************************************************************************************************/
 
-%macro InsertPDFReportHeader;
+%macro InsertPDFReportHeader(style=styles.raven);
 	ods escapechar="^";  
 	title;
 	footnote;
@@ -1236,7 +1257,8 @@ run;
 		run;
 	
 	/******** PDF ********/
-	ods pdf file="&outputpath./AllStatesAndCountries.pdf" startpage=no ; 
+	ods graphics / outputfmt=png;
+	ods pdf file="&outputpath./AllStatesAndCountries.pdf" startpage=no style=&style; 
 	
 	/* Insert a logo and blank lines (used to move the title text to the center of page) */
 	footnote1 j=c "Beware of drawing conclusions from this data. Lagged confirmations and deaths are contained.";
@@ -1255,3 +1277,137 @@ run;
 	/* Output the remainder of the report */
 	ods pdf startpage=yes;
 %mend InsertPDFReportHeader;
+
+
+
+
+/********************************************************************************************************************************/
+/***** PLOTPATHS Macro - 							*****/
+/********************************************************************************************************************************/
+
+
+%macro plotPaths(level,procvar,title,maxplots=10,style=styles.htmlblue);
+	proc sort data=&level._trajectories; by &procvar filedate; run;
+	data _trajectories;
+		set &level._trajectories;
+		label days_since_death1 = "Days Since First Death";
+		by &procvar filedate;
+		array ddflag[2]  _temporary_;
+		retain ddflag;
+		if first.&procvar then do;
+			days_since_death1 = 0;
+			ddflag[1]=0;
+		end; 
+		if ddflag[1] = 0 then do;
+			if dif1_deaths > 0.5 then ddflag[1] = 1;
+		end;
+		else do;
+			 days_since_death1 + 1;
+		end;
+		if ddflag[1] then output;
+	run;
+	proc sort data=_trajectories; by &procvar descending filedate; run;
+	data _trajectories ; set _trajectories;
+		by &procvar descending filedate;
+		array dd[1] _temporary_;
+		if first.&PROCVAR then dd[1]=0;
+		if ma7_new_deaths > 0.5 and dd[1]=0 then do;
+			lastdeath = 1;
+			dd[1] = 1;
+		end;
+		else lastdeath=0;
+	run;
+	
+		proc sort data=_trajectories(where=(plotseq=1)) out=_t ;
+			by descending ma7_new_confirmed;
+		run;
+		data _t; set _t;
+			by descending  ma7_new_confirmed;
+			plotset=_n_;
+		run;
+		proc sort data=_t ;by descending deaths;run;
+		data _t; set _t;
+			by descending  deaths;
+			plotdeathset=_n_;
+		run;
+		proc sql noprint;
+			create table Death_trajectories as	
+				select a.*,b.plotset,b.plotdeathset, 
+				case when a.plotseq=1 or a.lastdeath=1 then a.&procvar else "" end as plot_label
+				from _trajectories a
+				inner join _t b
+				on a.&procvar=b.&procvar
+				order by &procvar, filedate;
+		quit;
+	%if &maxplots=0 %then %do;
+		proc sql noprint;
+			select ceil((max(days_since_death1)+.01)/10)*10 into :deathmax from death_trajectories;
+		quit; 
+		%put deathmax=&deathmax ;
+		
+		title;footnote;
+			title 	  h=1 "All &title SARS-CoV-2 Trajectories";
+			footnote  h=1"Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
+			footnote3 h=0.9 justify=right "Samuel T. Croker - &sysdate9";
+			ods proclabel "Top &maxplots &title Trajectories"; 
+			proc sgplot 
+				data=death_trajectories(where=(ma7_new_deaths>0 ))
+				noautolegend nocycleattrs noborder
+				des="&title Paths Since Death One";
+				series x=days_since_death1 y=ma7_new_deaths  / group=&procvar 
+					datalabel=plot_label datalabelpos=top
+					datalabelattrs=(size=10  ) 
+					lineattrs =(thickness=2 pattern=solid )
+					transparency=0.25;
+				xaxis minor /*grid minorgrid*/display=(noline)   max=%eval(&deathmax) offsetmax=0 offsetmin=0  labelattrs=(size=10) valueattrs=(size=12) values=(0 to &deathmax by 10 ) ;
+				yaxis minor /*grid minorgrid*/display=(noline)  type=log labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
+			run;
+	%end;
+	%else %if &maxplots < 0 %then %do;
+		%let maxplots=%eval(-1*&maxplots);
+		proc sql noprint;
+			select ceil((max(days_since_death1)+.01)/20)*20 into :deathmax from death_trajectories(where=(ma7_new_deaths>0 and plotdeathset<=abs(&maxplots)));
+		quit; 
+		%put deathmax=&deathmax ;
+			title 	  h=1 "Top &maxplots &title Deaths SARS-CoV-2 Trajectories";
+			footnote  h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
+			footnote3 h=0.9 justify=right "Samuel T. Croker - &sysdate9";
+			ods proclabel "Top &maxplots &title Trajectories"; 
+			proc sgplot 
+				data=death_trajectories(where=(ma7_new_deaths>0 and plotdeathset<=abs(&maxplots)))
+				noautolegend nocycleattrs noborder
+				des="&title Deaths Paths Since Death One";
+				series x=days_since_death1 y=ma7_New_deaths  / group=&procvar 
+					datalabel=plot_label datalabelpos=top
+					datalabelattrs=(size=10 ) 
+					lineattrs =(thickness=2 pattern=solid ) 
+					transparency=0.25;
+				xaxis minor  /*grid minorgrid*/display=(noline)   max=%eval(&deathmax) offsetmax=0 offsetmin=0        labelattrs=(size=10) valueattrs=(size=12) values=(0 to &deathmax by 20 ) ;
+				yaxis minor /*grid minorgrid*/display=(noline)  type=log labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
+			run;
+
+	%end;
+	%else %do;
+		proc sql noprint;
+			select ceil((max(days_since_death1)+.01)/10)*10 into :deathmax from death_trajectories(where=(plotset<=abs(&maxplots)));
+		quit; 
+		%put deathmax=&deathmax ;
+			title 	  h=1 "&title - Top &maxplots SARS-CoV-2 Trajectories";
+			footnote  h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
+			footnote3 h=0.9 justify=right "Samuel T. Croker - &sysdate9";
+			ods proclabel "Top &maxplots &title Trajectories"; 
+			proc sgplot noborder
+				data=death_trajectories(where=(ma7_new_deaths>0 and plotset<=abs(&maxplots)))
+				noautolegend nocycleattrs
+				des="&title Paths Since Death One";
+				series x=days_since_death1 y=ma7_new_deaths  / group=&procvar 
+					datalabel=plot_label datalabelpos=top
+					datalabelattrs=(size=10 ) 
+					lineattrs =(thickness=2 pattern=solid )
+					transparency=0.25;
+				xaxis minor /*grid minorgrid*/display=(noline)  max=%eval(&deathmax) offsetmax=0 offsetmin=0        labelattrs=(size=15) valueattrs=(size=12) values=(0 to &deathmax by 10 ) ;
+				yaxis minor /*grid minorgrid*/display=(noline) type=log labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
+			run;
+
+	%end;
+%mend PlotPaths;
