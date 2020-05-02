@@ -422,9 +422,9 @@ run;
 /***** PLOTUSSTATES Macro - This is a runner for the PLOTSTATE macro for US States and for trajectories						*****/
 /********************************************************************************************************************************/
 
-%macro setgopts(h,w,ph,pw,gfmt=svg);
+%macro setgopts(h,w,ph,pw,gfmt=png);
 	options orientation=landscape papersize=(&h.in &w.in) ;
-	ods graphics on / reset width=&pw.in height=&ph.in  imagemap outputfmt=svg ;
+	ods graphics on / reset width=&pw.in height=&ph.in  imagemap outputfmt=&gfmt ;
 	ods html close;ods rtf close;ods pdf close;ods document close; 
 %mend setgopts;
 
@@ -1154,7 +1154,7 @@ run;
 /********************************************************************************************************************************/
 /***** PLOTSTATE Macro - plots any four panel region																		*****/
 /********************************************************************************************************************************/
-%macro plotstate(state=all,level=state,numback=30,gfmt=svg);
+%macro plotstate(state=all,level=state,numback=30,gfmt=png);
 
 	%if &level=state %then %do;
 		%let datastatement=&level._trajectories(where=(province_state;
