@@ -18,7 +18,10 @@ proc template;
 	define statgraph lattice;
 	begingraph / designwidth=1632px designheight=960px ;
 		entrytitle "SARS-CoV-2 Situation Report for Georgia";
-		layout lattice / border=false pad=0 opaque=true rows=2 columns=2 columngutter=0;
+		entryfootnote "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19 Data Updated: &sysdate";
+		entryfootnote  textattrs=(size=10) "Showing the Last 10 Days" ;
+		entryfootnote  textattrs=(size=8) halign=right "Samuel T. Croker - &sysdate9" ;
+		layout lattice / border=false pad=3 opaque=true rows=2 columns=2 columngutter=3;
 			cell; 
 				cellheader; entry "  Cumulative Infections and Deaths  ." / textattrs=(size=12); endcellheader;
 		      	layout overlay / &overlayopts &yaxisopts;
@@ -58,7 +61,7 @@ proc template;
 run;
 
 
-proc sgrender data=state_trajectories(where=(province_state="Georgia" and plotseq<=30) )template=lattice;
+proc sgrender data=state_trajectories(where=(province_state="Georgia" and plotseq<=30) )template=lattice des="State/Regional Panel for Georgia";
 run;
       
       
