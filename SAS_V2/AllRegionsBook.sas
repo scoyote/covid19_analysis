@@ -39,7 +39,7 @@ ods graphics on / reset width=16in height=10in imagemap outputfmt=&graphFormat i
 	%plotpaths(state,province_state,title=US States,maxplots=10);
 /* CBSAs */		
 	%plotCBSAs(maxplots=30,stplot=Y, minconf=3000,mindeath=200,xvalues=(5000 to 60000 by 5000), 	yvalues=(200 to 4200 by 1000));	
-	%plotpaths(cbsa,cbsa_title,title=US CBSAs,maxplots=10);
+	%plotpaths(cbsa,cbsa_title,title=US CBSAs,maxplots=25);
 /* ods html5 close;  */
 ods pdf close;
 
