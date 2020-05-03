@@ -1,4 +1,4 @@
-/********************************************************************************************************************************/
+ /********************************************************************************************************************************/
 /***** MACROS.sas - This macro file is for the second generation of the JHU Covid Plots 									*****/
 /********************************************************************************************************************************/
 
@@ -822,11 +822,11 @@ run;
 %mend rmPathFiles;
 
 /********************************************************************************************************************************/
-/***** PLOTNATIONS Macro - This is a runner for the PLOTSTATE macro at the national level and for trajectories				*****/
+/***** PLOTNATIONTRAJECTORY Macro - This is a runner for the national level for trajectories								*****/
 /********************************************************************************************************************************/
 
 
-%macro plotNations(numback=30
+%macro plotNationTrajectory(numback=30
 				,maxplots=5
 				,minconf=1000
 				,mindeath=100
@@ -834,10 +834,10 @@ run;
 				,yvalues=(200 to 2600 by 400)
 				,stplot=Y
 				);
-	proc sort data= global_trajectories(where=(plotseq=1)) out = _s;
-		by location;
-	run;
-	data _s2; set _s;
+/* 	proc sort data= global_trajectories(where=(plotseq=1)) out = _s; */
+/* 		by location; */
+/* 	run; */
+/* 	data _s2; set _s; */
 		by location;
 		mflag=0;
 /* 		if first.location then do; */
@@ -849,33 +849,33 @@ run;
 /* 			total_deaths+deaths; */
 /* 		end; */
 /* 		output _s1; */
-		if last.location then do;
+/* 		if last.location then do; */
 /* 			if missing(province_state) then do; */
 /* 				total_confirmed	= confirmed; */
 /* 				total_deaths	= deaths; */
 /* 			end; */
-			output _s2;
-		end;
-	run;
-
-	proc sort data= _s2;	by location;
-		by descending ma7_new_confirmed;
-	run;
-	data _s2; set _s2;
-		plotset=_n_;
-		if plotset <= &maxplots;
-	run;
-	proc sql noprint;
-		select distinct location into :creg1-:creg&maxplots 
-		from _s2 
-		order by location;
-	run;	
-	%if &stplot=Y %then %do;
-		%do nat=1 %to &maxplots;
-				%put Working on &nat of &maxplots: From PLOTNations: "&&creg&nat" ;
-			%plotstate(state="&&creg&nat",level=global,numback=&numback);
-		%end;
-	%end;
+/* 			output _s2; */
+/* 		end; */
+/* 	run; */
+/*  */
+/* 	proc sort data= _s2;	by location; */
+/* 		by descending ma7_new_confirmed; */
+/* 	run; */
+/* 	data _s2; set _s2; */
+/* 		plotset=_n_; */
+/* 		if plotset <= &maxplots; */
+/* 	run; */
+/* 	proc sql noprint; */
+/* 		select distinct location into :creg1-:creg&maxplots  */
+/* 		from _s2  */
+/* 		order by location; */
+/* 	run;	 */
+/* 	%if &stplot=Y %then %do; */
+/* 		%do nat=1 %to &maxplots; */
+/* 				%put Working on &nat of &maxplots: From PLOTNations: "&&creg&nat" ; */
+/* 			%plotstate(state="&&creg&nat",level=global,numback=&numback); */
+/* 		%end; */
+/* 	%end; */
 	
 	/********************************************************************/
 	/***** 				Plot Global Trajectories	 				*****/
@@ -941,10 +941,10 @@ run;
 %mend plotNations;
 
 /********************************************************************************************************************************/
-/***** PLOTCBSAS Macro - This is a runner for the PLOTSTATE macro for US CBSAs and for trajectories							*****/
+/***** PLOTCBSATRAJECTORY Macro - This is a runner for US CBSAs trajectories												*****/
 /********************************************************************************************************************************/
 		
-%macro plotCBSAs(numback=30
+%macro plotCBSATrajectory(numback=30
 				,maxplots=5
 				,minconf=5000
 				,mindeath=500
@@ -952,27 +952,27 @@ run;
 				,yvalues=(200 to 2600 by 400)
 				,stplot=Y
 			);
-
-	proc sort data=cbsa_trajectories(where=(plotseq=1)) out=_c;
-		by descending ma7_new_confirmed;
-	run;
-	data _c; set _c;
-		by descending  ma7_new_confirmed;
-		plotset=_n_;
-		if _n_ <= &maxplots then output;
-	run;
-
-	proc sql noprint;
-			select distinct cbsa_title into :cbsa1-:cbsa&maxplots 
-			from _c 
-			order by cbsa_title;
-	quit;
-	%if &stplot=Y %then %do;
-		%do cb=1 %to &maxplots;
-			%put Working on &cb of &maxplots: From PLOTCBSAs: "&&cbsa&cb";
-	 		%plotstate(state="&&cbsa&cb",level=cbsa,numback=&numback); 
-		%end;
-	%end;
+/*  */
+/* 	proc sort data=cbsa_trajectories(where=(plotseq=1)) out=_c; */
+/* 		by descending ma7_new_confirmed; */
+/* 	run; */
+/* 	data _c; set _c; */
+/* 		by descending  ma7_new_confirmed; */
+/* 		plotset=_n_; */
+/* 		if _n_ <= &maxplots then output; */
+/* 	run; */
+/*  */
+/* 	proc sql noprint; */
+/* 			select distinct cbsa_title into :cbsa1-:cbsa&maxplots  */
+/* 			from _c  */
+/* 			order by cbsa_title; */
+/* 	quit; */
+/* 	%if &stplot=Y %then %do; */
+/* 		%do cb=1 %to &maxplots; */
+/* 			%put Working on &cb of &maxplots: From PLOTCBSAs: "&&cbsa&cb"; */
+/* 	 		%plotstate(state="&&cbsa&cb",level=cbsa,numback=&numback);  */
+/* 		%end; */
+/* 	%end; */
 	/********************************************************************/
 	/***** 				Plot CBSA Trajectories						*****/
 	/********************************************************************/
@@ -1045,9 +1045,9 @@ run;
 %mend plotCBSAs;
 
 /********************************************************************************************************************************/
-/***** PLOTUSSTATES Macro - This is a runner for the PLOTSTATE macro for US States and for trajectories						*****/
+/***** PLOTUSTRAJECTORY Macro - This is a runner for the US trajectories													*****/
 /********************************************************************************************************************************/
-%macro plotUSStates(numback=30
+%macro plotUSTrajectory(numback=30
 				,maxplots=5
 				,minconf=5000
 				,mindeath=200
@@ -1056,26 +1056,26 @@ run;
 				,stplot=Y
 				);
 
-	proc sort data=state_trajectories(where=(plotseq=1)) out=_us;
-		by descending ma7_new_confirmed;
-	run;
-	data _us; set _us;
-		by descending  ma7_new_confirmed;
-		plotset=_n_;
-		if _n_ <= &maxplots then output;
-	run;
-
-	proc sql noprint;
-			select distinct province_state into :usState1-:usState&maxplots 
-			from _us 
-			order by province_state;
-	quit;
-	%if &stplot=Y %then %do;
-		%do st=1 %to &maxplots;
-			%put Working on &st of &maxplots: From PLOTUSSTATES: "&&USSTATE&st";
-	 		%plotstate(state="&&USSTATE&st",level=state,numback=&numback); 
-		%end;
-	%end;
+/* 	proc sort data=state_trajectories(where=(plotseq=1)) out=_us; */
+/* 		by descending ma7_new_confirmed; */
+/* 	run; */
+/* 	data _us; set _us; */
+/* 		by descending  ma7_new_confirmed; */
+/* 		plotset=_n_; */
+/* 		if _n_ <= &maxplots then output; */
+/* 	run; */
+/*  */
+/* 	proc sql noprint; */
+/* 			select distinct province_state into :usState1-:usState&maxplots  */
+/* 			from _us  */
+/* 			order by province_state; */
+/* 	quit; */
+/* 	%if &stplot=Y %then %do; */
+/* 		%do st=1 %to &maxplots; */
+/* 			%put Working on &st of &maxplots: From PLOTUSSTATES: "&&USSTATE&st"; */
+/* 	 		%plotstate(state="&&USSTATE&st",level=state,numback=&numback);  */
+/* 		%end; */
+/* 	%end; */
 
 	/********************************************************************/
 	/***** Plot State Trajectories	 								*****/
@@ -1461,3 +1461,30 @@ run;
 			%end;
 	%end;
 %mend PlotPaths;
+
+
+
+%macro plot_emerging(level,procvar,maxplots=20);
+	
+	data _plottemp;
+		set _global;
+		by &procvar filedate;
+		if ~first.&procvar then do;
+			lag_dif7_confirmed=lag(dif7_confirmed);
+			dif = lag_dif7_confirmed-dif7_confirmed;
+		end;
+		if last.&procvar then output;
+	run;
+	proc sql noprint;
+			select &procvar into :loc1-:loc&maxplots
+			from _plottemp 
+			order by dif ;
+	quit;
+	%do i=1 %to 2;*&maxplots;
+		%put Working on &i of &maxplots: From PLOTlocS: "&&loc&i";
+ 		%plotstate(state="&&loc&i",level=state,numback=30); 
+	%end;
+	
+%mend;
+
+

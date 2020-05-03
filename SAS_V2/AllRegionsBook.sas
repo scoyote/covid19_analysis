@@ -5,7 +5,7 @@
 %let rc = %sysfunc(dlgcdir("/covid_analysis/SAS_V2/")); 
 %include "MACROS.sas";
 %let graphFormat=png;
-
+ 
 /********************************************************************/
 /***** Update the JHU data from git site and run data load		*****/
 /********************************************************************/
@@ -31,15 +31,21 @@ ods graphics on / reset width=16in height=10in imagemap outputfmt=&graphFormat i
 
 /* ods html5 file="&outputpath./AllStatesAndCountries.html" gpath= "&outputpath./graphs/" (URL='graphs/') device=&graphFormat; *options(svg_mode="inline"); */
 /* Countries */ 
-	%plotNations(maxplots=30,stplot=Y);
+	%plotNationTrajectories(maxplots=30,stplot=Y);
 	%plotpaths(global,location,title=Nations,maxplots=-20);
+	%plot_emerging(global,location);
+
 /* States */ 	
-	%plotUSStates(maxplots=30,stplot=Y,minconf=5000,mindeath=200,xvalues=(5000 to 70000 by 5000),	yvalues=(200 to 4800 by 1000));
+	%plotUSTrajectories(maxplots=30,stplot=Y,minconf=5000,mindeath=200,xvalues=(5000 to 70000 by 5000),	yvalues=(200 to 4800 by 1000));
 	%plotpaths(state,province_state,title=US States,maxplots=0);
 	%plotpaths(state,province_state,title=US States,maxplots=10);
+	%plot_emerging(state,province_state);
+
 /* CBSAs */		
-	%plotCBSAs(maxplots=30,stplot=Y, minconf=3000,mindeath=200,xvalues=(5000 to 60000 by 5000), 	yvalues=(200 to 4200 by 1000));	
+	%plotCBSATrajectories(maxplots=30,stplot=Y, minconf=3000,mindeath=200,xvalues=(5000 to 60000 by 5000), 	yvalues=(200 to 4200 by 1000));	
 	%plotpaths(cbsa,cbsa_title,title=US CBSAs,maxplots=25);
+	%plot_emerging(cbsa,cbsa_title);
+
 /* ods html5 close;  */
 ods pdf close;
 
