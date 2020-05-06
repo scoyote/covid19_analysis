@@ -6,54 +6,31 @@
 /********************************************************************************************************************************/
 /***** Create Colors - Create color dataset to use as attributes in PROC SGPLOT. 											*****/
 /********************************************************************************************************************************/
+FILENAME REFFILE '/covid_analysis/SAS_V2/colors/Main.csv';
+PROC IMPORT DATAFILE=REFFILE
+	DBMS=CSV
+	OUT=WORK.color_raw
+	replace;
+	GETNAMES=YES;
+	DATAROW=2;
+	GUESSINGROWS=2000;
+RUN;
+filename reffile clear;
 
-data colormap;                 
-	length Value 8. FillColor $30;
-	input value FillColor $;
-	informat fillcolor $30.; 
-	retain ID 'myid'            
+data colormap;  
+	set color_raw(rename=(colorname=color) where=(value~=999));           
+	retain ID 'stcAttr'            
 	     Show 'AttrMap';  
 /* if you add here add the variable to the selects in the 3 macros */
-	COLOR		= fillcolor;
-	linecolor	= fillcolor;
-	MARKERCOLOR	= fillcolor;
-	textcolor	= fillcolor;
+	fillcolor	= color;
+	COLOR		= color;
+	linecolor	= color;
+	MARKERCOLOR	= color;
+	textcolor	= color;
 	MARKERTRANSPARENCY=0.5;
 	markersymbol='plus';
 	markersize=10;
-/* if you add here add the variable to the selects in the 3 macros */
-datalines;
-1	 red 
-2	 green
-3	 blue
-4	 lilac
-5	 black
-6	 gray
-7	 magenta
-8	 orange
-9	 steel
-10	 violet
-11	 vipk
-12	 brown
-13	 tan
-14	 grr
-15	 mopr
-16	 pav
-17	 vliv
-18	 vioy
-19	 dagry
-20	 bibg
-21	 vilg
-22	 molg
-23	 moolg
-24	 vig
-25	 viro
-26	 grro
-27	 moppk
-28	 grppk
-29	 stp
-30	 dap
-;
+	drop colorsample;
 run;
 
 
@@ -826,7 +803,10 @@ run;
 /********************************************************************************************************************************/
 
 
-%macro plotNationTrajectory(numback=30
+%macro plotNationTrajectory(
+				 sortkey=confirmed
+				,sortdir=
+				,numback=30
 				,maxplots=5
 				,minconf=1000
 				,mindeath=100
@@ -834,65 +814,50 @@ run;
 				,yvalues=(200 to 2600 by 400)
 				,stplot=Y
 				);
-/* 	proc sort data= global_trajectories(where=(plotseq=1)) out = _s; */
-/* 		by location; */
-/* 	run; */
-/* 	data _s2; set _s; */
-		by location;
-		mflag=0;
-/* 		if first.location then do; */
-/* 			total_confirmed=confirmed; */
-/* 			total_deaths=deaths; */
-/* 		end; */
-/* 		else if ~missing(province_state) then do; */
-/* 			total_confirmed+confirmed; */
-/* 			total_deaths+deaths; */
-/* 		end; */
-/* 		output _s1; */
-/* 		if last.location then do; */
-/* 			if missing(province_state) then do; */
-/* 				total_confirmed	= confirmed; */
-/* 				total_deaths	= deaths; */
-/* 			end; */
-/* 			output _s2; */
-/* 		end; */
-/* 	run; */
-/*  */
-/* 	proc sort data= _s2;	by location; */
-/* 		by descending ma7_new_confirmed; */
-/* 	run; */
-/* 	data _s2; set _s2; */
-/* 		plotset=_n_; */
-/* 		if plotset <= &maxplots; */
-/* 	run; */
-/* 	proc sql noprint; */
-/* 		select distinct location into :creg1-:creg&maxplots  */
-/* 		from _s2  */
-/* 		order by location; */
-/* 	run;	 */
-/* 	%if &stplot=Y %then %do; */
-/* 		%do nat=1 %to &maxplots; */
-/* 				%put Working on &nat of &maxplots: From PLOTNations: "&&creg&nat" ; */
-/* 			%plotstate(state="&&creg&nat",level=global,numback=&numback); */
-/* 		%end; */
-/* 	%end; */
-	
-	/********************************************************************/
-	/***** 				Plot Global Trajectories	 				*****/
-	/********************************************************************/
 
 	ods graphics / reset=imagename imagename="AllNations" Height=10in width=16in;
 	
-	%let plottip= location filedate confirmed deaths;
-	%let plottiplab="Location" "FileDate" "Confirmed" "Deaths";
+	data _globaltemp;
+		set global_trajectories;
+		by location filedate;
+		if ~first.location then do;
+			lag_dif7_confirmed=lag(dif7_confirmed);
+			dif = lag_dif7_confirmed-dif7_confirmed;
+		end;
+		if last.location then output;
+	run;
+	proc sort data=_globaltemp; by &sortdir &sortkey; run;
+/* 	%if &sortkey=dif %then %do;  by &sortkey; %end; */
+/* 	%else %do; by descending &sortkey; %end; */
+	run;
+	data _globaltemp;
+		set _globaltemp;
+		if _n_=1 then plotset=0;
+		plotset=_n_;
+	run;
+
+	%local vari next_var vars;
+	%let vars=confirmed deaths dif1_confirmed dif1_deaths dif7_confirmed dif7_deaths  ma7_new_confirmed ma7_new_deaths ma7_confirmed ma7_deaths;
+
 	proc sql noprint;
 		create table _globalplot as	
-			select a.*,b.plotset from global_trajectories(where=(plotseq<=&numback and confirmed>&minconf and deaths>&mindeath)) a
-			inner join _s2 b
+			select 
+			 a.location
+			,a.filedate
+			%do vari = 1 %to %sysfunc(countw(&vars));
+				%let next_var=%scan(&vars, &vari);
+/* 				%if &sortkey ~=&next_var %then %do; ,a.&next_var %end; */
+				,a.&next_var
+			%end;
+			,a.plotseq
+			,a.fd_weekday
+			,b.plotset 
+			from global_trajectories(where=(plotseq<=&numback and confirmed>&minconf and deaths>&mindeath )) a
+			inner join _globaltemp(drop=confirmed ) b
 			on a.location=b.location
 			order by location, filedate;
 	quit;
-	
+
 	proc sql noprint;
 		create table _attribset as
 			select b.location as value
@@ -904,8 +869,10 @@ run;
 			,linecolor
 			,textcolor
 			,markertransparency
-			from colormap a inner join _s2 b 
-			on a.value=b.plotset;	
+			from colormap a 
+			inner join _globaltemp b 
+			on a.value=b.plotset
+			;	
 	quit;
 	data _globalplot;
 		set _globalplot;
@@ -913,38 +880,53 @@ run;
 		if last.location then plot_label=location;
 		else plot_label="";
 	run;
+	proc sort data=_globalplot; by location filedate; run;
 	
-		title h=1.5 "Global Top &maxplots National SARS-CoV-2 Trajectories";
+	%let plottip= location filedate confirmed deaths;
+	%let plottiplab="Location" "FileDate" "Confirmed" "Deaths";
+/* 	%let tkey=%unquote(%sysfunc(propcase("&sortkey"))); */
+		title h=1.5 "Global Top &maxplots &sortkey National SARS-CoV-2 Trajectories";
+	%if &sortkey=dif %then %do; 
+		title h=1.5 "National Top &maxplots Emerging SARS-CoV-2 Trajectories";
+	%end;
+	%else %do;
+			title h=1.5 "National Top &maxplots &sortkey SARS-CoV-2 Trajectories";
+	%end;
 		footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 		footnote2  h=1 "Showing the Last &numback Days";
 		footnote3  justify=right  height=0.5 "Samuel T. Croker - &sysdate9";
+		footnote4  h=0.9 justify=left "&sortdir &sortkey";
 	ods proclabel "Top &maxplots Nation Trajectories"; 
 	proc sgplot 
-		data=_globalplot(where=(plotset<=30)) 
+		data=_globalplot(where=(plotset<=&maxplots)) 
 		noautolegend noborder 
 		nocycleattrs 
 		dattrmap=_attribset
 		des="National Trajectories";
 		series x=Confirmed y=Deaths  /
-			group=location attrid=myid 
+			group=location attrid=stcattr 
 			markers 
 			datalabel=plot_label
+			datalabelpos=top
 			datalabelattrs=(size=10) 
 			tip=(&plottip) 
 			tiplabel=(&plottiplab);
-		xaxis grid minor minorgrid display=(noline)  type=log min=&minconf  LOGSTYLE=linear;
-		yaxis grid minor minorgrid display=(noline)  type=log min=&mindeath LOGSTYLE=linear;
+		xaxis grid minor minorgrid display=(noline)  type=log min=&minconf  LOGSTYLE=linear values=&xvalues;
+		yaxis grid minor minorgrid display=(noline)  type=log min=&mindeath LOGSTYLE=linear values=&yvalues;
 	run;
 
-	proc datasets library=work nodetails nolist; delete _s2 _attribset _globalplot; quit;
+	proc datasets library=work nodetails nolist; delete _globaltemp _attribset _globalplot; quit;
 
-%mend plotNations;
+%mend plotNationTrajectory;
 
 /********************************************************************************************************************************/
 /***** PLOTCBSATRAJECTORY Macro - This is a runner for US CBSAs trajectories												*****/
 /********************************************************************************************************************************/
 		
-%macro plotCBSATrajectory(numback=30
+%macro plotCBSATrajectory(
+				 sortkey=confirmed
+				,sortdir=
+				,numback=30
 				,maxplots=5
 				,minconf=5000
 				,mindeath=500
@@ -952,44 +934,54 @@ run;
 				,yvalues=(200 to 2600 by 400)
 				,stplot=Y
 			);
-/*  */
-/* 	proc sort data=cbsa_trajectories(where=(plotseq=1)) out=_c; */
-/* 		by descending ma7_new_confirmed; */
-/* 	run; */
-/* 	data _c; set _c; */
-/* 		by descending  ma7_new_confirmed; */
-/* 		plotset=_n_; */
-/* 		if _n_ <= &maxplots then output; */
-/* 	run; */
-/*  */
-/* 	proc sql noprint; */
-/* 			select distinct cbsa_title into :cbsa1-:cbsa&maxplots  */
-/* 			from _c  */
-/* 			order by cbsa_title; */
-/* 	quit; */
-/* 	%if &stplot=Y %then %do; */
-/* 		%do cb=1 %to &maxplots; */
-/* 			%put Working on &cb of &maxplots: From PLOTCBSAs: "&&cbsa&cb"; */
-/* 	 		%plotstate(state="&&cbsa&cb",level=cbsa,numback=&numback);  */
-/* 		%end; */
-/* 	%end; */
-	/********************************************************************/
-	/***** 				Plot CBSA Trajectories						*****/
-	/********************************************************************/
+
 	%let plottip=cbsa_title filedate confirmed deaths;
 	%let plottiplab="CBSA" "FileDate" "Confirmed" "Deaths";
 		
+	data _cbsatemp;
+		set cbsa_trajectories;
+		by cbsa_title filedate;
+		if ~first.cbsa_title then do;
+			lag_dif7_confirmed=lag(dif7_confirmed);
+			dif = lag_dif7_confirmed-dif7_confirmed;
+		end;
+		if last.cbsa_title then do;
+			output;
+		end;
+	run;
+	proc sort data=_cbsatemp; by &sortdir &sortkey; run;
+	data _cbsatemp;
+		set _cbsatemp;
+		if _n_=1 then plotset=0;
+		plotset+1;
+	run;
+
+	%local vari next_var vars;
+	%let vars=confirmed deaths dif1_confirmed dif1_deaths dif7_confirmed dif7_deaths  
+			 ma7_new_confirmed ma7_new_deaths ma7_confirmed ma7_deaths CASEPERCAPITA CASEPERBED  CASEPERHOSPITAL;
+
 	proc sql noprint;
 		create table _cbsaplot as	
-			select a.*, b.plotset from cbsa_trajectories(where=(cbsa_title ~= "New York-Newark-Jersey City, NY-NJ-PA" and plotseq<=&numback and confirmed>&minconf and deaths>&mindeath)) a
-			inner join _C b
-			on a.CBSA_TITLE=b.CBSA_TITLE
-			order by CBSA_TITLE, filedate;
+			select 
+			a.cbsa_title
+			,a.filedate
+			%do vari = 1 %to %sysfunc(countw(&vars));
+				%let next_var=%scan(&vars, &vari);
+/* 				%if &sortkey ~=&next_var %then %do; ,a.&next_var %end; */
+				,a.&next_var
+			%end;
+			,a.plotseq
+			,a.fd_weekday
+			,b.plotset 
+			from cbsa_trajectories(where=(plotseq<=&numback and confirmed>&minconf and deaths>&mindeath )) a
+			inner join _cbsatemp(drop=confirmed ) b
+			on a.cbsa_title=b.cbsa_title
+			order by cbsa_title, filedate;
 	quit;
-	
+
 	proc sql noprint;
 		create table _attribset as
-			select b.CBSA_TITLE as value
+			select b.cbsa_title as value
 			,id
 			,color
 			,fillcolor
@@ -998,15 +990,18 @@ run;
 			,linecolor
 			,textcolor
 			,markertransparency
-			from colormap a inner join _c b 
-			on a.value=b.plotset;	
+			from colormap a 
+			inner join _cbsatemp b 
+			on a.value=b.plotset
+			;	
 	quit;
 	data _cbsaplot;
 		set _cbsaplot;
-		by CBSA_TITLE;
-		if last.CBSA_TITLE then plot_label=CBSA_TITLE;
+		by cbsa_title;
+		if last.cbsa_title then plot_label=cbsa_title;
 		else plot_label="";
 	run;
+	proc sort data=_cbsaplot; by cbsa_title filedate; run;
 	
 	proc datasets  nodetails nolist lib=work;
 		modify _cbsaplot;
@@ -1019,18 +1014,23 @@ run;
 				  caseperhospital comma12.6;
 	quit;
 	ods graphics  / reset=imagename imagename="AllCBSA";
-		title h=1.5 "US CBSA Top &maxplots SARS-CoV-2 Trajectories";
-		title2 h=0.95 "Removed: New York-Newark-Jersey City, NY-NJ-PA";
+	%if &sortkey=dif %then %do; 
+		title h=1.5 "US CBSA Top &maxplots Emerging SARS-CoV-2 Trajectories";
+	%end;
+	%else %do;
+			title h=1.5 "US CBSA Top &maxplots &sortkey SARS-CoV-2 Trajectories";
+	%end;
 		footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 		footnote2  h=1 "Showing the Last &numback Days";
 		footnote3  h=0.5 justify=right "Samuel T. Croker - &sysdate9";
+		footnote4  h=0.9 justify=left "&sortdir &sortkey";
 	ods proclabel "Top &maxplots US CBSA Trajectories"; 
 	proc sgplot 
-		data=_cbsaplot(where=(plotset<=&numback))
+		data=_cbsaplot(where=(plotset<=&maxplots))
 		noautolegend noborder 
 		dattrmap=_attribset
 		des="CBSA Trajectories";
-		series x=Confirmed y=Deaths  / group=cbsa_title attrid=myid
+		series x=Confirmed y=Deaths  / group=cbsa_title attrid=stcattr
 			datalabel=plot_label  
 			datalabelattrs=(size=10) 
 			markers
@@ -1040,14 +1040,16 @@ run;
 		yaxis grid minor minorgrid display=(noline)  type=log values=&yvalues	LOGSTYLE=LOGEXPAND min=&mindeath;
 	run;
 
-	proc datasets library=work nodetails nolist; delete _c _cbsaplot _attribset; quit;
+	proc datasets library=work nodetails nolist; delete _cbsatemp _cbsaplot _attribset; quit;
 
-%mend plotCBSAs;
+%mend plotCBSATrajectory;
 
 /********************************************************************************************************************************/
 /***** PLOTUSTRAJECTORY Macro - This is a runner for the US trajectories													*****/
 /********************************************************************************************************************************/
-%macro plotUSTrajectory(numback=30
+%macro plotUSTrajectory(sortkey=confirmed
+				,sortdir=
+				,numback=30
 				,maxplots=5
 				,minconf=5000
 				,mindeath=200
@@ -1055,45 +1057,52 @@ run;
 				,yvalues=(200 500 1000 1500 2000 2500 )
 				,stplot=Y
 				);
-
-/* 	proc sort data=state_trajectories(where=(plotseq=1)) out=_us; */
-/* 		by descending ma7_new_confirmed; */
-/* 	run; */
-/* 	data _us; set _us; */
-/* 		by descending  ma7_new_confirmed; */
-/* 		plotset=_n_; */
-/* 		if _n_ <= &maxplots then output; */
-/* 	run; */
-/*  */
-/* 	proc sql noprint; */
-/* 			select distinct province_state into :usState1-:usState&maxplots  */
-/* 			from _us  */
-/* 			order by province_state; */
-/* 	quit; */
-/* 	%if &stplot=Y %then %do; */
-/* 		%do st=1 %to &maxplots; */
-/* 			%put Working on &st of &maxplots: From PLOTUSSTATES: "&&USSTATE&st"; */
-/* 	 		%plotstate(state="&&USSTATE&st",level=state,numback=&numback);  */
-/* 		%end; */
-/* 	%end; */
-
-	/********************************************************************/
-	/***** Plot State Trajectories	 								*****/
-	/********************************************************************/
 	%let plottip=province_state filedate confirmed deaths;
 	%let plottiplab="State" "FileDate" "Confirmed" "Deaths";
-	
+
+	data _statetemp;
+		set state_trajectories;
+		by province_state filedate;
+		if ~first.province_stat then do;
+			lag_dif7_confirmed=lag(dif7_confirmed);
+			dif = lag_dif7_confirmed-dif7_confirmed;
+		end;
+		if last.province_state then output;
+	run;
+	%put NOTE: ***** [&sortdir, &sortkey] ************************;
+	proc sort data=_statetemp; by &sortdir &sortkey; run;
+	data _statetemp;
+		set _statetemp;
+		by &sortdir &sortkey;
+		if _n_=1 then plotset=0;
+		plotset+1;
+	run;
+	%local vari next_var vars;
+	%let vars=confirmed deaths dif1_confirmed dif1_deaths dif7_confirmed dif7_deaths  
+			 ma7_new_confirmed ma7_new_deaths ma7_confirmed ma7_deaths CASEPERCAPITA CASEPERBED  CASEPERHOSPITAL;
 	proc sql noprint;
 		create table _stateplot as	
-			select a.*,b.plotset from state_trajectories(where=(province_state ~in  ("New York" "New Jersey") and plotseq<=&numback and confirmed>&minconf and deaths>&mindeath)) a
-			inner join _us b
+			select
+			 a.province_state
+			,a.filedate
+			%do vari = 1 %to %sysfunc(countw(&vars));
+				%let next_var=%scan(&vars, &vari);
+/* 				%if &sortkey ~=&next_var %then %do; ,a.&next_var %end; */
+				,a.&next_var
+			%end;
+			,a.plotseq
+			,a.fd_weekday
+			,b.plotset 
+			from state_trajectories(where=(plotseq<=&numback and confirmed>&minconf and deaths>&mindeath )) a
+			inner join _statetemp b
 			on a.province_state=b.province_state
 			order by province_state, filedate;
 	quit;
-	
+
 	proc sql noprint;
 		create table _attribset as
-			select b.province_state as value
+			select 
+			 b.province_state as value
 			,id
 			,color
 			,fillcolor
@@ -1102,16 +1111,18 @@ run;
 			,linecolor
 			,textcolor
 			,markertransparency
-			from colormap a inner join _us b 
-			on a.value=b.plotset;	
+			from colormap a 
+			inner join _statetemp b 
+			on a.value=b.plotset
+			;	
 	quit;
+	proc sort data=_stateplot; by province_state filedate; run;
 	data _stateplot;
 		set _stateplot;
 		by province_state;
 		if last.province_state then plot_label=province_state;
 		else plot_label="";
 	run;
-	
 	proc datasets  nodetails nolist lib=work;
 		modify _stateplot;
 			label casepercapita 	= "Case per Capita"
@@ -1123,32 +1134,36 @@ run;
 				  caseperhospital comma12.6;
 	quit;
 		ods graphics on / reset=imagename imagename="AllStates"  ;
-	
-		title h=1.5 "US State Top &maxplots SARS-CoV-2 Trajectories";
-		title2 h=1.5 "Removed: New York, New Jersey";
+	%if &sortkey=dif %then %do; 
+		title h=1.5 "US State Top &maxplots Emerging SARS-CoV-2 Trajectories";
+	%end;
+	%else %do;
+			title h=1.5 "US State Top &maxplots &sortkey SARS-CoV-2 Trajectories";
+	%end;
 		footnote   h=1.5 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 		footnote2  h=1.5 "Showing the Last &numback Days";
 		footnote3  h=0.9 justify=right "Samuel T. Croker - &sysdate9";
+		footnote4  h=0.9 justify=left "&sortdir &sortkey";
 	ods proclabel "Top &maxplots US States Trajectories"; 
 	proc sgplot 
-		data=_stateplot(where=(plotset<=&numback))
+		data=_stateplot(where=(plotset<=&maxplots))
 		noautolegend noborder 
 		dattrmap=_attribset
 		des="State Trajectories";
-		series x=Confirmed y=Deaths  / group=province_state attrid=myid
+		series x=Confirmed y=Deaths  / group=province_state attrid=stcattr
 			datalabel=plot_label
 			datalabelattrs=(size=10) 
 			markers 
 			transparency=0.25
 			tip=(&plottip) 
 			tiplabel=(&plottiplab) ;
-		xaxis grid minor minorgrid display=(noline)  type=log min=&minconf  values=&xvalues labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
-		yaxis grid minor minorgrid display=(noline)  type=log min=&mindeath values=&yvalues labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
+		xaxis grid minor minorgrid display=(noline) minorcount=100 type=log min=&minconf  values=&xvalues labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
+		yaxis grid minor minorgrid display=(noline) minorcount=100 type=log min=&mindeath values=&yvalues labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
 	run;
 
-	proc datasets library=work nodetails nolist; delete _us _stateplot _attribset; quit;
+	proc datasets library=work nodetails nolist; delete  _stateplot _statetemp _attribset; quit;
 
-%mend plotUSStates;
+%mend plotUSTrajectory;
 
 
 /********************************************************************************************************************************/
@@ -1234,6 +1249,9 @@ run;
 		proc sgrender 
 			 data=&datastatement.=&state and plotseq<=&numback)) template=lattice des="&stlab";
 		run;
+/* 		%put data=&datastatement.=&state and plotseq<=&numback)); */
+/* 		proc print data=&datastatement.=&state and plotseq<=&numback)); */
+/* 		run; */
 
 %mend plotstate;
 
@@ -1350,6 +1368,65 @@ run;
 			by descending  &plotvariable._per_census2010pop;
 			plotpercapita=_n_;
 		run;
+		
+		%if &level=global %then %do;
+			proc sql noprint;
+				create table _attribset as
+					select 
+					 b.location as value
+					,id
+					,color
+					,fillcolor
+					,markercolor
+					,markersymbol
+					,linecolor
+					,textcolor
+					,markertransparency
+					from colormap a 
+					inner join _t b 
+					on a.value=b.plotset
+					;	
+			quit;
+		
+		%end;
+		%else %if &level=state %then %do;
+			proc sql noprint;
+				create table _attribset as
+					select 
+					 b.province_state as value
+					,id
+					,color
+					,fillcolor
+					,markercolor
+					,markersymbol
+					,linecolor
+					,textcolor
+					,markertransparency
+					from colormap a 
+					inner join _t b 
+					on a.value=b.plotset
+					;	
+			quit;
+		%end;
+		%else %if &level=cbsa %then %do;
+			proc sql noprint;
+				create table _attribset as
+					select 
+					 b.cbsa_title as value
+					,id
+					,color
+					,fillcolor
+					,markercolor
+					,markersymbol
+					,linecolor
+					,textcolor
+					,markertransparency
+					from colormap a 
+					inner join _t b 
+					on a.value=b.plotset
+					;	
+			quit;
+		%end;
 		proc sql noprint;
 			create table Death_trajectories as	
 				select a.*
@@ -1374,11 +1451,11 @@ run;
 			footnote  h=1"Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 			footnote3 h=0.9 justify=right "Samuel T. Croker - &sysdate9";
 			ods proclabel "Top &maxplots &title Death Paths"; 
-			proc sgplot 
+			proc sgplot dattrmap=_attribset
 				data=death_trajectories(where=(&plotvariable>0 ))
 				noautolegend nocycleattrs noborder
 				des="&title Paths Since Death One";
-				series x=days_since_death1 y=&plotvariable  / group=&procvar 
+				series x=days_since_death1 y=&plotvariable  / group=&procvar  attrid=stcattr
 					datalabel=plot_label datalabelpos=top
 					datalabelattrs=(size=10  ) 
 					lineattrs =(thickness=2 pattern=solid )
@@ -1389,6 +1466,7 @@ run;
 	%end;
 	%else %if &maxplots < 0 %then %do;
 		%let maxplots=%eval(-1*&maxplots);
+		
 		proc sql noprint;
 			select ceil((max(days_since_death1)+.01)/20)*20 into :deathmax from death_trajectories(where=(ma7_new_deaths>0 and plotdeathset<=abs(&maxplots)));
 		quit; 
@@ -1397,11 +1475,11 @@ run;
 			footnote  h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 			footnote3 h=0.9 justify=right "Samuel T. Croker - &sysdate9";
 			ods proclabel "Top &maxplots &title Death Paths"; 
-			proc sgplot 
+			proc sgplot dattrmap=_attribset
 				data=death_trajectories(where=(&plotvariable>0 and plotdeathset<=abs(&maxplots)))
 				noautolegend nocycleattrs noborder
 				des="&title Deaths Paths Since Death One";
-				series x=days_since_death1 y=&plotvariable  / group=&procvar 
+				series x=days_since_death1 y=&plotvariable  / group=&procvar  attrid=stcattr
 					datalabel=plot_label datalabelpos=top
 					datalabelattrs=(size=10 ) 
 					lineattrs =(thickness=2 pattern=solid ) 
@@ -1410,11 +1488,11 @@ run;
 				yaxis minor /*grid minorgrid*/display=(noline)  type=log labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
 			run;			
 			%if "&level" = "cbsa" %then %do;
-				proc sgplot 
+				proc sgplot dattrmap=_attribset
 					data=death_trajectories(where=(&plotvariable>0 and plotpercapita<=abs(&maxplots)))
 					noautolegend nocycleattrs noborder
 					des="&title Deaths Per Capita Paths Since Death One";
-					series x=days_since_death1 y=&plotvariable._per_census2010pop  / group=&procvar 
+					series x=days_since_death1 y=&plotvariable._per_census2010pop  / group=&procvar  attrid=stcattr
 						datalabel=plot_label datalabelpos=top
 						datalabelattrs=(size=10 ) 
 						lineattrs =(thickness=2 pattern=solid ) 
@@ -1433,11 +1511,11 @@ run;
 			footnote  h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
 			footnote3 h=0.9 justify=right "Samuel T. Croker - &sysdate9";
 			ods proclabel "Top &maxplots &title Death Paths"; 
-			proc sgplot noborder
+			proc sgplot noborder dattrmap=_attribset
 				data=death_trajectories(where=(&plotvariable>0 and plotset<=abs(&maxplots)))
 				noautolegend nocycleattrs
 				des="&title Paths Since Death One";
-				series x=days_since_death1 y=&plotvariable  / group=&procvar 
+				series x=days_since_death1 y=&plotvariable  / group=&procvar  attrid=stcattr
 					datalabel=plot_label datalabelpos=top
 					datalabelattrs=(size=10 ) 
 					lineattrs =(thickness=2 pattern=solid )
@@ -1446,11 +1524,11 @@ run;
 				yaxis minor /*grid minorgrid*/display=(noline) type=log labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
 			run;
 			%if "&level" = "cbsa" %then %do;
-				proc sgplot noborder
+				proc sgplot noborder dattrmap=_attribset
 					data=death_trajectories(where=(&plotvariable>0 and plotpercapita<=abs(&maxplots) ))
 					noautolegend nocycleattrs
 					des="&title Paths Since Death One";
-					series x=days_since_death1 y=&plotvariable._per_census2010pop  / group=&procvar 
+					series x=days_since_death1 y=&plotvariable._per_census2010pop  / group=&procvar  attrid=stcattr
 						datalabel=plot_label datalabelpos=top
 						datalabelattrs=(size=10 ) 
 						lineattrs =(thickness=2 pattern=solid )
@@ -1460,14 +1538,17 @@ run;
 				run;
 			%end;
 	%end;
+	
+	proc datasets library=work nodetails nolist; delete _trajectories Death_trajectories _t; quit;
+
 %mend PlotPaths;
 
 
 
-%macro plot_emerging(level,procvar,maxplots=20);
+%macro plot_emerging(sortkey,level,procvar,maxplots=20,sortdir=);
 	
 	data _plottemp;
-		set _global;
+		set &level._trajectories;
 		by &procvar filedate;
 		if ~first.&procvar then do;
 			lag_dif7_confirmed=lag(dif7_confirmed);
@@ -1475,14 +1556,16 @@ run;
 		end;
 		if last.&procvar then output;
 	run;
+	
 	proc sql noprint;
 			select &procvar into :loc1-:loc&maxplots
 			from _plottemp 
-			order by dif ;
+			order by &sortkey &sortdir ;
 	quit;
-	%do i=1 %to 2;*&maxplots;
+	
+	%do i=1 %to &maxplots;
 		%put Working on &i of &maxplots: From PLOTlocS: "&&loc&i";
- 		%plotstate(state="&&loc&i",level=state,numback=30); 
+ 		%plotstate(state="&&loc&i",level=&level,numback=30); 
 	%end;
 	
 %mend;

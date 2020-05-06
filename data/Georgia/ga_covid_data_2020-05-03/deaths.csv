@@ -1,6 +1,5 @@
 age,Gender,County,Chronic_Condition
 71,MALE,Appling,Unknown
-82,MALE,Appling,Yes
 83,MALE,Appling,Unknown
 79,MALE,Appling,Unknown
 71,MALE,Appling,Yes
@@ -92,7 +91,7 @@ age,Gender,County,Chronic_Condition
 96,FEMALE,Butts,Yes
 62,MALE,Butts,Unknown
 44,MALE,Butts,Unknown
-83,UNKNOWN,Butts,Unknown
+83,FEMALE,Butts,Unknown
 85,FEMALE,Butts,Unknown
 82,MALE,Butts,Unknown
 59,FEMALE,Calhoun,Yes
@@ -267,7 +266,7 @@ age,Gender,County,Chronic_Condition
 85,MALE,Cobb,Yes
 81,MALE,Cobb,No
 64,FEMALE,Cobb,Yes
-57,MALE,Cobb,Unknown
+57,MALE,Cobb,Yes
 94,FEMALE,Cobb,No
 84,FEMALE,Cobb,Yes
 60,FEMALE,Cobb,Yes
@@ -299,6 +298,7 @@ age,Gender,County,Chronic_Condition
 50,FEMALE,Colquitt,Unknown
 90,FEMALE,Colquitt,Unknown
 45,MALE,Colquitt,Unknown
+,MALE,Colquitt,Unknown
 59,MALE,Columbia,Unknown
 50,FEMALE,Columbia,No
 77,FEMALE,Columbia,Unknown
@@ -358,6 +358,7 @@ age,Gender,County,Chronic_Condition
 46,FEMALE,DeKalb,Yes
 46,FEMALE,DeKalb,Yes
 89,FEMALE,DeKalb,Yes
+65,MALE,DeKalb,Unknown
 81,MALE,DeKalb,Unknown
 85,MALE,DeKalb,Unknown
 84,FEMALE,DeKalb,Unknown
@@ -682,7 +683,7 @@ age,Gender,County,Chronic_Condition
 87,FEMALE,Fulton,Yes
 76,FEMALE,Fulton,Yes
 100,FEMALE,Fulton,Yes
-,FEMALE,Fulton,Yes
+82,FEMALE,Fulton,Yes
 98,MALE,Fulton,Unknown
 80,FEMALE,Fulton,Yes
 65,MALE,Fulton,Unknown
@@ -703,6 +704,7 @@ age,Gender,County,Chronic_Condition
 59,MALE,Grady,Yes
 85,FEMALE,Grady,Unknown
 64,MALE,Grady,Unknown
+47,MALE,Greene,Yes
 100,FEMALE,Greene,Unknown
 99,MALE,Greene,Yes
 85,FEMALE,Gwinnett,Yes
@@ -1089,6 +1091,7 @@ age,Gender,County,Chronic_Condition
 69,MALE,Turner,Yes
 83,MALE,Turner,Yes
 75,FEMALE,Turner,Yes
+87,MALE,Turner,Unknown
 63,MALE,Turner,Yes
 63,MALE,Turner,Unknown
 85,FEMALE,Turner,Yes
@@ -1103,8 +1106,8 @@ age,Gender,County,Chronic_Condition
 83,MALE,Non-Georgia Resident,Unknown
 93,FEMALE,Non-Georgia Resident,Yes
 68,MALE,Non-Georgia Resident,Unknown
-77,MALE,Non-Georgia Resident,Yes
 84,FEMALE,Non-Georgia Resident,Unknown
+77,MALE,Non-Georgia Resident,Yes
 68,FEMALE,Non-Georgia Resident,Unknown
 79,FEMALE,Non-Georgia Resident,Unknown
 71,MALE,Non-Georgia Resident,Yes
@@ -1124,6 +1127,7 @@ age,Gender,County,Chronic_Condition
 82,MALE,Upson,Unknown
 89,MALE,Upson,No
 83,MALE,Upson,Unknown
+59,MALE,Upson,Unknown
 88,FEMALE,Upson,Unknown
 58,FEMALE,Upson,Yes
 76,FEMALE,Upson,Unknown

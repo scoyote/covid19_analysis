@@ -8,3 +8,5 @@
 *.html
 *.htm
 *.sas~
+*.sas7bdat
+*.zip
