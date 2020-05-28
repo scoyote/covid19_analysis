@@ -33,6 +33,36 @@ data colormap;
 	drop colorsample;
 run;
 
+ 
+data daycolormap;
+	informat id $20. value $3. fillcolor symbol $30.;
+	ID='daycolor1';value = 'Sun'; color	= 'lightgreen'; fillcolor=color; output;
+	ID='daycolor1';value = 'Mon'; color	= 'lightblue';  fillcolor=color; output;
+	ID='daycolor1';value = 'Tue'; color	= 'lightblue';  fillcolor=color; output;
+	ID='daycolor1';value = 'Wed'; color	= 'lightblue';  fillcolor=color; output;
+	ID='daycolor1';value = 'Thu'; color	= 'lightblue';  fillcolor=color; output;
+	ID='daycolor1';value = 'Fri'; color	= 'lightblue';  fillcolor=color; output;
+	ID='daycolor1';value = 'Sat'; color	= 'lightgreen'; fillcolor=color; output;
+	
+	ID='daycolor2';value = 'Sun'; color	= 'lightgreen'; fillcolor=color; linecolor=color; size=8; linethickness=1;symbol="circlefilled";markersymbol=symbol; markercolor=color; output;
+	ID='daycolor2';value = 'Mon'; color	= 'lightblue' ; fillcolor=color; linecolor=color; size=8; linethickness=1;symbol="circlefilled";markersymbol=symbol; markercolor=color; output;
+	ID='daycolor2';value = 'Tue'; color	= 'lightblue' ; fillcolor=color; linecolor=color; size=8; linethickness=1;symbol="circlefilled";markersymbol=symbol; markercolor=color; output;
+	ID='daycolor2';value = 'Wed'; color	= 'lightblue' ; fillcolor=color; linecolor=color; size=8; linethickness=1;symbol="circlefilled";markersymbol=symbol; markercolor=color; output;
+	ID='daycolor2';value = 'Thu'; color	= 'lightblue' ; fillcolor=color; linecolor=color; size=8; linethickness=1;symbol="circlefilled";markersymbol=symbol; markercolor=color; output;
+	ID='daycolor2';value = 'Fri'; color	= 'lightblue' ; fillcolor=color; linecolor=color; size=8; linethickness=1;symbol="circlefilled";markersymbol=symbol; markercolor=color; output;
+	ID='daycolor2';value = 'Sat'; color	= 'lightgreen'; fillcolor=color; linecolor=color; size=8; linethickness=1;symbol="circlefilled";markersymbol=symbol; markercolor=color; output;
+
+run;
+
+/*
+size=8; symbol="circlefilled"; 
+size=8; symbol="circlefilled"; 
+size=8; symbol="circlefilled"; 
+size=8; symbol="circlefilled"; 
+size=8; symbol="circlefilled"; 
+size=8; symbol="circlefilled"; 
+size=8; symbol="circlefilled"; 
+*/
 
 /********************************************************************************************************************************/
 /***** LOADTS_GLOBAL - Import the global time series, dates in columns, and put it into a single date column. 						*****/
@@ -49,7 +79,7 @@ run;
 		GETNAMES=YES;
 	RUN;
 
-	proc datasets library=work;
+	proc datasets library=work nolist nodetails ;
 		modify T_IMPORT_TS;
 		rename 'Country/Region'n=country_region;
 		rename 'Province/State'n=province_state;
@@ -73,10 +103,10 @@ run;
 		by province_state country_region latitude longitude;
 	run;
 
-	proc contents data=t_import_ts out=_cont;
+	proc contents data=t_import_ts out=_cont nodetails noprint;
 	run;
 
-	proc sql;
+	proc sql noprint;
 		select compress(name) into :txcols separated by '"n "' from _cont where 
 			type=1 and name not in ('province_state', 'country_region', 'location', 
 			'latitude', 'longitude');
@@ -87,7 +117,7 @@ run;
 		by province_state country_region location latitude longitude;
 	run;
 
-	proc datasets library=work;
+	proc datasets library=work nolist nodetails ;
 		modify &TYPE._TS;
 		rename update_t1=&type;
 		label &type="&ptype";
@@ -108,7 +138,7 @@ run;
 	proc sort data=WORK.&TYPE._TS out=WORK.&type._global_TS;
 		by province_state country_region location latitude longitude filedate;
 	run;
-	proc datasets library=work;
+	proc datasets library=work nolist nodetails ;
 		delete t_import_ts &type._ts _cont;
 	quit;
 
@@ -155,7 +185,7 @@ run;
 		drop a fips;
 	run;
 
-	proc datasets library=work;
+	proc datasets library=work nolist nodetails ;
 		modify T_IMPORT_TS;
 		rename fipsjoin=fips;
 	quit;
@@ -168,10 +198,10 @@ run;
 		;
 	run;
 
-	proc contents data=t_import_ts out=_cont;
+	proc contents data=t_import_ts out=_cont noprint;
 	run;
 
-	proc sql;
+	proc sql noprint;
 		select compress(name) into :txcols separated by '"n "' from _cont where 
 			type=1 and upcase(name) not in ('UID', 'POPULATION', 'COMBINED_KEY'
 		, 'COUNTRY_REGION', 'PROVINCE_STATE', 'FIPS', 'ADMIN2', 'CODE3', 'ISO2', 
@@ -189,7 +219,7 @@ run;
 		;
 	run;
 
-	proc datasets library=work;
+	proc datasets library=work nolist nodetails ;
 		modify &TYPE._TS;
 		rename update_t1=&type;
 		rename _name_=temp_FileDate;
@@ -207,7 +237,7 @@ run;
 	proc sort data=WORK.&TYPE._TS out=WORK.&type._US_TS;
 		by fips filedate;
 	run;
-	proc datasets library=work;
+	proc datasets library=work nolist nodetails ;
 		delete t_import_ts &type._ts _cont;
 	quit;
 
@@ -352,7 +382,7 @@ run;
 /********************************************************************************************************************************/
 
 %macro buildDatasets(region, join);
-	proc sql;
+	proc sql noprint;
 		create table &region._stacked as select "Confirmed" as measure
 				, confirmed as value
 				, filedate
@@ -410,7 +440,7 @@ run;
 /***** CREATE_TRAJECTORIES Macro - This macro is just to make the process cleaner, and rerunable when needed. 				*****/
 /********************************************************************************************************************************/
 
-%MACRO CREATE_TRAJECTORIES;
+%MACRO CREATE_TRAJECTORIES(removestate=NO,removestates=);
 	/*
 	proc print data=us_augmented;
 	var fips province_state country_region combined_key confirmed deaths dif_confirmed dif_deaths;
@@ -421,9 +451,9 @@ run;
 	/********************************************************************/
 	/***** 					STATE ROLLUP BLOCK						*****/
 	/********************************************************************/
-	proc sql; select max(filedate) into :filedate from us_augmented; quit;
+	proc sql noprint; select max(filedate) into :filedate from us_augmented; quit;
 	
-	proc sql;
+	proc sql noprint;
 		create table state_totals as	
 			select 
 				 Province_State 
@@ -454,7 +484,7 @@ run;
 	
 	*/
 	
-			proc sql;
+			proc sql noprint;
 				create table _fips_trajectories as	
 					select
 						 fips
@@ -521,11 +551,11 @@ run;
 			run;
 			proc sort data=fips_trajectories ; by  fips country_region province_state cbsa_title combined_key filedate; run;
 	
-			proc datasets library=work; delete _t1 _fips_trajectories ; quit;
+			proc datasets library=work nolist nodetails ; delete _t1 _fips_trajectories ; quit;
 	/********************************************************************/
 	/***** 					CBSA TRAJECTORIES BLOCK					*****/
 	/********************************************************************/
-			proc sql;
+			proc sql noprint;
 				create table _cbsa_trajectories as
 					select
 						 cbsa_title 
@@ -586,12 +616,12 @@ run;
 			proc sort data=cbsa_trajectories ; by cbsa_title filedate; run;
 	
 			
-			proc datasets library=work; delete _t1 _cbsa_trajectories ; quit;
+			proc datasets library=work nolist nodetails ; delete _t1 _cbsa_trajectories ; quit;
 	
 	/********************************************************************/
 	/***** 			STATE TRAJECTORIES BLOCK						*****/
 	/********************************************************************/
-			proc sql;
+			proc sql noprint;
 				create table _state_trajectories as
 					select
 						 Province_State 
@@ -653,23 +683,16 @@ run;
 			proc sort data=state_trajectories; by province_state filedate; run;
 	
 			
-			proc datasets library=work; delete _t1 _state_trajectories _fips_trajectories ; quit;
+			proc datasets library=work nolist nodetails ; delete _t1 _state_trajectories _fips_trajectories ; quit;
 	
 	
 	/********************************************************************/
 	/***** 			Global TRAJECTORIES BLOCK						*****/
 	/********************************************************************/
 	
-			proc sql;
-				create table _global_trajectories as	
+			proc sql noprint;
+				create table _temp_global_t as 
 					select 
-						 location
-						,filedate
-						,count(*) as freq				format=comma12.	label = "Rollup Count"
-						,sum(confirmed) as confirmed 	format=comma12.	label="Confirmed"
-						,sum(deaths) as deaths			format=comma12.	label="Deaths"
-					from (
-						select 
 						 country_region
 						,province_state
 						,case when country_region = "China" then "China"
@@ -679,7 +702,19 @@ run;
 						,confirmed
 						,deaths
 						from global_joined
-					)
+						%if &removestate=YES %then %do;
+							%put WARNING: WHERE PROVINCE_STATE NOT IN (&removestates);
+							WHERE PROVINCE_STATE NOT IN (&removestates)
+						%end;
+					;
+				create table _global_trajectories as	
+					select 
+						 location
+						,filedate
+						,count(*) as freq				format=comma12.	label = "Rollup Count"
+						,sum(confirmed) as confirmed 	format=comma12.	label="Confirmed"
+						,sum(deaths) as deaths			format=comma12.	label="Deaths"
+					from _temp_global_t
 
 					group by 
 						 location
@@ -736,7 +771,7 @@ run;
 				    	 plotseq="Days"
 				    	 fd_weekday="Weekday of File Date";
 				  
-	proc datasets library=work; 
+	proc datasets library=work nolist nodetails ; 
 		delete _global_trajectories _t1; 
 		modify fips_trajectories; 	&bulkformat; &bulklabel;
 		modify cbsa_trajectories;	&bulkformat; &bulklabel;
@@ -892,7 +927,7 @@ run;
 	%else %do;
 			title h=1.5 "National Top &maxplots &sortkey SARS-CoV-2 Trajectories";
 	%end;
-		footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
+		footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
 		footnote2  h=1 "Showing the Last &numback Days";
 		footnote3  justify=right  height=0.5 "Samuel T. Croker - &sysdate9";
 		footnote4  h=0.9 justify=left "&sortdir &sortkey";
@@ -915,7 +950,7 @@ run;
 		yaxis grid minor minorgrid display=(noline)  type=log min=&mindeath LOGSTYLE=linear values=&yvalues;
 	run;
 
-	proc datasets library=work nodetails nolist; delete _globaltemp _attribset _globalplot; quit;
+	proc datasets library=work nolist nodetails ; delete _globaltemp _attribset _globalplot; quit;
 
 %mend plotNationTrajectory;
 
@@ -1003,7 +1038,7 @@ run;
 	run;
 	proc sort data=_cbsaplot; by cbsa_title filedate; run;
 	
-	proc datasets  nodetails nolist lib=work;
+	proc datasets  nolist nodetails  lib=work;
 		modify _cbsaplot;
 			label casepercapita 	= "Case per Capita"
 				  caseperbed 		= "Case per ICU Bed"
@@ -1020,7 +1055,7 @@ run;
 	%else %do;
 			title h=1.5 "US CBSA Top &maxplots &sortkey SARS-CoV-2 Trajectories";
 	%end;
-		footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
+		footnote   h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
 		footnote2  h=1 "Showing the Last &numback Days";
 		footnote3  h=0.5 justify=right "Samuel T. Croker - &sysdate9";
 		footnote4  h=0.9 justify=left "&sortdir &sortkey";
@@ -1040,7 +1075,7 @@ run;
 		yaxis grid minor minorgrid display=(noline)  type=log values=&yvalues	LOGSTYLE=LOGEXPAND min=&mindeath;
 	run;
 
-	proc datasets library=work nodetails nolist; delete _cbsatemp _cbsaplot _attribset; quit;
+	proc datasets library=work nolist nodetails ; delete _cbsatemp _cbsaplot _attribset; quit;
 
 %mend plotCBSATrajectory;
 
@@ -1123,7 +1158,7 @@ run;
 		if last.province_state then plot_label=province_state;
 		else plot_label="";
 	run;
-	proc datasets  nodetails nolist lib=work;
+	proc datasets  nolist nodetails  lib=work;
 		modify _stateplot;
 			label casepercapita 	= "Case per Capita"
 				  caseperbed 		= "Case per ICU Bed"
@@ -1140,7 +1175,7 @@ run;
 	%else %do;
 			title h=1.5 "US State Top &maxplots &sortkey SARS-CoV-2 Trajectories";
 	%end;
-		footnote   h=1.5 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
+		footnote   h=1.5 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
 		footnote2  h=1.5 "Showing the Last &numback Days";
 		footnote3  h=0.9 justify=right "Samuel T. Croker - &sysdate9";
 		footnote4  h=0.9 justify=left "&sortdir &sortkey";
@@ -1161,7 +1196,7 @@ run;
 		yaxis grid minor minorgrid display=(noline) minorcount=100 type=log min=&mindeath values=&yvalues labelattrs=(size=15) valueattrs=(size=12) LOGSTYLE=LOGEXPAND ;
 	run;
 
-	proc datasets library=work nodetails nolist; delete  _stateplot _statetemp _attribset; quit;
+	proc datasets library=work nolist nodetails ; delete  _stateplot _statetemp _attribset; quit;
 
 %mend plotUSTrajectory;
 
@@ -1193,7 +1228,7 @@ run;
 		%let confirmline=%str( yaxis=y lineattrs=(thickness=2 color=darkblue) );
 		%let confirmmarker=%str( yaxis=y markerattrs=(size=8 color=darkblue symbol=circlefilled) FILLEDOUTLINEDMARKERS=TRUE MARKERFILLATTRS=(color=darkblue) MARKEROUTLINEATTRS=(color=darkblue) );
 		%let deathline	=%str( yaxis=y2 lineattrs=(thickness=2 color=darkred) );
-		%let deathmarker=%str( yaxis=y2 markerattrs=(size=8 color=darkred symbol=circlefilled) FILLEDOUTLINEDMARKERS=TRUE MARKERFILLATTRS=(color=darkred) MARKEROUTLINEATTRS=(color=darkred) );
+		%let deathmarker=%str( yaxis=y2 markerattrs=(size=8 symbol=circlefilled) FILLEDOUTLINEDMARKERS=TRUE);
 		%let overlayopts=%str( border=FALSE walldisplay=NONE height=4.5in width=7.5in xaxisopts=(label=" " timeopts=(tickvalueformat=mmddyy5.)) yaxisopts=(label="Confirmed") y2axisopts=(label="Deaths"));
 		%let xaxisopts  =%str( xaxisopts=(griddisplay=Off display=(label ticks tickvalues) gridattrs=(color=BWH )  type=time timeopts=(interval=day tickvaluerotation=diagonal tickvaluefitpolicy=rotatealways splittickvalue=FALSE) ));
 		%let yaxisopts  =%str( yaxisopts=(griddisplay=Off display=(label ticks tickvalues) gridattrs=(color=BWH)));
@@ -1201,44 +1236,60 @@ run;
 		proc template;
 			define statgraph lattice;
 			begingraph / designwidth=1632px designheight=960px ;
+			
+				discreteattrvar attrvar=dayatr1 var=fd_weekday attrmap='daycolor1';
+				discreteattrvar attrvar=dayatr2 var=fd_weekday attrmap='daycolor2';
+
 				entrytitle textattrs=(size=15)  &state;
 				entrytitle  "SARS-CoV-2 Situation Report as of &maxdate";
 				entryfootnote "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19 Data Updated: &sysdate";
 				entryfootnote  "Showing the Last &numback Days" ;
 				entryfootnote  textattrs=(size=7) halign=right "Samuel T. Croker - &sysdate9" ;
-
 				layout lattice / border=FALSE pad=3 opaque=true rows=2 columns=2 columngutter=3;
 					cell; 
 						cellheader; entry "Cumulative Infections and Deaths" / textattrs=(size=12); endcellheader;
 				      	layout overlay / &overlayopts &yaxisopts xaxisopts=(display=(label ticks tickvalues)) y2axisopts=(display=(label ticks tickvalues));
 				      		barchart  category=filedate response=confirmed 	/ stat=sum datatransparency=0.75;
-							linechart category=filedate response=deaths 	/ stat=sum &deathline ;
+							linechart category=filedate response=deaths 	/ stat=sum &deathline datatransparency=0.6 smoothconnect=true;
+/* 							%if &stateunquote=Georgia %then %do	; */
+/* 								referenceline x='04/24' / lineattrs=(color=lightblue) curvelabel="GA Restriction Ends"; */
+/* 							%end; */
 				      	endlayout;
 				    endcell;
 				    
 					cell; 
-						cellheader; entry "  Cumulative Infections and Deaths" / textattrs=(size=10); endcellheader;
+						cellheader; entry "Cumulative Infections and Deaths" / textattrs=(size=10); endcellheader;
 				      	layout overlay /&overlayopts &xaxisopts &yaxisopts y2axisopts=(display=(label ticks tickvalues));
 				      		scatterplot	y=confirmed x=filedate / &confirmmarker	;
-							seriesplot	y=confirmed x=filedate / &confirmline	;
+							seriesplot	y=confirmed x=filedate / &confirmline	smoothconnect=true;
 							scatterplot	y=deaths 	x=filedate / &deathmarker 	;
-							seriesplot	y=deaths 	x=filedate / &deathline		;
+							seriesplot	y=deaths 	x=filedate / &deathline		smoothconnect=true;
+/* 							%if &stateunquote=Georgia %then %do	; */
+/* 								referenceline x='24apr2020'd / lineattrs=(color=lightblue) curvelabel="GA Restriction Ends"; */
+/* 							%end; */
 				      	endlayout;						 
 				    endcell;
 				    
 					cell; 
 						cellheader; entry "New Infections and Deaths" / textattrs=(size=10); endcellheader;
 				      	layout overlay /&overlayopts &yaxisopts xaxisopts=(display=(label ticks tickvalues)) y2axisopts=(display=(label ticks tickvalues));
-				      		barchart    category=filedate 	response=dif1_confirmed / stat=sum datatransparency=0.75;
-							scatterplot x		=filedate 	y		=dif1_deaths 	/ &deathmarker;
+				      		barchart    category=filedate 	response=dif1_confirmed / stat=sum datatransparency=0.75 group=dayatr1 filltype=solid outlineattrs=(color=grey) ;
+							scatterplot x		=filedate 	y		=dif1_deaths 	/ /*&deathmarker */ yaxis=y2 FILLEDOUTLINEDMARKERS=TRUE group=dayatr2;
+/* 							%if &stateunquote=Georgia %then %do	; */
+/* 								referenceline x='04/24' / lineattrs=(color=lightblue) curvelabel="GA Restriction Ends"; */
+/* 							%end; */
 						endlayout; 
 					endcell;
 				    
 					cell; 
 						cellheader; entry "New Infections and Deaths - Seven Day Moving Average" / textattrs=(size=10); endcellheader;
 				      	layout overlay /&overlayopts  &yaxisopts xaxisopts=(display=(label ticks tickvalues)) y2axisopts=(display=(label ticks tickvalues));
-				      		barchart  category=filedate response=ma7_new_confirmed 	/ stat=sum datatransparency=0.75;
-							linechart category=filedate response=ma7_new_deaths 	/ stat=sum &deathline;
+				      		barchart  category=filedate response=ma7_new_confirmed 	/ stat=sum datatransparency=0.75 group=dayatr1 filltype=solid outlineattrs=(color=grey);
+/* 							linechart category=filedate response=ma7_new_deaths 	/ stat=sum &deathline datatransparency=0.6 smoothconnect=true;							 */
+							scatterplot x		=filedate 	y		=dif1_deaths 	/ /*&deathmarker */ yaxis=y2 FILLEDOUTLINEDMARKERS=TRUE group=dayatr2;
+/* 							%if &stateunquote=Georgia %then %do	; */
+/* 								referenceline x='04/24' / lineattrs=(color=lightblue) curvelabel="GA Restriction Ends"; */
+/* 							%end; */
 				      	endlayout;	
 			      	endcell;
 				endlayout;
@@ -1247,7 +1298,7 @@ run;
 		run;
 		ods graphics /reset=imagename imagename="&stlab" ;
 		proc sgrender 
-			 data=&datastatement.=&state and plotseq<=&numback)) template=lattice des="&stlab";
+			 data=&datastatement.=&state and plotseq<=&numback)) dattrmap=daycolormap template=lattice des="&stlab";
 		run;
 /* 		%put data=&datastatement.=&state and plotseq<=&numback)); */
 /* 		proc print data=&datastatement.=&state and plotseq<=&numback)); */
@@ -1259,7 +1310,7 @@ run;
 /***** INSERTPDFREPORTHEADER Macro - Inserts title frame and preps for the rest of the pdf report							*****/
 /********************************************************************************************************************************/
 
-%macro InsertPDFReportHeader(style=styles.raven);
+%macro InsertPDFReportHeader(style=styles.raven,fname=AllStatesAndCountries,titlespec=Overall);
 	ods escapechar="^";  
 	title;
 	footnote;
@@ -1271,17 +1322,17 @@ run;
 		/* Create a data set containing the desired title text */
 		data test;
 			length text $100;
-		   text="SARS-CoV-2 2019 Pandemic (COVID-19) Report - &cvdate"; output;
+		   text="SARS-CoV-2 2019 Pandemic (COVID-19) &titlespec Report - &cvdate"; output;
 		run;
 	
 	/******** PDF ********/
 	ods graphics / outputfmt=png;
-	ods pdf file="&outputpath./AllStatesAndCountries.pdf" startpage=no style=&style; 
+	ods pdf file="&outputpath./&fname..pdf" startpage=no style=&style; 
 	
 	/* Insert a logo and blank lines (used to move the title text to the center of page) */
 	footnote1 j=c "Beware of drawing conclusions from this data. Lagged confirmations and deaths are contained.";
 	footnote2 j=r "Samuel T. Croker";
-	footnote3 j=c "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &cvdate";
+	footnote3 j=c "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &cvdate";
 	ods pdf text='^S={preimage="coronavirus-image.png"}';
 	ods pdf text="^20n";
 	
@@ -1448,7 +1499,7 @@ run;
 		
 		title;footnote;
 			title 	  h=1 "All &title SARS-CoV-2 Trajectories";
-			footnote  h=1"Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
+			footnote  h=1"Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
 			footnote3 h=0.9 justify=right "Samuel T. Croker - &sysdate9";
 			ods proclabel "Top &maxplots &title Death Paths"; 
 			proc sgplot dattrmap=_attribset
@@ -1472,7 +1523,7 @@ run;
 		quit; 
 		%put deathmax=&deathmax ;
 			title 	  h=1 "Top &maxplots &title Deaths SARS-CoV-2 Trajectories";
-			footnote  h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
+			footnote  h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
 			footnote3 h=0.9 justify=right "Samuel T. Croker - &sysdate9";
 			ods proclabel "Top &maxplots &title Death Paths"; 
 			proc sgplot dattrmap=_attribset
@@ -1508,7 +1559,7 @@ run;
 		quit; 
 		%put deathmax=&deathmax ;
 			title 	  h=1 "&title - Top &maxplots SARS-CoV-2 Trajectories";
-			footnote  h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/SARS-CoV-2  Data Updated: &sysdate";
+			footnote  h=1 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &sysdate";
 			footnote3 h=0.9 justify=right "Samuel T. Croker - &sysdate9";
 			ods proclabel "Top &maxplots &title Death Paths"; 
 			proc sgplot noborder dattrmap=_attribset
@@ -1539,7 +1590,7 @@ run;
 			%end;
 	%end;
 	
-	proc datasets library=work nodetails nolist; delete _trajectories Death_trajectories _t; quit;
+	proc datasets library=work nolist nodetails ; delete _trajectories Death_trajectories _t; quit;
 
 %mend PlotPaths;
 
@@ -1571,3 +1622,19 @@ run;
 %mend;
 
 
+%macro CountyPlot(county);
+	proc sql noprint;
+		select count(distinct(cbsa_title)) into :tot trimmed
+			from cbsa_trajectories
+			where substr(cbsa_title,length(cbsa_title)-1,2)="&county";
+		select distinct cbsa_title into :cbsa1-:cbsa&tot
+			from cbsa_trajectories
+			where substr(cbsa_title,length(cbsa_title)-1,2)="&county";
+	quit;
+	ods pdf file="/covid_analysis/SAS_V2/graphs/&county._CBSAs.pdf";
+		%do i=1 %to &tot;		
+			%put NOTE: [&i, &&cbsa&i];
+			%plotstate(state="&&cbsa&i",level=cbsa,numback=30); 
+		%end;
+	ods pdf close;
+%mend CountyPlot;

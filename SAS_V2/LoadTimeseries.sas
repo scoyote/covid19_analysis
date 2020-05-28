@@ -1,4 +1,4 @@
-proc datasets library=WORK kill; run; quit;
+proc datasets library=WORK kill nodetails nolist; run; quit;
 
 proc format;
 	picture fipsfive low-high= "99999"
@@ -24,14 +24,14 @@ filename covid19 "&covidpath";
 %loadCensus;
 %JhuXW;
 
-proc print data=confirmed_global_ts;
-where country_region="Canada";
-run;
+/* proc print data=confirmed_global_ts; */
+/* where country_region="Canada"; */
+/* run; */
 
 %buildDatasets(US,fips);
 %buildDatasets(global,location);
 
-proc datasets library=work;
+proc datasets library=work noprint nodetails;
 	delete  
 		CONFIRMED_US_TS  
 		CONFIRMED_GLOBAL_TS
