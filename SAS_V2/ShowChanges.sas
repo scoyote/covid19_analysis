@@ -26,29 +26,32 @@ options papersize=letter orientation=landscape;
 /* %include "LoadTimeseries.sas"; */
 /********************************************************************/
 
-%let analysisvar=dif7_confirmed;
-%let analysisvar_label=Confirmed Cases;
-%let thresh=5;
-%let plotmin='01mar20'd;
-%let labelpos=topright;
-%let regwindow=10;
+
+%let Lthresh			=-2;
+%let Uthresh			=2;
+%let plotmin			='01mar20'd;
+%let regwindow			=7;
 %let whcl=;
+
+%let analysisvar		=dif7_confirmed;
+%let analysisvar_label	=Confirmed Cases;
+%let labelpos			=topright;
+
+%let titleinclude=All;
 
 /* %let level=state; */
 /* %let catvar=province_state; */
-/* %let level=global; */
-/* %let catvar=location; */
+%let level=global;
+%let catvar=location;
 
 /**** CBSA Techniques *********/
-%let level=cbsa;
-%let catvar=cbsa_title;
-/*be sure whcl ends in 'and' */
-%let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ='GA' and;
-%let titleinclude=GA;
+/* %let level=cbsa; */
+/* %let catvar=cbsa_title; */
+/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="WI" and; */
+/* %let titleinclude=Wisconsin; */
 /******************************/
 data _null_;
 	call symput("changesince",compress(intnx("days","&sysdate"d,%eval(&regwindow*(-1))))); run;data _null_;
-	
 	call symput('changesince_fmt',trim(left(put(&changesince,worddate19.)))); 
 	call symput('refdate',put(&changesince,date5.)); 
 	call symput('plotMonth',compress(intnx("months","&sysdate"d,-1))); run;data _null_;
@@ -99,7 +102,7 @@ data _regest(drop=value linecolor id pattern) _colormap(keep=value id linecolor 
 	length linecolor $25;
 	rownum+1;
 	retain id value;
-	if slope <= -&thresh then do;
+	if slope <= &Lthresh then do;
 		plotcat="Decreasing";
 		value=&catvar.;
 		linecolor="cornflowerblue      ";
@@ -108,7 +111,7 @@ data _regest(drop=value linecolor id pattern) _colormap(keep=value id linecolor 
 		id='setid';
 		output _colormap;
 	end;
-	else if slope >= &thresh then do;
+	else if slope >= &Uthresh then do;
 		plotcat="Increasing";
 		value=&catvar.;
 		linecolor='indianred';
@@ -287,7 +290,7 @@ proc sql;
 		;
 quit;
 
-ODS PROCLABEL "All Countries";
+ODS PROCLABEL "All Regions Slope Over Last &regwindow Days";
 proc print data=_report;
 	var plotcat &catvar. slope; 
 run;

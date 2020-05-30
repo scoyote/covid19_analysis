@@ -1,6 +1,13 @@
-/*********************************************************************************/
-/***** Data Section - retrieve the raw data from GitHub, then make it usable *****/
-/*********************************************************************************/
+/************************************************************************************/
+/***** Data Section - retrieve the raw data from GitHub, then make it usable 	*****/
+/***** 				  This program avoids CBSAs, but there is a loss of the  	*****/
+/*****				  ability to look at conjoined geographic areas that span 	*****/
+/*****				  state boundaries, which are common.You can put associated *****/
+/*****				  FIPS together though - just has to be manual. Create a 	*****/
+/*****				  new column that identifies the new grouping, then manually ****/
+/*****				  assign FIPS codes by giving the new column the same value *****/
+/*****				  for the FIPS rows that are associated.  			    	*****/
+/************************************************************************************/
 /* Commonly Changed Settings */
 %let analysisStartDate	='13may2020'd;
 %let plotStartDate		='01apr2020'd;
@@ -9,7 +16,7 @@
 
 /* Other settings */
 %let regionColumn		=province_state;
-/*********************************************************************************/
+/************************************************************************************/
 
 /* Step 0: clear work library */
 	proc datasets library=WORK kill nodetails nolist; run; quit;
