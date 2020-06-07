@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Task schemaVersion="5.4" runNLS="never">
+	<Registration>
+	<Name>SARS-COVID-2 Pandemic CBSA Plotting Tool</Name>
+	<Description>This is a blank task so far</Description>
+	<GUID>726B2B12-4542-4200-96F4-960C645D767F</GUID>
+	<Procedures>TBD</Procedures>
+	<Version>3.8</Version>
+	<Links>
+		<Link href="http://documentation.sas.com/?softwareId=STUDIOMID&amp;softwareVersion=3.8&amp;softwareContextId=tasks&amp;requestor=inapp">SAS Studio Task Reference Guide</Link>
+	</Links>
+	</Registration>
+	
+	<Metadata>
+		
+		<DataSources>	
+		</DataSources>
+
+		<Options>
+		</Options>
+		
+	</Metadata>
+	
+	<UI>
+	</UI>
+	
+  	<CodeTemplate>
+		<![CDATA[
+/* This is the containing folder as of 5/27/2020: https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv */
+	filename us_jhu url 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv';
+
+/* step 1; Import the csv directly from the website. I normally dont like proc import but it works here. */
+	PROC IMPORT DATAFILE=us_jhu DBMS=CSV OUT=WORK._IMPORT_TS replace ; 
+		GETNAMES=YES;
+	run;
+	
+/* Commonly Changed Settings */
+%let analysisStartDate	='13may2020'd;
+%let plotStartDate		='01apr2020'd;
+%let regionName			=Georgia;
+
+
+/* Other settings */
+%let regionColumn		=province_state;
+		]]>
+	</CodeTemplate>
+</Task>

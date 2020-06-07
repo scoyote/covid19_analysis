@@ -1,0 +1,314 @@
+<Task schemaVersion="5.4" runNLS="never">
+	<Registration>
+		<Name>Advanced Task</Name>
+		<Description>Demonstrates advanced features of the Common Task Model.</Description>
+		<GUID>6D0213FB-18BF-4A11-BD5E-5AA686D7635B</GUID>
+		<Procedures/>
+		<Version>3.8</Version>
+		<Links>
+	            <Link href="http://documentation.sas.com/?softwareId=STUDIOMID&amp;softwareVersion=3.8&amp;softwareContextId=tasks&amp;requestor=inapp" nlsKey="LinkKey999">SAS Studio Task Reference Guide</Link>
+		</Links>
+	</Registration>
+
+	<Metadata>
+
+		<!--- Define the data and roles for this task.    -->
+		<DataSources>
+			<DataSource name="DATASOURCE">
+				<Roles>
+					<Role type="A" minVars="0" maxVars="0" name="dataVariables" exclude="dataVariablesNumeric">Variables:</Role>
+					<Role type="N" minVars="0" maxVars="0" name="dataVariablesNumeric" exclude="dataVariables">Numeric Variables:</Role>
+				</Roles>
+			</DataSource>
+		</DataSources>
+		
+		<!--- Define the task options.             -->
+		<Options>
+		
+			<!-- Options needed for the DATA tab. -->
+			<Option name="DATATAB" inputType="string">DATA</Option>
+			<Option name="DATAGROUP" inputType="string">DATA</Option>
+			<Option name="ROLESGROUP" inputType="string">ROLES</Option>
+			<Option name="ROLESTEXT" inputType="string">Roles selected here will be used by controls in both the Model Effects Builder and Data Linking tabs.</Option>
+						
+			<!-- Options needed for the DEPENDENCIES tab. -->
+			<Option name="DEPENDENCYTAB" inputType="string">DEPENDENCIES</Option>
+			<Option name="DEPENDENCYTEXT" inputType="string">This tab shows examples of Dependencies.  Dependencies allow you to show/hide, enable/disable, or in some cases set the values of controls.</Option>
+			<Option name="DEP_CBX" inputType="checkbox" defaultValue="1">Groups can be the target of a dependency.</Option>
+			<Option name="DEPENDENCYGROUP" inputType="string">GROUP OF CONTROLS</Option>
+			<Option name="labelRADIO" inputType="string">Select the type of dependency to see an example of:</Option>
+			<Option name="radioShowHide" variable="radioChoice" defaultValue="1" inputType="radio">Show / Hide Options</Option>
+			<Option name="radioEnableDisable" variable="radioChoice" inputType="radio">Enable / Disable Options</Option>
+			<Option name="radioSetValue" variable="radioChoice" inputType="radio">Set Values</Option>
+			<Option name="labelShowChange" inputType="string">Change the combobox value to see options change.</Option>
+			<Option name="comboShowChange" defaultValue="valueShowColor" inputType="combobox" width="100%">Combobox:</Option>
+			<Option name="valueShowColor" inputType="string">Show a color selector</Option>
+			<Option name="valueShowDate" inputType="string">Show a date picker</Option>
+			<Option name="valueShowSlider" inputType="string">Show a slider control</Option>
+			<Option name="colorControl" defaultValue="red" inputType="color">Choose a color</Option>
+			<Option name="dateControl" inputType="datepicker" format="monyy7.">Choose a date:</Option>
+			<Option name="sliderControl" defaultValue="80.00" inputType="slider" discreteValues="14" minValue="-10" maxValue="120">Slider with buttons</Option>
+			<Option name="labelEnableChange" inputType="string">Change the combobox value to see options become enabled or disabled.</Option>
+			<Option name="comboEnableChange" defaultValue="valueEnableColor" inputType="combobox" width="100%">Combobox:</Option>
+			<Option name="valueEnableColor" inputType="string">Enable the color selector</Option>
+			<Option name="valueEnableDate" inputType="string">Enable the date picker</Option>
+			<Option name="valueEnableSlider" inputType="string">Enable the slider control</Option>
+			<Option name="labelShowSet" inputType="string">Change the combobox value change the value of the checkbox.</Option>
+			<Option name="comboSetChange" defaultValue="valueSetCheck" inputType="combobox" width="100%">Combobox:</Option>
+			<Option name="valueSetCheck" inputType="string">Check the checkbox</Option>
+			<Option name="valueSetUncheck" inputType="string">Uncheck the checkbox</Option>
+			<Option name="checkboxCheckUncheck" inputType="checkbox" defaultValue="1">Checkbox</Option>
+
+			
+			<!-- Options needed for the MIXED EFFECTS CONTROL tab. -->
+			<Option name="MECTAB" inputType="string">MIXED EFFECTS CONTROL</Option>
+			<Option name="MECTEXT" inputType="string">This tab shows an example of the Mixed Effects control.  The variables come from both the Variables and Numeric Variables roles.</Option>
+			<Option name="mixedEffects" inputType="mixedeffects" roleContinuous="dataVariablesNumeric" roleClassification="dataVariables" excludeTools="POLYEFFECT,TWOFACT,THREEFACT,NFACTPOLY"/>
+
+			<!-- Options needed for the DATA LINKING tab. -->
+			<Option name="DATALINKINGTAB" inputType="string">DATA LINKING</Option>
+			<Option name="DATALINKINGTEXT" inputType="string">This tab shows examples of Data Linking.  Data linking allows controls to be populated based on data from another control.</Option>
+			<Option name="ROLELINKING" inputType="string">LINKING TO ROLES</Option>
+			<Option name="selectRoles" inputType="select" multiple="true" sourceLink="dataVariables">This select control is populated with the variables selected on the Data tab.</Option>
+			<Option name="MECLINKING" inputType="string">LINKING TO MIXED EFFECTS CONTROL</Option>
+			<Option name="selectMEC" inputType="select" multiple="true" sourceLink="mixedEffects">This select control is populated from the output of the mixed effects control.</Option>
+
+			<!-- Options needed for the RETURN VALUE tab. -->
+			<Option name="RETURNVALUETAB" inputType="string">RETURN VALUE</Option>
+			<Option name="labelReturnValue" inputType="string">This tab shows an example of the option's returnValue attribute.  This attribute can be used in OptionChoice controls to customize velocity return values.</Option>
+			<Option name="vegetables" inputType="select" multiple="true">Select the vegetables:</Option>
+			<Option name="carrots" returnValue="1" inputType="string">Carrots</Option>
+			<Option name="peas" returnValue="2" inputType="string">Peas</Option>
+			<Option name="corn" returnValue="3" inputType="string">Corn</Option>
+
+		</Options>
+	</Metadata>
+
+	<!--- Define the UI for task options                         -->
+	<!--- The UI engine will determine the best representation. -->
+	<UI>
+		<!-- Layout for the DATA tab. -->
+		<Container option="DATATAB">
+			<Group option="DATAGROUP" open="true">
+				<DataItem data="DATASOURCE"/>
+			</Group>
+			<Group option="ROLESGROUP" open="true">
+				<OptionItem option="ROLESTEXT"/>
+				<RoleItem role="dataVariables"/>
+				<RoleItem role="dataVariablesNumeric"/>
+			</Group>
+		</Container>
+
+		<!-- Layout for the DEPENDENCIES tab. -->
+		<Container option="DEPENDENCYTAB">
+			<OptionItem option="DEPENDENCYTEXT"/>
+			<OptionItem option="DEP_CBX"/>
+			<Group option="DEPENDENCYGROUP" open="true">
+				<OptionItem option="labelRADIO"/>
+				<OptionItem option="radioShowHide"/>
+				<OptionItem option="radioEnableDisable"/>
+				<OptionItem option="radioSetValue"/>
+				
+				<OptionItem option="labelShowChange"/>
+				<OptionChoice option="comboShowChange">
+					<OptionItem option="valueShowColor"/>
+					<OptionItem option="valueShowDate"/>
+					<OptionItem option="valueShowSlider"/>
+				</OptionChoice>
+				<OptionItem option="labelEnableChange"/>
+				<OptionChoice option="comboEnableChange">
+					<OptionItem option="valueEnableColor"/>
+					<OptionItem option="valueEnableDate"/>
+					<OptionItem option="valueEnableSlider"/>
+				</OptionChoice>
+
+				<OptionItem option="colorControl"/>
+				<OptionItem option="dateControl"/>
+				<OptionItem option="sliderControl"/>
+				
+				<OptionItem option="labelShowSet"/>
+				<OptionChoice option="comboSetChange">
+					<OptionItem option="valueSetCheck"/>
+					<OptionItem option="valueSetUncheck"/>
+				</OptionChoice>
+				<OptionItem option="checkboxCheckUncheck"/>
+			</Group>
+		</Container>
+
+		<!-- Layout for the MODEL EFFECTS BUILDER tab. -->
+		<Container option="MECTAB">
+			<OptionItem option="MECTEXT"/>
+			<OptionItem option="mixedEffects"/>
+		</Container>
+
+		<!-- Layout for the DATA LINKING tab. -->
+		<Container option="DATALINKINGTAB">
+			<OptionItem option="DATALINKINGTEXT"/>
+			<Group option="ROLELINKING" open="true">
+				<OptionChoice option="selectRoles"/>
+			</Group>
+			<Group option="MECLINKING" open="true">
+				<OptionChoice option="selectMEC"/>
+			</Group>
+		</Container>
+
+		<!-- Layout for the RETURN VALUE tab. -->
+		<Container option="RETURNVALUETAB">
+			<OptionItem option="labelReturnValue"/>
+			<OptionChoice option="vegetables">
+			   <OptionItem option="carrots"/>
+			   <OptionItem option="peas"/>
+			   <OptionItem option="corn"/>
+			</OptionChoice>
+		</Container>
+		
+	</UI>
+	
+	<Dependencies>
+	
+		<Dependency condition="($DEP_CBX == '1')">
+			<Target option="DEPENDENCYGROUP" conditionResult="true" action="show"/>
+			<Target option="DEPENDENCYGROUP" conditionResult="false" action="hide"/>
+		</Dependency>		
+
+        <Dependency condition="$radioChoice == 'radioSetValue'">
+            <Target action="hide" conditionResult="true" option="labelShowChange"/>
+            <Target action="hide" conditionResult="true" option="comboShowChange"/>
+            <Target action="hide" conditionResult="true" option="labelEnableChange"/>
+            <Target action="hide" conditionResult="true" option="comboEnableChange"/>
+            <Target action="hide" conditionResult="true" option="colorControl"/>
+            <Target action="hide" conditionResult="true" option="dateControl"/>                                    
+            <Target action="hide" conditionResult="true" option="sliderControl"/>   
+
+            <Target action="show" conditionResult="true" option="labelShowSet"/>                                    
+            <Target action="show" conditionResult="true" option="comboSetChange"/>                                    
+            <Target action="show" conditionResult="true" option="checkboxCheckUncheck"/>                                    
+
+        </Dependency>
+		
+        <Dependency condition="$radioChoice == 'radioShowHide'">
+            <Target action="show" conditionResult="true" option="labelShowChange"/>
+            <Target action="show" conditionResult="true" option="comboShowChange"/>
+            <Target action="hide" conditionResult="true" option="labelEnableChange"/>
+            <Target action="hide" conditionResult="true" option="comboEnableChange"/>
+			
+            <Target action="hide" conditionResult="true" option="labelEnableChange"/>
+            <Target action="hide" conditionResult="true" option="comboEnableChange"/>
+            <Target action="hide" conditionResult="true" option="colorControl"/>
+			
+            <Target action="hide" conditionResult="true" option="labelShowSet"/>                                    
+            <Target action="hide" conditionResult="true" option="comboSetChange"/>                                    
+            <Target action="hide" conditionResult="true" option="checkboxCheckUncheck"/>                                    
+
+        </Dependency>
+		
+        <Dependency condition="$radioChoice == 'radioEnableDisable'">
+            <Target action="show" conditionResult="true" option="labelEnableChange"/>
+            <Target action="show" conditionResult="true" option="comboEnableChange"/>
+            <Target action="hide" conditionResult="true" option="labelShowChange"/>
+            <Target action="hide" conditionResult="true" option="comboShowChange"/>
+            <Target action="show" conditionResult="true" option="colorControl"/>
+            <Target action="show" conditionResult="true" option="dateControl"/>                                    
+            <Target action="show" conditionResult="true" option="sliderControl"/>                                    
+			
+            <Target action="hide" conditionResult="true" option="labelShowSet"/>                                    
+            <Target action="hide" conditionResult="true" option="comboSetChange"/>                                    
+            <Target action="hide" conditionResult="true" option="checkboxCheckUncheck"/>                                    
+
+        </Dependency>
+
+
+        <Dependency condition="$comboShowChange == 'valueShowColor'">
+            <Target action="show" conditionResult="true" option="colorControl"/>
+            <Target action="hide" conditionResult="true" option="dateControl"/>                                    
+            <Target action="hide" conditionResult="true" option="sliderControl"/>                                    
+        </Dependency>
+		
+        <Dependency condition="$comboShowChange == 'valueShowDate'">
+            <Target action="show" conditionResult="true" option="dateControl"/>
+            <Target action="hide" conditionResult="true" option="colorControl"/>                                    
+            <Target action="hide" conditionResult="true" option="sliderControl"/>                                    
+        </Dependency>
+		
+        <Dependency condition="$comboShowChange == 'valueShowSlider'">
+            <Target action="show" conditionResult="true" option="sliderControl"/>
+            <Target action="hide" conditionResult="true" option="dateControl"/>                                    
+            <Target action="hide" conditionResult="true" option="colorControl"/>                                    
+        </Dependency>
+
+        <Dependency condition="$comboEnableChange == 'valueEnableColor'">
+            <Target action="enable" conditionResult="true" option="colorControl"/>
+            <Target action="disable" conditionResult="true" option="dateControl"/>                                    
+            <Target action="disable" conditionResult="true" option="sliderControl"/>                                    
+        </Dependency>
+
+        <Dependency condition="$comboEnableChange == 'valueEnableDate'">
+            <Target action="disable" conditionResult="true" option="colorControl"/>
+            <Target action="enable" conditionResult="true" option="dateControl"/>                                    
+            <Target action="disable" conditionResult="true" option="sliderControl"/>                                    
+        </Dependency>
+
+        <Dependency condition="$comboEnableChange == 'valueEnableSlider'">
+            <Target action="disable" conditionResult="true" option="colorControl"/>
+            <Target action="disable" conditionResult="true" option="dateControl"/>                                    
+            <Target action="enable" conditionResult="true" option="sliderControl"/>                                    
+        </Dependency>
+		
+        <Dependency condition="$comboSetChange == 'valueSetCheck'">
+            <Target action="set" conditionResult="true" option="checkboxCheckUncheck" property="value" value="1"/>
+            <Target action="set" conditionResult="false" option="checkboxCheckUncheck" property="value" value="0"/>
+        </Dependency>
+
+	</Dependencies>
+
+	<!--- Define the velocity code template.        -->
+	<CodeTemplate>
+		<![CDATA[
+/*
+ * Dump out table information and roles.
+ */
+ 
+%put DATASET=$DATASOURCE;
+
+#if( $dataVariables.size() > 0 )%put VARIABLES=#foreach( $item in $dataVariables )
+$item #end;#end
+ 
+#if( $dataVariablesNumeric.size() > 0 )%put NUMERICVARIABLES=#foreach( $item in $dataVariablesNumeric )
+$item #end;#end
+ 
+ 
+/*
+ * Summarize current state of Mixed Effects control.
+ */
+#foreach( $model in $mixedEffects.mixedEffectsModels )
+#if ( $model.modelEffects.size() > 0 )
+%put MIXEDEFFECTS =
+#foreach( $modelEffect in $model.modelEffects )
+ #if ( $modelEffect.effectType == 'nested' )
+#foreach( $subitem1 in $modelEffect.memberSet1 )$subitem1#if($velocityCount < $modelEffect.memberSet1.size())*#end#end(#foreach($subitem2 in $modelEffect.memberSet2)$subitem2#if($velocityCount < $modelEffect.memberSet2.size())*#end#end) 
+#else
+#foreach( $subitem in $modelEffect.memberSet1 )$subitem#if($velocityCount < $modelEffect.memberSet1.size())*#end#end
+#end#end;
+#end
+#end
+ 
+
+#if( $vegetables.size() > 0 )
+/*
+ * Dump out the selected values
+ * Notice that these are the returnValue values.
+ */
+
+%put VEGETABLES=#foreach( $item in $vegetables )
+$item #end;#end
+
+
+		]]>
+	</CodeTemplate>
+
+<TemplateValues version="3.8">
+<![CDATA[
+{"corn":"Corn","sasOS":"Linux LIN X64 4.19.76-linuxkit","MECTEXT":"This tab shows an example of the Mixed Effects control.  The variables come from both the Variables and Numeric Variables roles.","labelReturnValue":"This tab shows an example of the option's returnValue attribute.  This attribute can be used in OptionChoice controls to customize velocity return values.","comboEnableChange":"valueEnableColor","checkboxCheckUncheck":"0","ROLELINKING":"LINKING TO ROLES","radioShowHide":"1","dataVariables":"","selectMEC":"","DATASOURCE":{"librarytable":"SASHELP.CARS"},"valueSetUncheck":"Uncheck the checkbox","valueEnableSlider":"Enable the slider control","valueEnableDate":"Enable the date picker","radioChoice":"radioShowHide","DEPENDENCYGROUP":"GROUP OF CONTROLS","DATAGROUP":"DATA","MECLINKING":"LINKING TO MIXED EFFECTS CONTROL","valueShowColor":"Show a color selector","radioSetValue":"0","labelShowSet":"Change the combobox value change the value of the checkbox.","labelRADIO":"Select the type of dependency to see an example of:","RETURNVALUETAB":"RETURN VALUE","MECTAB":"MIXED EFFECTS CONTROL","mixedEffects":{"modelSummaryValues":{"randomEffectsSetCount":0,"repeatedEffectsSetCount":0,"zeroInflatedEffectsSetCount":0,"zeroInflatedEffectsCount":0,"fixedEffectsCount":0,"fixedContinuousMainEffectsCount":0,"fixedClassificationMainEffectsCount":0,"fixedInterceptValue":"True","fixedModelsetInvalidStateCount":0,"randomModelsetInvalidStateCount":0,"repeatedModelsetInvalidStateCount":0,"meansModelsetInvalidStateCount":0,"zeroInflatedModelsetInvalidStateCount":0},"mixedEffectsModels":[{"emtype":"FIXED","intercept":"True","modelEffects":[]}]},"sliderControl":"80.00","valueShowDate":"Show a date picker","dateControl":"","valueSetCheck":"Check the checkbox","dataVariablesNumeric":"","selectRoles":"","colorControl":"red","comboShowChange":"valueShowSlider","radioEnableDisable":"0","vegetables":"","DEPENDENCYTEXT":"This tab shows examples of Dependencies.  Dependencies allow you to show/hide, enable/disable, or in some cases set the values of controls.","peas":"Peas","DEPENDENCYTAB":"DEPENDENCIES","labelEnableChange":"Change the combobox value to see options become enabled or disabled.","DATATAB":"DATA","carrots":"Carrots","ROLESGROUP":"ROLES","DATALINKINGTEXT":"This tab shows examples of Data Linking.  Data linking allows controls to be populated based on data from another control.","valueShowSlider":"Show a slider control","DEP_CBX":"1","ROLESTEXT":"Roles selected here will be used by controls in both the Model Effects Builder and Data Linking tabs.","sasVersion":"9.46","labelShowChange":"Change the combobox value to see options change.","valueEnableColor":"Enable the color selector","comboSetChange":"valueSetCheck","DATALINKINGTAB":"DATA LINKING"}
+]]>
+</TemplateValues>
+</Task>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Task schemaVersion="5.4" runNLS="never">
+	<Registration>
+	<Name>Prepare COVID19(JHU) Data</Name>
+	<Description>This tasks pulls data using the URL filename method, and transposes it into a long timeseries from a dataset where each date is a column.</Description>
+	<GUID>726B2B12-4542-4200-96F4-960C645D767F</GUID>
+	<Procedures>TBD</Procedures> 
+	<Version>3.8</Version>
+	<Links>
+		<Link href="http://documentation.sas.com/?softwareId=STUDIOMID&amp;softwareVersion=3.8&amp;softwareContextId=tasks&amp;requestor=inapp">SAS Studio Task Reference Guide</Link>
+	</Links>
+	</Registration>
+	
+	<Metadata>
+
+		<DataSources>
+		   <DataSource name="DATASOURCE">
+		      <Roles>
+		         <Role maxVars="1" minVars="1" name="VAR"
+		            order="true" type="A"> Required variable:</Role>
+		         <Role exclude="VAR" maxVars="0" minVars="0" 
+		            name="OPTNVAR" order="true" type="N">Numeric variable:</Role>
+		         <Role maxVars="3" minVars="0" name="OPTCVAR"
+		            order="true" type="C">Character variable:</Role>
+		      </Roles>
+		   </DataSource>
+		</DataSources>
+
+		<Options>
+		
+			<Option name="DATATAB" inputType="string">DATA</Option>
+			<Option name="DATAGROUP" inputType="string">DATA</Option>
+			<Option name="ROLESGROUP" inputType="string">ROLES</Option>
+			<Option name="OPTIONSTAB" inputType="string">OPTIONS</Option>
+
+			<Option name="txtGlobal" defaultValue="Text goes here" inputType="inputtext"
+				required="true"
+				promptMessage="Enter some text."
+				missingMessage="Missing text.">Input text:</Option>
+		
+
+			<Option name="lbl_RADIO" inputType="string">Select the Aggregation Level:</Option>
+			<Option name="rd_Global" variable="radioChoice" defaultValue="1" inputType="radio">Global</Option>
+			<Option name="rd_State" variable="radioChoice" inputType="radio">State</Option>
+			<Option name="rd_CBSA" variable="radioChoice" inputType="radio">CBSA</Option>
+					
+		
+			<Option name="lbl_SetRegion" inputType="string">Select the dataset to create.</Option>
+			<Option name="cmb_SetRegion" defaultValue="vl_SelectLevel" inputType="combobox" width="100%">Combobox:</Option>
+	
+			<Option name="vl_Global" inputType="string">Global</Option>
+			<Option name="vl_State" inputType="string">State</Option>
+			<Option name="vl_CBSA" inputType="string">CBSA</Option>
+						
+						
+		</Options>
+		
+	</Metadata>
+	
+	<UI>
+
+		
+			<OptionItem option="lbl_RADIO"/>
+			<OptionItem option="rd_Global"/>
+			<OptionItem option="rd_State"/>
+			<OptionItem option="rd_CBSA"/>
+			
+			<OptionItem option="lbl_SetRegion"/>
+			<OptionChoice option="cmb_SetRegion">
+				<OptionItem option="vl_Global"/>
+				<OptionItem option="vl_State"/>
+				<OptionItem option="vl_CBSA"/>
+			</OptionChoice>
+			
+	</UI>
+	
+	<!--
+	<Dependencies>
+	        <Dependency condition="$radioChoice == 'rd_Global'">
+            <Target action="show" conditionResult="true" option="labelEnableChange"/>
+            
+            <Target action="show" conditionResult="true" option="comboEnableChange"/>
+            <Target action="hide" conditionResult="true" option="labelShowChange"/>
+            <Target action="hide" conditionResult="true" option="comboShowChange"/>
+            <Target action="show" conditionResult="true" option="colorControl"/>
+            <Target action="show" conditionResult="true" option="dateControl"/>                                    
+            <Target action="show" conditionResult="true" option="sliderControl"/>                                    
+            <Target action="hide" conditionResult="true" option="labelShowSet"/>                                    
+            <Target action="hide" conditionResult="true" option="comboSetChange"/>                                    
+            <Target action="hide" conditionResult="true" option="checkboxCheckUncheck"/>                                    
+			
+        </Dependency>
+		
+	</Dependencies>
+	-->
+  	<CodeTemplate>
+		<![CDATA[
+	libname pCovid '/repositories/covid19_analysis/SAS_V2/data';
+	
+	filename usConf 	url 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv';
+	filename globConf 	url	'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv';
+	filename usDeath	url 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv';
+	filename globDeath  url	'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv';
+
+		]]>
+	</CodeTemplate>
+</Task>
