@@ -27,8 +27,8 @@ options papersize=letter orientation=landscape;
 /********************************************************************/
 
 
-%let Lthresh			=-2;
-%let Uthresh			=2;
+%let Lthresh			=-10;
+%let Uthresh			=10;
 %let plotmin			='01mar20'd;
 %let regwindow			=7;
 %let whcl=;
@@ -47,8 +47,8 @@ options papersize=letter orientation=landscape;
 /**** CBSA Techniques *********/
 /* %let level=cbsa; */
 /* %let catvar=cbsa_title; */
-/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="WI" and; */
-/* %let titleinclude=Wisconsin; */
+/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="GA" and; */
+/* %let titleinclude=Georgia; */
 /******************************/
 data _null_;
 	call symput("changesince",compress(intnx("days","&sysdate"d,%eval(&regwindow*(-1))))); run;data _null_;
