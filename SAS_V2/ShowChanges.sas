@@ -6,6 +6,7 @@
 %include "MACROS.sas";
 %let graphFormat=png;
 options papersize=letter orientation=landscape;
+
 /********************************************************************/
 /***** MACROS													*****/
 /********************************************************************/
@@ -16,7 +17,7 @@ options papersize=letter orientation=landscape;
 	quit;
 	%do i=1 %to %sysfunc(min(&maxplots,&topn));
 		%put NOTE: Calling plotstate macro: i=&i of %sysfunc(min(&maxplots,&topn)) state="&&loc&i";
- 		%plotstate(state="&&loc&i",level=&lvl,numback=30); 
+ 		%plotstate(state="&&loc&i",level=&lvl,numback=92); 
 	%end;
 %mend plotIncreasing; 
 
@@ -26,10 +27,9 @@ options papersize=letter orientation=landscape;
 /* %include "LoadTimeseries.sas"; */
 /********************************************************************/
 
-
-%let Lthresh			=-10;
-%let Uthresh			=10;
-%let plotmin			='01mar20'd;
+%let Lthresh			=-1;
+%let Uthresh			=1;
+%let plotmin			='01feb20'd;
 %let regwindow			=7;
 %let whcl=;
 
@@ -37,18 +37,24 @@ options papersize=letter orientation=landscape;
 %let analysisvar_label	=Confirmed Cases;
 %let labelpos			=topright;
 
-%let titleinclude=All;
-
+%let titleinclude=;
 /* %let level=state; */
 /* %let catvar=province_state; */
-%let level=global;
-%let catvar=location;
+/* %let level=global; */
+/* %let catvar=location; */
 
 /**** CBSA Techniques *********/
-/* %let level=cbsa; */
-/* %let catvar=cbsa_title; */
-/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="GA" and; */
-/* %let titleinclude=Georgia; */
+%let level=cbsa;
+%let catvar=cbsa_title;
+/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="GA" and; %let titleinclude=Georgia; */
+/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="CA" and; %let titleinclude=California; */
+/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="SC" and; %let titleinclude=South Carolina; */
+/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="FL" and; %let titleinclude=Florida; */
+/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="NC" and; %let titleinclude=North Carolina; */
+/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="AL" and; %let titleinclude=Alabama; */
+/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="TX" and; %let titleinclude=Texas; */
+/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="TN" and; %let titleinclude=Tennesee; */
+%let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="AZ" and; %let titleinclude=Arizona;
 /******************************/
 data _null_;
 	call symput("changesince",compress(intnx("days","&sysdate"d,%eval(&regwindow*(-1))))); run;data _null_;
@@ -214,7 +220,7 @@ proc sgplot data=_graph2(where=(yval >0 )) dattrmap=_color3;
 run;
 quit;
 
-/********************** ^^^overall^^^ **************************/
+/********************** ^^^overall^^^ *************************/
 title "Increasing and Decreasing - Since &changesince_fmt";
 ODS PROCLABEL "All Regions";
 proc sgplot data=_graph(where=(yval >0 and value ~= "Steady" and filedate>&plotMonth)) dattrmap=_colormap noautolegend;
@@ -225,31 +231,31 @@ proc sgplot data=_graph(where=(yval >0 and value ~= "Steady" and filedate>&plotM
 run;
 
 PROC SORT data=_graph; by descending &catvar. filedate; run;
-title "Steady - Since &changesince_fmt";
-ODS PROCLABEL "All - Steady";
-proc sgplot data=_graph(where=(yval >0 and value = "Steady" and filedate>&plotMonth)) noautolegend dattrmap=_regioncolor;
-	series x=filedate y=yval /  smoothconnect group=&catvar. datalabel=plotlabel datalabelpos=&labelpos lineattrs=(pattern=solid) attrid=regionid;
-	yaxis grid minorgrid offsetmin=0 ;
-	xaxis min=&plotMonth offsetmin=0 offsetmax=.1;
-	refline &changesince /axis=x;
-run;
-title "Increasing - Since &changesince_fmt";
-ODS PROCLABEL "All - Increasing";
-proc sgplot data=_graph(where=(yval >0 and value = "Increasing" and filedate>&plotMonth)) noautolegend  dattrmap=_regioncolor;
-	series x=filedate y=yval /  smoothconnect group=&catvar. datalabel=plotlabel datalabelpos=&labelpos lineattrs=(pattern=solid) attrid=regionid;
-	yaxis grid minorgrid offsetmin=0 ;
-	xaxis min=&plotMonth offsetmin=0 offsetmax=.1;
-	refline &changesince /axis=x;
-run;
-title "Decreasing - Since &changesince_fmt";
-ODS PROCLABEL "All - Decreasing";
-proc sgplot data=_graph(where=(yval >0 and value = "Decreasing"  and filedate>&plotMonth)) noautolegend  dattrmap=_regioncolor;
-	series x=filedate y=yval /  smoothconnect group=&catvar. datalabel=plotlabel datalabelpos=&labelpos lineattrs=(pattern=solid) attrid=regionid;
-	yaxis grid minorgrid offsetmin=0 ;
-	xaxis min=&plotMonth offsetmin=0 offsetmax=.1;
-	refline &changesince /axis=x;
-run;
-quit;
+/* title "Steady - Since &changesince_fmt"; */
+/* ODS PROCLABEL "All - Steady"; */
+/* proc sgplot data=_graph(where=(yval >0 and value = "Steady" and filedate>&plotMonth)) noautolegend dattrmap=_regioncolor; */
+/* 	series x=filedate y=yval /  smoothconnect group=&catvar. datalabel=plotlabel datalabelpos=&labelpos lineattrs=(pattern=solid) attrid=regionid; */
+/* 	yaxis grid minorgrid offsetmin=0 ; */
+/* 	xaxis min=&plotMonth offsetmin=0 offsetmax=.1; */
+/* 	refline &changesince /axis=x; */
+/* run; */
+/* title "Increasing - Since &changesince_fmt"; */
+/* ODS PROCLABEL "All - Increasing"; */
+/* proc sgplot data=_graph(where=(yval >0 and value = "Increasing" and filedate>&plotMonth)) noautolegend  dattrmap=_regioncolor; */
+/* 	series x=filedate y=yval /  smoothconnect group=&catvar. datalabel=plotlabel datalabelpos=&labelpos lineattrs=(pattern=solid) attrid=regionid; */
+/* 	yaxis grid minorgrid offsetmin=0 ; */
+/* 	xaxis min=&plotMonth offsetmin=0 offsetmax=.1; */
+/* 	refline &changesince /axis=x; */
+/* run; */
+/* title "Decreasing - Since &changesince_fmt"; */
+/* ODS PROCLABEL "All - Decreasing"; */
+/* proc sgplot data=_graph(where=(yval >0 and value = "Decreasing"  and filedate>&plotMonth)) noautolegend  dattrmap=_regioncolor; */
+/* 	series x=filedate y=yval /  smoothconnect group=&catvar. datalabel=plotlabel datalabelpos= lineattrs=(pattern=solid) attrid=regionid; */
+/* 	yaxis grid minorgrid offsetmin=0 ; */
+/* 	xaxis min=&plotMonth offsetmin=0 offsetmax=.1; */
+/* 	refline &changesince /axis=x; */
+/* run; */
+/* quit; */
 
 %plotIncreasing(lvl=&level,direction=Increasing);
 

@@ -14,23 +14,21 @@
 	<Metadata>
 
 		<DataSources>
-		   <DataSource name="COVIDDATA" defaultValue="WORK.GLOBAL_TRAJECTORIES" active="true"> 
+		   <DataSource name="COVIDDATA" defaultValue="WORK.STATE_TRAJECTORIES" active="true"> 
 			  <Roles>
-				 <Role type="A" maxVars="1" order="true" minVars="1" name="VAR" default='state' > Choose a column to retrieve values for:</Role>
+				 <Role type="A" maxVars="1" order="true" minVars="1" name="VAR_region"    > Choose a column to retrieve values for:</Role>
+				 <Role type="N" maxVars="1" order="true" minVars="1" name="VAR_analysis"  > Choose analysis variable:</Role>
 			  </Roles>
 		   </DataSource>
 		</DataSources>
  
-
 		<Options>
-		
 			<Option name="DATATAB" inputType="string">DATA</Option>
 			<Option name="DATAGROUP" inputType="string">DATA</Option>
 			<Option name="ROLESGROUP" inputType="string">ROLES</Option>
 			<Option name="OPTIONSTAB" inputType="string">OPTIONS</Option>
 
-	 		<Option name="OPTIONSTAB" inputType="string">OPTIONS</Option>
-	 		<Option name="dst_select" inputType="distinct" max='1500' source="VAR">Distinct Values:</Option> 
+	 		<Option name="dst_select" inputType="distinct" max='1500' source="VAR_region">Analysis Region:</Option> 
 
 			<Option name="GRP_TYPE"	inputType="string">Data Type</Option>
 
@@ -41,6 +39,32 @@
 					
 			<Option name="Cases" variable="rd_type" defaultValue="1" inputType="radio">Cases</Option>
 			<Option name="Deaths" variable="rd_type" inputType="radio">Deaths</Option>	
+
+			<Option name="txt_titleinclude" defaultValue="Title for Graphs" inputType="inputtext"
+				required="true"
+				promptMessage="Enter title text."
+				missingMessage="You have to put a title.">Title Text:</Option>
+						
+			<Option name="txt_analysisvarLabel" defaultValue="Confirmed Cases" inputType="inputtext"
+				required="true"
+				promptMessage="Enter label for analysis variable."
+				missingMessage="You have to put a title.">Title Text:</Option>						
+						
+			<Option name="stp_LThresh" defaultValue="-5" inputType="numstepper">Lower Slope Threshold:</Option>
+			<Option name="stp_UThresh" defaultValue="5" inputType="numstepper">Upper Slope Threshold:</Option>
+			<Option name="dte_PlotMin" inputType="datepicker" format="date9." default="'01mar2020'd">Plot Starting Date:</Option>
+
+			<Option name="GROUPCOMBO" inputType="string">Plot Settings</Option>
+			<Option name="cmb_labpos" defaultValue="topright" inputType="combobox">Label Position:</Option>
+			<Option name="topright" inputType="string">Top Right</Option>
+			<Option name="topleft" inputType="string">Top Left</Option>
+			<Option name="top" inputType="string">Top</Option>
+			<Option name="center" inputType="string">Center</Option>
+			<Option name="left" inputType="string">Left</Option>
+			<Option name="right" inputType="string">Right</Option>			
+			<Option name="bottom" inputType="string">Bottom</Option>
+			<Option name="bottomleft" inputType="string">Bottom Left</Option>
+			<Option name="bottomright" inputType="string">Bottom Right</Option>
 						
 		</Options>
 		
@@ -50,13 +74,36 @@
 	
 	<Container option="OPTIONSTAB">
 	 	<DataItem data="COVIDDATA" />
-		<RoleItem role="VAR"/>
+		<RoleItem role="VAR_region"/>
 		<OptionChoice option="dst_select"/>
+		<RoleItem role="VAR_analysis"/>
 		
 		<Group option="GRP_TYPE" open='true'>
 			<OptionItem option="Cases"/>
 			<OptionItem option="Deaths"/>
 		</Group>
+		
+		<OptionItem option="stp_LThresh"/>
+		<OptionItem option="stp_UThresh"/>
+		<OptionItem option="txt_titleinclude"/>
+		<OptionItem option="txt_analysisvarLabel"/>
+		
+		<Group option="GROUPCOMBO">
+			<OptionItem option="dte_PlotMin"/>
+
+			<OptionChoice option="cmb_labpos">
+				<OptionItem option="topright" />
+				<OptionItem option="topleft"/>
+				<OptionItem option="top" />
+				<OptionItem option="center"/>
+				<OptionItem option="left" />
+				<OptionItem option="right" />		
+				<OptionItem option="bottom"/>
+				<OptionItem option="bottomleft" />
+				<OptionItem option="bottomright" />
+			</OptionChoice>
+		</Group>
+
 	</Container>
 		
 	</UI>
@@ -83,17 +130,67 @@
   	<CodeTemplate>
 		<![CDATA[
 		
+%let Lthresh			=$stp_LThresh;
+%let Uthresh			=$stp_UThresh;
+%let regwindow			=7;
+%let whcl=;
+%let labelpos			=$cmb_labpos;
+%let titleinclude		=$txt_titleinclude;
+%let fips				=;
 		data _null_;
+			length catvar $50;
 			X=scan("$COVIDDATA",2,"._");
-			if x="CBSA" or x='STATE' then y='us';
-			else y='gl';
+			if x="CBSA" or x='STATE' then do;
+				y='us';
+				call symput('fips',"fips");
+			end;
+			else do;
+				y='gl';
+			end;
 			call symput("fname",cats(y,"$rd_type"));
-			call symput('var',compress("$VAR","[]"));
+			#if ("$dte_PlotMin" == "")
+				put "NOTE: No Plotmin ";
+				call symput("plotmin",put(intnx("days","&sysdate"d,%eval(90*(-1))),date9.));
+			#else
+				put "NOTE: Picked Plotmin ";
+				call symput("plotmin","$dte_PlotMin");
+			#end
+			if x="CBSA" then catvar='CBSA_TITLE';
+			else if x="STATE" then catvar='province_state';
+			else catvar='location';
+			call symput("catvar",catvar);
+			
+			call symput("level",x);
+			call symput('region',compress("$VAR_region","[]"));
+			
+			call symput('analysisvar',compress("$VAR_analysis","[]"));
+			call symput('analysisvar_label',compress("$txt_analysisvarLabel","[]"));
+			
 			call symput('tabnm',"$dst_select");
 		run;
 	
-	/* Radio Buttons */
-	%put Region=$rd_type Dataset=$CARDATA fname=&fname $VAR &var tabnm=&tabnm;
+	/*Print out all Velocity to Macro Variable transitions */
+	data _null_;
+		put @20 "Velocity" 						@40 "SAS";         
+		put "Region" 		@20 "$rd_type"; 
+		put "Dataset" 		@20 "$COVIDDATA";
+		put "fname" 		@20 "$rd_type" 		@40 "&fname";
+		put "region" 		@20 "$VAR_region"	@40 "&var_region";
+		put "analysisvar" 	@20 "$VAR_analysis"	@40 "&var_analysis";
+		put "tabnm"			@20 "$dst_select" 	@40 "&tabnm";
+	
+		put "LThresh" 		@20 "$stp_LThresh"	@40 "&LThresh";
+		put "UThresh" 		@20 "$stp_UThresh"	@40 "&UThresh";
+		put "plotmin" 		@20 "$dte_PlotMin"	@40 "&plotmin";
+		put "regwindow" 						@40	"&regwindow";
+		put "whcl" 								@40 "&whcl";
+		put "analysisvar" 						@40 "&analysisvar";		
+		put "analysisvar_label" 				@40 "&analysisvar_label";
+		put "labelpos" 		@20 "$cmb_labpos"	@40 "&labelpos";	
+		put "titleinclude" 						@40 "&titleinclude";
+		put "level" 							@40	"&level";
+		put "catvar" 							@40 "&catvar";
+	run;
 
 	/* This is the containing folder as of 5/27/2020: https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv */
 	filename uscases  url 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv';
@@ -101,14 +198,11 @@
 	filename usDeaths url 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv';
 	filename glDeaths url 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv';
 
-	/* step 1; Import the csv directly from the website. I normally dont like proc import but it works here. */
 	PROC IMPORT DATAFILE=&fname DBMS=CSV OUT=WORK._IMPORT_TS replace ; 
 		GETNAMES=YES;
+		guessingrows=2000;
 	run;
 
-	/* These data is arranged with every new date in a column. We need to turn this into a long dataset. */
-	/*  step 1: Extract metadata
-	/* 		   Create a dataset of column names that is used to specify transpose columns in proc transpose later */
 	proc contents 
 		data=_import_ts 
 		out=_cont 
@@ -132,30 +226,23 @@
 	%put NOTE: Sanity Check: There were &columnCount Date Columns -> txcols="&txcols";
 	
 	
-	/* Step 2: transpose the dataset using the columns in step 1. THis makes more sense in a  */
-	/* 		daily ETL operation for which it was designed. Here it just saves typing. Without it, */
-	/* 		you have to type out all the date column names... */
 	proc sort data=_import_ts; 
 		by uid fips Combined_Key Country_Region province_state admin2 code3 iso2 iso3 lat long_ ;
 	run;
-	/* Rotate the dataset to make it long rather than wide */
 	proc transpose 
 		 data	= _IMPORT_ts 
 		 out	= _import_t 
 		 prefix	= UpDate_t;
 		var "&txcols"n;
-		by uid fips Combined_Key Country_Region province_state admin2 code3 iso2 iso3 lat long_ ;
+		by uid &fips Combined_Key Country_Region province_state admin2 code3 iso2 iso3 lat long_ ;
 	run;
 		
-	/* Step 4: update column names the fast way*/
 	proc datasets library=work nolist nodetails ;
 		modify _import_t;
 		rename update_t1	= CumulativeCases;
 		rename _name_		= FileDate;
 	quit;
 	
-	/* Step 5: Create the analysis dataset - select only some columns etc... format */
-
 	data _analysis_temp;
 		set _import_t;
 		format 
@@ -164,31 +251,30 @@
 			;
 		reportdate=input(filedate,mmddyy10.);
 		keep 
-			&VAR 
-			fips 
+			&region
+			&fips 
 			combined_key 
 			reportdate 
 			cumulativeCases;
-		if &VAR="$dst_select";
+		if &region="$dst_select";
 	run;
 	proc sort data=_analysis_temp; 
-		by  &VAR
-			fips 
+		by  &region
+			&fips 
 			combined_key 
 			reportdate ;
 	run;
-	proc expand data=_analysis_temp out=&tabnm._fips;
-	   by fips;
+	proc expand data=_analysis_temp out=&tabnm._region;
+	   by &region &fips;
 	   id reportdate;
    			convert cumulativeCases	= DailyCases / transout=(dif 1);
 	run;
 	
-	/* Step 7: Create region master time series by summing up cases over date - the filter was done already */
 	proc sql;
 		create table &tabnm._overall as	
 			select reportdate
 				,floor(sum(DailyCases)) as DailyCases
-			from &tabnm._fips
+			from &tabnm._region
 			group by 
 				reportdate
 			order by 
@@ -196,7 +282,6 @@
 			;
 	quit;
 	
-	/* step 6: delete datasets */
 	proc datasets library=work nolist; 
 		delete 
 			_cont 
@@ -204,7 +289,6 @@
 			_import_t 
 			_import_ts;
 	quit;
-
 
 
 		]]>

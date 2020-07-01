@@ -13,7 +13,7 @@ PROC IMPORT DATAFILE=REFFILE
 	replace;
 	GETNAMES=YES;
 	DATAROW=2;
-	GUESSINGROWS=2000;
+	GUESSINGROWS=2000000;
 RUN;
 filename reffile clear;
 
@@ -77,6 +77,7 @@ size=8; symbol="circlefilled";
 
 	PROC IMPORT DATAFILE=REFFILE DBMS=CSV OUT=WORK.T_IMPORT_TS;
 		GETNAMES=YES;
+		guessingrows=200000;
 	RUN;
 
 	proc datasets library=work nolist nodetails ;
@@ -158,6 +159,7 @@ size=8; symbol="circlefilled";
 
 	PROC IMPORT DATAFILE=REFFILE DBMS=CSV OUT=WORK.T_IMPORT_TS;
 		GETNAMES=YES;
+		guessingrows=200000;
 	RUN;
 
 	proc sort data=t_import_ts;
@@ -1071,8 +1073,8 @@ size=8; symbol="circlefilled";
 			markers
 			transparency=0.25
 			tip=(&plottip) tiplabel=(&plottiplab) ;
-		xaxis grid minor minorgrid display=(noline)  type=log values=&xvalues	LOGSTYLE=LOGEXPAND min=&minconf;
-		yaxis grid minor minorgrid display=(noline)  type=log values=&yvalues	LOGSTYLE=LOGEXPAND min=&mindeath;
+		xaxis grid display=(noline)  type=log values=&xvalues	LOGSTYLE=LOGEXPAND min=&minconf;
+		yaxis grid display=(noline)  type=log values=&yvalues	LOGSTYLE=LOGEXPAND min=&mindeath;
 	run;
 
 	proc datasets library=work nolist nodetails ; delete _cbsatemp _cbsaplot _attribset; quit;
@@ -1204,7 +1206,7 @@ size=8; symbol="circlefilled";
 /********************************************************************************************************************************/
 /***** PLOTSTATE Macro - plots any four panel region																		*****/
 /********************************************************************************************************************************/
-%macro plotstate(state=all,level=state,numback=30,gfmt=png);
+%macro plotstate(state=all,level=state,numback=30,gfmt=svg);
 
 	%if &level=state %then %do;
 		%let datastatement=&level._trajectories(where=(province_state;
@@ -1230,8 +1232,8 @@ size=8; symbol="circlefilled";
 		%let deathline	=%str( yaxis=y2 lineattrs=(thickness=2 color=darkred) );
 		%let deathmarker=%str( yaxis=y2 markerattrs=(size=8 symbol=circlefilled) FILLEDOUTLINEDMARKERS=TRUE);
 		%let overlayopts=%str( border=FALSE walldisplay=NONE height=4.5in width=7.5in xaxisopts=(label=" " timeopts=(tickvalueformat=mmddyy5.)) yaxisopts=(label="Confirmed") y2axisopts=(label="Deaths"));
-		%let xaxisopts  =%str( xaxisopts=(griddisplay=Off display=(label ticks tickvalues) gridattrs=(color=BWH )  type=time timeopts=(interval=day tickvaluerotation=diagonal tickvaluefitpolicy=rotatealways splittickvalue=FALSE) ));
-		%let yaxisopts  =%str( yaxisopts=(griddisplay=Off display=(label ticks tickvalues) gridattrs=(color=BWH)));
+		%let xaxisopts  =%str( xaxisopts=( griddisplay=Off display=(label ticks tickvalues) gridattrs=(color=BWH )  type=time timeopts=(interval=day tickvaluerotation=diagonal tickvaluefitpolicy=rotatethin splittickvalue=FALSE) ));
+		%let yaxisopts  =%str( yaxisopts=(  griddisplay=Off display=(label ticks tickvalues) gridattrs=(color=BWH)));
 		ODS PROCLABEL "&stateunquote Profile";
 		proc template;
 			define statgraph lattice;
@@ -1240,15 +1242,15 @@ size=8; symbol="circlefilled";
 				discreteattrvar attrvar=dayatr1 var=fd_weekday attrmap='daycolor1';
 				discreteattrvar attrvar=dayatr2 var=fd_weekday attrmap='daycolor2';
 
-				entrytitle textattrs=(size=15)  &state;
-				entrytitle  "SARS-CoV-2 Situation Report as of &maxdate";
+				entrytitle textattrs=(size=13)   &state;
+				entrytitle textattrs=(size=10)   "SARS-CoV-2 Situation Report &sysdate9";
 				entryfootnote "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19 Data Updated: &sysdate";
 				entryfootnote  "Showing the Last &numback Days" ;
 				entryfootnote  textattrs=(size=7) halign=right "Samuel T. Croker - &sysdate9" ;
 				layout lattice / border=FALSE pad=3 opaque=true rows=2 columns=2 columngutter=3;
 					cell; 
-						cellheader; entry "Cumulative Infections and Deaths" / textattrs=(size=12); endcellheader;
-				      	layout overlay / &overlayopts &yaxisopts xaxisopts=(display=(label ticks tickvalues)) y2axisopts=(display=(label ticks tickvalues));
+						cellheader; entry "Cumulative Infections and Deaths" / textattrs=(size=10); endcellheader;
+				      	layout overlay / &overlayopts &yaxisopts xaxisopts=(discreteopts=(tickvaluefitpolicy=rotatethin) display=(label ticks tickvalues)) y2axisopts=(display=(label ticks tickvalues));
 				      		barchart  category=filedate response=confirmed 	/ stat=sum datatransparency=0.75;
 							linechart category=filedate response=deaths 	/ stat=sum &deathline datatransparency=0.6 smoothconnect=true;
 /* 							%if &stateunquote=Georgia %then %do	; */
@@ -1272,7 +1274,7 @@ size=8; symbol="circlefilled";
 				    
 					cell; 
 						cellheader; entry "New Infections and Deaths" / textattrs=(size=10); endcellheader;
-				      	layout overlay /&overlayopts &yaxisopts xaxisopts=(display=(label ticks tickvalues)) y2axisopts=(display=(label ticks tickvalues));
+				      	layout overlay /&overlayopts &yaxisopts xaxisopts=(discreteopts=(tickvaluefitpolicy=rotatethin) display=(label ticks tickvalues)) y2axisopts=(display=(label ticks tickvalues));
 				      		barchart    category=filedate 	response=dif1_confirmed / stat=sum datatransparency=0.75 group=dayatr1 filltype=solid outlineattrs=(color=grey) ;
 							scatterplot x		=filedate 	y		=dif1_deaths 	/ /*&deathmarker */ yaxis=y2 FILLEDOUTLINEDMARKERS=TRUE group=dayatr2;
 /* 							%if &stateunquote=Georgia %then %do	; */
@@ -1283,7 +1285,7 @@ size=8; symbol="circlefilled";
 				    
 					cell; 
 						cellheader; entry "New Infections and Deaths - Seven Day Moving Average" / textattrs=(size=10); endcellheader;
-				      	layout overlay /&overlayopts  &yaxisopts xaxisopts=(display=(label ticks tickvalues)) y2axisopts=(display=(label ticks tickvalues));
+				      	layout overlay /&overlayopts  &yaxisopts xaxisopts=(discreteopts=(tickvaluefitpolicy=rotatethin) display=(label ticks tickvalues)) y2axisopts=(display=(label ticks tickvalues));
 				      		barchart  category=filedate response=ma7_new_confirmed 	/ stat=sum datatransparency=0.75 group=dayatr1 filltype=solid outlineattrs=(color=grey);
 /* 							linechart category=filedate response=ma7_new_deaths 	/ stat=sum &deathline datatransparency=0.6 smoothconnect=true;							 */
 							scatterplot x		=filedate 	y		=dif1_deaths 	/ /*&deathmarker */ yaxis=y2 FILLEDOUTLINEDMARKERS=TRUE group=dayatr2;
@@ -1326,8 +1328,9 @@ size=8; symbol="circlefilled";
 		run;
 	
 	/******** PDF ********/
-	ods graphics / outputfmt=png;
+	ods graphics / outputfmt=svg;
 	ods pdf file="&outputpath./&fname..pdf" startpage=no style=&style; 
+/* 	ods html5 file="&outputpath./&fname..htm" style=&style;  */
 	
 	/* Insert a logo and blank lines (used to move the title text to the center of page) */
 	footnote1 j=c "Beware of drawing conclusions from this data. Lagged confirmations and deaths are contained.";
@@ -1345,6 +1348,7 @@ size=8; symbol="circlefilled";
 	
 	/* Output the remainder of the report */
 	ods pdf startpage=yes;
+
 %mend InsertPDFReportHeader;
 
 

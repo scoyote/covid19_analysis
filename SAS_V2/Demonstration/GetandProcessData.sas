@@ -27,14 +27,15 @@
 	
 	
 	/* This is the containing folder as of 5/27/2020: https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv */
-	filename usConf 	url 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv';
-	filename globConf 	url	'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv';
+	filename usConf 	url 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv' lrecl=256000 ;
+	filename glConf 	url	'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv';
 	filename usDeath	url 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv';
-	filename globDeath  url	'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv';
+	filename glDeath	url	'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv';
 
 /* step 1; Import the csv directly from the website. I normally dont like proc import but it works here. */
-	PROC IMPORT DATAFILE=us_jhu DBMS=CSV OUT=WORK._IMPORT_TS replace ; 
-		GETNAMES=YES;
+	PROC IMPORt DATAFILE=usconf DBMS=CSV OUT=WORK._IMPORT_TS replace ; 
+		GETNAMES=YES; 
+		GUESSINGROWS=1500000 ;
 	run;
 
 /* These data is arranged with every new date in a column. We need to turn this into a long dataset. */

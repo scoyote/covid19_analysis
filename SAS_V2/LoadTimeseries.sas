@@ -87,3 +87,20 @@ run;
 
 
 %create_trajectories;
+
+proc datasets lib=work;
+	delete _temp_global_t;
+	delete color_raw;
+	delete global_joined;
+	delete global_stacked;
+	delete jhu_crosswalk;
+	delete recovered_global_ts;
+	delete state_totals;
+	delete us_augmented;
+	delete us_joined;
+	delete us_stacked;
+	quit;
+	
+	
+	
+	

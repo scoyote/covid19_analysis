@@ -14,7 +14,7 @@
 		<DataSources>
 			<DataSource name="DATASOURCE">
 				<Roles>
-					<Role type="A" maxVars="1" order="true" minVars="1" name="VAR" fetchDistinct="true" defaultValue="Province_State">Required variable:</Role>
+					<Role type="A" maxVars="1" order="true" minVars="1" name="VAR">Required variable:</Role>
 					<Role type="N" maxVars="0" order="true" minVars="0" name="OPTNVAR" exclude="VAR">Numeric variable:</Role>
 					<Role type="C" maxVars="3" order="true" minVars="0" name="OPTCVAR">Character variable:</Role>
 				</Roles>
@@ -46,15 +46,15 @@
 	
   	<CodeTemplate>
 		<![CDATA[
-			$DATASOURCE.getWhereClause()
+			
 	data _null_;
-		put "$VAR
+		put 
 			#if ($VAR.size() > 0)
 			 	#foreach ($item in $DATASOURCE.getDistinctValues($VAR[0]))
 					$item
 				#end
 			#end
-		";
+		;
 	run;
 
 		]]>
@@ -62,7 +62,7 @@
 
 <TemplateValues version="3.8">
 <![CDATA[
-{"OPTIONSTAB":"OPTIONS","sasVersion":"9.46","VAR":"json:[{\"value\":\"Location\",\"type\":\"Char\",\"length\":200,\"format\":\"\",\"informat\":\"\",\"className\":\"RoleObject\"}]","DATASOURCE":{"librarytable":"WORK.GLOBAL_TRAJECTORIES"},"OPTNVAR":"json:[{\"value\":\"dif7_confirmed\",\"type\":\"Numeric\",\"length\":8,\"format\":\"COMMA12.\",\"informat\":\"\",\"className\":\"RoleObject\"}]","OPTCVAR":"json:[{\"value\":\"Location\",\"type\":\"Char\",\"length\":200,\"format\":\"\",\"informat\":\"\",\"className\":\"RoleObject\"}]","DATATAB":"DATA","DATAGROUP":"DATA","sasOS":"Linux LIN X64 4.19.76-linuxkit","ROLESGROUP":"ROLES"}
+{"OPTIONSTAB":"OPTIONS","sasVersion":"9.46","VAR":"json:[{\"value\":\"Province_State\",\"type\":\"Char\",\"length\":25,\"format\":\"$25.\",\"informat\":\"$24.\",\"className\":\"RoleObject\"}]","DATASOURCE":{"librarytable":"WORK.STATE_TRAJECTORIES"},"OPTNVAR":"json:[{\"value\":\"dif7_confirmed\",\"type\":\"Numeric\",\"length\":8,\"format\":\"COMMA12.\",\"informat\":\"\",\"className\":\"RoleObject\"}]","OPTCVAR":"json:[{\"value\":\"Province_State\",\"type\":\"Char\",\"length\":25,\"format\":\"$25.\",\"informat\":\"$24.\",\"className\":\"RoleObject\"}]","DATATAB":"DATA","DATAGROUP":"DATA","sasOS":"Linux LIN X64 4.19.76-linuxkit","ROLESGROUP":"ROLES"}
 ]]>
 </TemplateValues>
 </Task>

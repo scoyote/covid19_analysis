@@ -1,0 +1,293 @@
+<Task schemaVersion="5.4" runNLS="never">
+	<Registration>
+	<Name>Prepare COVID19(JHU) Data</Name>
+	<Description>This tasks pulls data using the URL filename method, and transposes it into a long timeseries from a dataset where each date is a column.</Description>
+	<GUID>726B2B12-4542-4200-96F4-960C645D767F</GUID>
+	<Procedures>TBD</Procedures> 
+	<Version>3.8</Version>
+	<Links>
+		<Link href="http://documentation.sas.com/?softwareId=STUDIOMID&amp;softwareVersion=3.8&amp;softwareContextId=tasks&amp;requestor=inapp">SAS Studio Task Reference Guide</Link>
+	</Links>
+	</Registration>
+	
+	<Metadata>
+
+		<DataSources>
+		   <DataSource name="COVIDDATA" defaultValue="WORK.STATE_TRAJECTORIES" active="true"> 
+			  <Roles>
+				 <Role type="A" maxVars="1" order="true" minVars="1" name="VAR_region" exclude="dataVariablesNumeric"> Choose a column to retrieve values for:</Role>
+				 <Role type="N" maxVars="1" order="true" minVars="1" name="VAR_analysis" defaultValue="dif7_confirmed"> Choose analysis variable:</Role>
+			  </Roles>
+		   </DataSource>
+		</DataSources>
+ 
+		<Options>
+			<Option name="DATATAB" inputType="string">DATA</Option>
+			<Option name="DATAGROUP" inputType="string">DATA</Option>
+			<Option name="ROLESGROUP" inputType="string">ROLES</Option>
+			<Option name="OPTIONSTAB" inputType="string">OPTIONS</Option>
+
+	 		<Option name="dst_select" inputType="distinct" max="1500" source="VAR_region">Analysis Region:</Option> 
+
+			<Option name="GRP_TYPE" inputType="string">Data Type</Option>
+
+			<Option name="txtGlobal" defaultValue="Text goes here" inputType="inputtext" required="true" promptMessage="Enter some text." missingMessage="Missing text.">Input text:</Option>
+					
+			<Option name="Cases" variable="rd_type" defaultValue="1" inputType="radio">Cases</Option>
+			<Option name="Deaths" variable="rd_type" inputType="radio">Deaths</Option>	
+
+			<Option name="txt_titleinclude" defaultValue="Title for Graphs" inputType="inputtext" required="true" promptMessage="Enter title text." missingMessage="You have to put a title.">Title Text:</Option>
+						
+			<Option name="txt_analysisvarLabel" defaultValue="Confirmed Cases" inputType="inputtext" required="true" promptMessage="Enter label for analysis variable." missingMessage="You have to put a title.">Title Text:</Option>						
+						
+			<Option name="stp_LThresh" defaultValue="-5" inputType="numstepper">Lower Slope Threshold:</Option>
+			<Option name="stp_UThresh" defaultValue="5" inputType="numstepper">Upper Slope Threshold:</Option>
+			<Option name="dte_PlotMin" inputType="datepicker" format="date9." default="'01mar2020'd">Plot Starting Date:</Option>
+
+			<Option name="GROUPCOMBO" inputType="string">Plot Settings</Option>
+			<Option name="cmb_labpos" defaultValue="topright" inputType="combobox">Label Position:</Option>
+			<Option name="topright" inputType="string">Top Right</Option>
+			<Option name="topleft" inputType="string">Top Left</Option>
+			<Option name="top" inputType="string">Top</Option>
+			<Option name="center" inputType="string">Center</Option>
+			<Option name="left" inputType="string">Left</Option>
+			<Option name="right" inputType="string">Right</Option>			
+			<Option name="bottom" inputType="string">Bottom</Option>
+			<Option name="bottomleft" inputType="string">Bottom Left</Option>
+			<Option name="bottomright" inputType="string">Bottom Right</Option>
+						
+		</Options>
+		
+	</Metadata>
+	
+	<UI>
+	
+	<Container option="OPTIONSTAB">
+	 	<DataItem data="COVIDDATA"/>
+		<RoleItem role="VAR_region"/>
+		<OptionChoice option="dst_select"/>
+		<RoleItem role="VAR_analysis"/>
+		
+		<Group option="GRP_TYPE" open="true">
+			<OptionItem option="Cases"/>
+			<OptionItem option="Deaths"/>
+		</Group>
+		
+		<OptionItem option="stp_LThresh"/>
+		<OptionItem option="stp_UThresh"/>
+		<OptionItem option="txt_titleinclude"/>
+		<OptionItem option="txt_analysisvarLabel"/>
+		
+		<Group option="GROUPCOMBO">
+			<OptionItem option="dte_PlotMin"/>
+
+			<OptionChoice option="cmb_labpos">
+				<OptionItem option="topright"/>
+				<OptionItem option="topleft"/>
+				<OptionItem option="top"/>
+				<OptionItem option="center"/>
+				<OptionItem option="left"/>
+				<OptionItem option="right"/>		
+				<OptionItem option="bottom"/>
+				<OptionItem option="bottomleft"/>
+				<OptionItem option="bottomright"/>
+			</OptionChoice>
+		</Group>
+
+	</Container>
+		
+	</UI>
+	
+	<!--
+	<Dependencies>
+	        <Dependency condition="$radioChoice == 'rd_Global'">
+            <Target action="show" conditionResult="true" option="labelEnableChange"/>
+            
+            <Target action="show" conditionResult="true" option="comboEnableChange"/>
+            <Target action="hide" conditionResult="true" option="labelShowChange"/>
+            <Target action="hide" conditionResult="true" option="comboShowChange"/>
+            <Target action="show" conditionResult="true" option="colorControl"/>
+            <Target action="show" conditionResult="true" option="dateControl"/>                                    
+            <Target action="show" conditionResult="true" option="sliderControl"/>                                    
+            <Target action="hide" conditionResult="true" option="labelShowSet"/>                                    
+            <Target action="hide" conditionResult="true" option="comboSetChange"/>                                    
+            <Target action="hide" conditionResult="true" option="checkboxCheckUncheck"/>                                    
+			
+        </Dependency>
+		
+	</Dependencies>
+	-->
+  	<CodeTemplate>
+		<![CDATA[
+		
+%let Lthresh			=$stp_LThresh;
+%let Uthresh			=$stp_UThresh;
+%let regwindow			=7;
+%let whcl=;
+%let labelpos			=$cmb_labpos;
+%let titleinclude		=$txt_titleinclude;
+%let fips				=;
+		data _null_;
+			length catvar $50;
+			X=scan("$COVIDDATA",2,"._");
+			if x="CBSA" or x='STATE' then do;
+				y='us';
+				call symput('fips',"fips");
+			end;
+			else do;
+				y='gl';
+			end;
+			call symput("fname",cats(y,"$rd_type"));
+			#if ("$dte_PlotMin" == "")
+				put "NOTE: No Plotmin ";
+				call symput("plotmin",put(intnx("days","&sysdate"d,%eval(90*(-1))),date9.));
+			#else
+				put "NOTE: Picked Plotmin ";
+				call symput("plotmin","$dte_PlotMin");
+			#end
+			if x="CBSA" then catvar='CBSA_TITLE';
+			else if x="STATE" then catvar='province_state';
+			else catvar='location';
+			call symput("catvar",catvar);
+			
+			call symput("level",x);
+			call symput('region',compress("$VAR_region","[]"));
+			
+			#if ("$dte_PlotMin" == "")
+			call symput('analysisvar',compress("$VAR_analysis","[]"));
+			call symput('analysisvar_label',compress("$txt_analysisvarLabel","[]"));
+			
+			call symput('tabnm',"$dst_select");
+		run;
+	
+	/*Print out all Velocity to Macro Variable transitions */
+	data _null_;
+		put @20 "Velocity" 						@40 "SAS";         
+		put "Region" 		@20 "$rd_type"; 
+		put "Dataset" 		@20 "$COVIDDATA";
+		put "fname" 		@20 "$rd_type" 		@40 "&fname";
+		put "region" 		@20 "$VAR_region"	@40 "&var_region";
+		put "analysisvar" 	@20 "$VAR_analysis"	@40 "&var_analysis";
+		put "tabnm"			@20 "$dst_select" 	@40 "&tabnm";
+	
+		put "LThresh" 		@20 "$stp_LThresh"	@40 "&LThresh";
+		put "UThresh" 		@20 "$stp_UThresh"	@40 "&UThresh";
+		put "plotmin" 		@20 "$dte_PlotMin"	@40 "&plotmin";
+		put "regwindow" 						@40	"&regwindow";
+		put "whcl" 								@40 "&whcl";
+		put "analysisvar" 						@40 "&analysisvar";		
+		put "analysisvar_label" 				@40 "&analysisvar_label";
+		put "labelpos" 		@20 "$cmb_labpos"	@40 "&labelpos";	
+		put "titleinclude" 						@40 "&titleinclude";
+		put "level" 							@40	"&level";
+		put "catvar" 							@40 "&catvar";
+	run;
+
+	/* This is the containing folder as of 5/27/2020: https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv */
+	filename uscases  url 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv';
+	filename glcases  url 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv';
+	filename usDeaths url 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv';
+	filename glDeaths url 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv';
+
+	PROC IMPORT DATAFILE=&fname DBMS=CSV OUT=WORK._IMPORT_TS replace ; 
+		GETNAMES=YES;
+		guessingrows=2000;
+	run;
+
+	proc contents 
+		data=_import_ts 
+		out=_cont 
+		noprint; 
+	run;
+	
+	%let colset=('UID','POPULATION','COMBINED_KEY','COUNTRY_REGION',"province_state",'FIPS','ADMIN2','CODE3','ISO2','ISO3','LAT','LONG_');	
+	proc sql noprint;
+		select count(*) into :columnCount 
+		from _cont 
+		where 
+			type=1 
+			and upcase(name) not in &colset;
+			
+		select compress(name) into :txcols separated by '"n "' 
+		from _cont 
+		where 
+			type=1 
+			and upcase(name) not in &colset;
+	quit;
+	%put NOTE: Sanity Check: There were &columnCount Date Columns -> txcols="&txcols";
+	
+	
+	proc sort data=_import_ts; 
+		by uid fips Combined_Key Country_Region province_state admin2 code3 iso2 iso3 lat long_ ;
+	run;
+	proc transpose 
+		 data	= _IMPORT_ts 
+		 out	= _import_t 
+		 prefix	= UpDate_t;
+		var "&txcols"n;
+		by uid &fips Combined_Key Country_Region province_state admin2 code3 iso2 iso3 lat long_ ;
+	run;
+		
+	proc datasets library=work nolist nodetails ;
+		modify _import_t;
+		rename update_t1	= CumulativeCases;
+		rename _name_		= FileDate;
+	quit;
+	
+	data _analysis_temp;
+		set _import_t;
+		format 
+			reportdate 		mmddyy5. 
+			CumulativeCases	comma12.
+			;
+		reportdate=input(filedate,mmddyy10.);
+		keep 
+			&region
+			&fips 
+			combined_key 
+			reportdate 
+			cumulativeCases;
+		if &region="$dst_select";
+	run;
+	proc sort data=_analysis_temp; 
+		by  &region
+			&fips 
+			combined_key 
+			reportdate ;
+	run;
+	proc expand data=_analysis_temp out=&tabnm._region;
+	   by &region &fips;
+	   id reportdate;
+   			convert cumulativeCases	= DailyCases / transout=(dif 1);
+	run;
+	
+	proc sql;
+		create table &tabnm._overall as	
+			select reportdate
+				,floor(sum(DailyCases)) as DailyCases
+			from &tabnm._region
+			group by 
+				reportdate
+			order by 
+				reportdate
+			;
+	quit;
+	
+	proc datasets library=work nolist; 
+		delete 
+			_cont 
+			_analysis_temp
+			_import_t 
+			_import_ts;
+	quit;
+
+
+		]]>
+	</CodeTemplate>
+
+<TemplateValues version="3.8">
+<![CDATA[
+{"COVIDDATA":{"librarytable":"WORK.STATE_TRAJECTORIES"},"txtGlobal":"Text goes here","topleft":"Top Left","VAR_region":"json:[{\"value\":\"Province_State\",\"type\":\"Char\",\"length\":25,\"format\":\"$25.\",\"informat\":\"$24.\",\"className\":\"RoleObject\"}]","sasOS":"Linux LIN X64 4.19.76-linuxkit","VAR_analysis":"json:[{\"value\":\"dif7_confirmed\",\"type\":\"Numeric\",\"length\":8,\"format\":\"COMMA12.\",\"informat\":\"\",\"className\":\"RoleObject\"}]","dst_select":"Alabama","top":"Top","topright":"Top Right","Deaths":"0","DATATAB":"DATA","stp_UThresh":"5","dte_PlotMin":"","txt_titleinclude":"Title for Graphs","ROLESGROUP":"ROLES","OPTIONSTAB":"OPTIONS","bottom":"Bottom","center":"Center","txt_analysisvarLabel":"Confirmed Cases","DATAGROUP":"DATA","right":"Right","bottomright":"Bottom Right","GRP_TYPE":"Data Type","cmb_labpos":"topright","bottomleft":"Bottom Left","sasVersion":"9.46","left":"Left","rd_type":"Cases","stp_LThresh":"-5","Cases":"1","GROUPCOMBO":"Plot Settings"}
+]]>
+</TemplateValues>
+</Task>

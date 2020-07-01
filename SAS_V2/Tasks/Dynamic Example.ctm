@@ -19,26 +19,23 @@
 		  <Roles>
 			 <Role type="A" maxVars="1" order="true" minVars="1" name="VAR" default='state' > Choose a column to retrieve values for:</Role>
 		  </Roles>
-		  <!--
+		   <!--
+
 		  <Filters>
-			 <Filter name="filterMake">
-				<Column column="make"/>
+			 <Filter name="filterFiledate">
+				<Column column="Filedate"/>
 			 </Filter>
 			 <Filter name="filterVar">
 				<Column role="VAR" sortDirection="descending"/>
 				<Where>
 				   <Expressions>
 					  <Expression operator="ge">
-						 <Column column="cylinders"/>
-						 <Value value="6"/>
+						 <Column column="deaths"/>
+						 <Value value="100"/>
 					  </Expression>
-					  <Expression operator="eq">
-						 <Column column="make"/>
+					  <Expression operator="ge">
+						 <Column column="cases"/>
 						 <Value option="comboMake"/>
-					  </Expression>
-					  <Expression operator="in">
-						 <Column column="msrp"/>
-						 <Value option="priceRange"/>
 					  </Expression>
 				   </Expressions>
 				</Where>
@@ -52,8 +49,8 @@
 	<Options>
  
  		<Option name="OPTIONSTAB" inputType="string">OPTIONS</Option>
- 		<Option name="distinctEXAMPLE" inputType="distinct" source="VAR">Distinct Values:</Option> 
-
+ 		<Option name="distinctEXAMPLE" inputType="distinct" max='1500' source="VAR">Distinct Values:</Option> 
+ 		
  	  <!--
 		<Option name="comboMake" defaultValue="default" inputType="combobox" filter="filterMake" >Select a car make:</Option>
  
@@ -74,6 +71,7 @@
 	 	<DataItem data="DATASOURCE" />
 		<RoleItem role="VAR"/>
 		<OptionChoice option="distinctEXAMPLE"/>
+		
 	<!--
 		
 
