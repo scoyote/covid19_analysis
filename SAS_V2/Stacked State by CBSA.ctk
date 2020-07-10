@@ -1,0 +1,96 @@
+%let stateplot=PA;
+%let analysisvar=dif7_confirmed;
+
+
+
+data _graph; 
+	set CBSA_TRAJECTORIES (where=(substr(cbsa_title,length(cbsa_title)-1, length(cbsa_title))="&stateplot"));
+	by cbsa_title filedate;
+	if last.cbsa_title then do;
+		tips=cbsa_title;
+	end;
+	if filedate >= '01mar20'd and cbsa_title ~= "New York-Newark-Jersey City, NY-NJ-PA";
+run;
+
+ods html5  path="../" body="CBSADaily_&StatePlot..html" (url=none) style=STYLES.ocean options(bitmap_mode="inline");
+ods graphics / reset width=12in height=8in imagemap=on tipmax=100000  imagefmt=svg;
+
+title "SARS-COV-2: CBSA Contribution per Reporting Date for &Stateplot";
+footnote  j=c h=1 "Beware of drawing conclusions from this data beyond the purpose for which it was generated.";
+footnote2 j=c h=.95 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19 Data Updated: &sysdate";
+footnote3 j=r h=0.5  "Samuel T. Croker - &sysdate9";
+
+proc sgplot data=_graph des="CBSA Daily Contribution for &stateplot" noautolegend ;
+	vbar Filedate / nooutline
+		response=&ANALYSISVAR    
+		group=CBSA_Title 
+		groupdisplay=stack 
+		fillattrs=(transparency=0.5)
+		tip=(CBSA_Title FileDate &analysisvar)
+		;
+
+	xaxis fitpolicy=rotatethin;
+	yaxis ;
+run;
+
+ods html5 close;
+ods graphics / reset;
+
+
+/*Part 2*/
+
+title;footnote;
+
+%let maxcutoff=50;
+proc sql noprint; 
+	create table cbsalevel as
+	select cbsa_title,max(confirmed) as maxcase, max(deaths) as maxdeaths
+	from cbsa_trajectories 
+	group by cbsa_title
+	order by maxcase desc; 
+quit;
+data _null_; set cbsalevel;
+	if _n_ = &maxcutoff+1 then call symput("cutoff",maxcase);
+run;
+proc sql noprint;
+	select count(*) into :numk from cbsalevel where maxcase>&cutoff;
+	select distinct cbsa_title into :cbsa1-:cbsa%cmpres(&numk) from cbsalevel where maxcase>=&cutoff;
+	select distinct cbsa_title into :cbsas separated by '","'from cbsalevel where maxcase>=&cutoff;
+quit;
+
+data _graph; 
+	set cbsa_trajectories;
+	where cbsa_title in ("&cbsas");
+	if filedate >= '01mar20'd ;
+	if &analysisvar < 1 then &analysisvar=1;
+	logged=log10(&analysisvar);
+	keep filedate cbsa_title &analysisvar logged;
+
+run;
+%let analysisvar=logged;
+ods html5  path="../" body="CBSADaily_Top&maxcutoff..html" (url=none) style=STYLES.ocean options(bitmap_mode="inline");
+ods graphics / reset width=12in height=8in imagemap=on tipmax=100000  imagefmt=svg;
+
+title "SARS-COV-2: CBSA Contribution per Reporting Date for Top &maxcutoff by Cases";
+footnote  j=c h=1 "Beware of drawing conclusions from this data beyond the purpose for which it was generated.";
+footnote2 j=c h=.95 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19 Data Updated: &sysdate";
+footnote3 j=r h=0.5  "Samuel T. Croker - &sysdate9";
+
+proc sgplot data=_graph des="CBSA Daily Contribution for top &maxcutoff CBSAs" noautolegend ;
+	vbar Filedate / nooutline
+		response=&ANALYSISVAR    
+		group=CBSA_Title 
+		groupdisplay=stack 
+		fillattrs=(transparency=0.5)
+		tip=(CBSA_Title FileDate &analysisvar) 
+		;
+
+	xaxis fitpolicy=rotatethin;
+	yaxis ;*type=log offsetmin=1 min=10 values=(10 100 1000 to 10000 by 1000) ;
+run;
+
+ods html5 close;
+ods graphics / reset;
+
+
+title;footnote;
