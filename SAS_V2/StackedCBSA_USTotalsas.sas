@@ -1,5 +1,6 @@
-%let stateplot=GA;
-%let analysisvar=dif7_confirmed;
+
+%let analysisvar=MA7_new_confirmed;
+%let tipvars=dif1_confirmed dif1_deaths;
 %let startdate='01mar20'd;
 
 %let seed = 5;
@@ -50,7 +51,7 @@ proc sql noprint;
 	select distinct cbsa_title into :cbsas separated by '","' from cbsalevel where maxcase>=&cutoff;
 quit;
 
-data _graph(keep=filedate cbsa_title &analysisvar) 
+data _graph(keep=filedate cbsa_title &analysisvar &tipvars) 
 	 _cc(keep=cbsa_title cbsacolormatch) ; 
 	set cbsa_trajectories;
 	by cbsa_title filedate;
@@ -95,7 +96,7 @@ proc sgplot data=_graph des="CBSA Daily Contribution for top &maxcutoff CBSAs" n
 		group=CBSA_Title 
 		groupdisplay=stack 
 		fillattrs=(transparency=.5)
-		tip=(CBSA_Title FileDate &analysisvar) 
+		tip=(CBSA_Title FileDate &analysisvar &tipvars) 
 		attrid=c_ramp
 		;
 

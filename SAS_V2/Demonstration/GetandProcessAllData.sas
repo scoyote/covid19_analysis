@@ -17,23 +17,23 @@
 	filename glDeath	url	'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv';
 
 %macro BuildDS(fname,region,type);
-	
-	%if &fname=usconf %then %do;
-		%let sortkey=Province_state fips combined_key;
-		%let colset=('UID','COMBINED_KEY','COUNTRY_REGION',"province_state",'FIPS','ADMIN2','CODE3','ISO2','ISO3','LAT','LONG_');	
-		%let scolset=UID COMBINED_KEY COUNTRY_REGION province_state FIPS ADMIN2 CODE3 ISO2 ISO3 LAT LONG_;	
-	%end;
-	%if &fname=usdeath %then %do;
-		%let sortkey=Province_state fips combined_key;
-		%let colset=('UID','POPULATION','COMBINED_KEY','COUNTRY_REGION',"province_state",'FIPS','ADMIN2','CODE3','ISO2','ISO3','LAT','LONG_');	
-		%let scolset=UID POPULATION COMBINED_KEY COUNTRY_REGION province_state FIPS ADMIN2 CODE3 ISO2 ISO3 LAT LONG_;	
-	%end;
-	%else %if &region=GL %then %do;
-		%let sortkey='COUNTRY/REGION'n 'Province/State'n;
-		%let colset=('COUNTRY/REGION','Province/State','LAT','LONG');	
-		%let scolset='COUNTRY/REGION'n 'Province/State'n LAT LONG;	
-	%end;
-	
+	 %let keeps=;
+	 %if &fname=usconf %then %do;
+        %let sortkey=Province_state fips combined_key;
+        %let colset=('UID','COMBINED_KEY','COUNTRY_REGION',"province_state",'FIPS','ADMIN2','CODE3','ISO2','ISO3','LAT','LONG_');    
+        %let scolset=UID COMBINED_KEY COUNTRY_REGION province_state FIPS ADMIN2 CODE3 ISO2 ISO3 LAT LONG_;   
+ 	%end;
+    %if &fname=usdeath %then %do;
+        %let sortkey=Province_state fips combined_key;
+        %let colset=('UID','POPULATION','COMBINED_KEY','COUNTRY_REGION',"province_state",'FIPS','ADMIN2','CODE3','ISO2','ISO3','LAT','LONG_');    
+        %let scolset=UID POPULATION COMBINED_KEY COUNTRY_REGION province_state FIPS ADMIN2 CODE3 ISO2 ISO3 LAT LONG_;    
+        %let keeps=POPULATION;
+    %end;
+    %else %if &region=GL %then %do;
+        %let sortkey='COUNTRY/REGION'n 'Province/State'n;
+        %let colset=('COUNTRY/REGION','Province/State','LAT','LONG');    
+        %let scolset='COUNTRY/REGION'n 'Province/State'n LAT LONG;    
+    %end;
 	PROC IMPORT DATAFILE=&fname DBMS=CSV OUT=WORK._IMPORT_TS replace  ; 
 		GETNAMES=YES; 
 		GUESSINGROWS=1500;
@@ -84,7 +84,8 @@
 		keep 
 			&sortkey
 			reportdate 
-			&type;
+			&type
+			&keeps;
 	run;
 	proc sort data=_analysis_temp; 
 		by  &sortkey 
@@ -122,4 +123,69 @@
 %BuildDS(usdeath,US,deaths);
 %BuildDS(glConf,GL,confirmed);
 %BuildDS(gldeath,GL,deaths);
+
+
+proc sql;
+    create table _US_Daily as
+        select a.*, b.population, b.dailydeaths, b.deaths
+        from
+            pcovid.US_CONFIRMED a 
+        inner join
+            pcovid.US_DEATHS b
+        on a.fips=b.fips
+        and a.combined_key=b.combined_key
+        and a.province_state=b.province_state
+        and a.reportdate=b.reportdate
+        order by 
+             a.fips
+            ,a.province_state
+            ,a.combined_key
+            ,a.reportdate
+        ;
+quit;
+
+proc expand data=_us_daily out=US_DAILY;
+    by fips province_state combined_key;
+    id reportdate;
+    convert DailyConfirmed = MA7_Cases  / transout=(movave 7);
+    convert DailyDeaths    = MA7_Deaths / transout=(movave 7);
+run;
+
+proc sql;
+    create table _GL_Daily as
+        select a.*, b.dailydeaths, b.deaths
+        from
+            pcovid.GL_CONFIRMED a 
+        inner join
+            pcovid.GL_DEATHS b
+        on a.country_region=b.country_region
+        and a.province_state=b.province_state
+        and a.reportdate=b.reportdate
+        order by 
+             a.country_region
+            ,a.province_state
+            ,a.reportdate
+        ;
+quit;
+
+proc expand data=_GL_daily out=GL_DAILY;
+    by country_region province_state;
+    id reportdate;
+    convert DailyConfirmed = MA7_Cases  / transout=(movave 7);
+    convert DailyDeaths    = MA7_Deaths / transout=(movave 7);
+run;
+
+proc datasets library=work nodetails nolist ;
+    delete _us_daily _gl_daily;
+quit;
+
+proc sql; 
+/* 	select * from gl_daily where country_region='US' order by reportdate desc; */
+	select sum(dailyconfirmed) as summer from us_daily where province_state='Florida' and reportdate='11jul20'd  group by reportdate order by reportdate desc;
+
+quit;
+
+
+
+
 

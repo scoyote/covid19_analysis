@@ -53,7 +53,7 @@ data US_Augmented;
 		fipsjoin 			$5.
 		country_region 		$25.
 		Province_State 		$25.
-		combined_key 		$50.
+		combined_key 		$57.
 		Filedate 			yymmdd10.
 		confirmed 			comma12.
 		deaths 				comma12.

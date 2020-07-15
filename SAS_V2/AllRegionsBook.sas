@@ -48,7 +48,7 @@ option &mlv.mlogic &mlv.mprint;
 /* 	%plotstate(state="Charlotte-Concord-Gastonia, NC-SC",level=cbsa,numback=&overallplotdays); */
 /* 	%plotstate(state="Greensboro-High Point, NC",level=cbsa,numback=&overallplotdays); */
 /* 	%plotstate(state="Durham-Chapel Hill, NC",level=cbsa,numback=&overallplotdays); */
-/* 	%plotstate(state="Raleigh-Cary, NC",level=cbsa,numback=&overallplotdays); */
+	%plotstate(state="San Francisco-Oakland-Berkeley, CA",level=cbsa,numback=&overallplotdays);
 	%plotstate(state="New York-Newark-Jersey City, NY-NJ-PA",level=cbsa,numback=&overallplotdays);
 	
 	%plotstate(state="Florida",level=state,numback=&overallplotdays); 

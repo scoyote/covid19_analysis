@@ -1,5 +1,6 @@
-%let stateplot=GA;
-%let analysisvar=dif7_confirmed;
+%let stateplot=CA;
+%let analysisvar=MA7_new_confirmed;
+%let tipvars=dif1_confirmed dif1_deaths;
 %let startdate='01mar20'd;
 /*
 proc sql;
@@ -86,7 +87,7 @@ proc sgplot data=_graph des="CBSA Daily Contribution for &stateplot" noautolegen
 		group=CBSA_Title 
 		groupdisplay=stack 
 		fillattrs=(transparency=0.5)
-		tip=(CBSA_Title FileDate &analysisvar)
+		tip=(CBSA_Title FileDate &analysisvar &tipvars)
 		attrid=c_ramp
 		;
 	xaxis fitpolicy=rotatethin;
@@ -122,7 +123,7 @@ proc sgplot data=_graph(where=(cbsa_title not in ("&blocks"))) des="CBSA Daily C
 		group=CBSA_Title 
 		groupdisplay=stack 
 		fillattrs=(transparency=0.5)
-		tip=(CBSA_Title FileDate &analysisvar)
+		tip=(CBSA_Title FileDate &analysisvar &tipvars)
 		attrid=c_ramp
 		;
 

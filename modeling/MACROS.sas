@@ -128,7 +128,7 @@
 	run;
 %mend tsimulate;
 
-%macro CreateModelData(database,region_field,region,enddate=&sysdate,populationestimate=10E6);
+%macro CreateModelData(database,region_field,region,startdate=01jan20,enddate=&sysdate,populationestimate=10E6,back=0);
 	data _null_; 
 		*call symput("enddate",left(put("&enddate"d,8.))); 
 		put "NOTE: Building _model dataset ending on &enddate ";
@@ -140,9 +140,22 @@
 		set &database._trajectories(rename=(confirmed=cases filedate=date) 
 								where=(&region_field="&Region" 
 									and cases>0 
-									and date <= "&enddate"d))end=eof;
+									and date <= "&enddate"d
+									and date >= "&startdate"d))end=eof;
+			/* set the forecast area as I */
+			if date <= intnx('day',"&enddate"d,-&back) then role='I';
+			else role='O';
+			
 			if eof then call symput('popest',census2010pop);
+			cumulative_deaths=deaths;
+			cumulative_cases=cases;
+			cases=dif1_confirmed;
+			deaths=dif1_deaths;
+			log_cumulative_cases=log(cumulative_cases);
+			
+		keep &region_field role combined_key date cumulative_cases log_cumulative_cases cumulative_deaths cases deaths ;
 	run;
+	
 	%if &populationEstimate ~= 10E6 %then %do;
 		%put NOTE: **************************************************************************;	
 		%PUT NOTE: Population Estimate was provide in the macro call.;;
@@ -197,3 +210,11 @@
 	quit;
 	
 %mend LookupRegion;
+
+
+proc format;
+	value $xvalid 
+		"I"='Training Data'
+        "O"='Cross Validation Sample'
+        "E"='ERROR';
+run;
