@@ -1,17 +1,17 @@
 /********************************************************************/
 /***** ALLStates.sas - Run through all the graphs from load-plot*****/
 /********************************************************************/
-
-%let rc = %sysfunc(dlgcdir("/covid_analysis/SAS_V2/")); 
+%let codepath=/repositories/covid19_analysis/SAS_V2/;
+%let rc = %sysfunc(dlgcdir("&codepath")); 
 %let mlv = no;
 %include "MACROS.sas";
 %let graphFormat=svg;
-
+ 
 /********************************************************************/
 /***** Update the JHU data from git site and run data load		*****/
 /********************************************************************/
 
-%include "LoadTimeseries.sas"; 
+%include "&codepath.LoadTimeseries.sas"; 
 
 /********************************************************************/
 /***** Clean up the old html and graphs						 	*****/
@@ -24,6 +24,8 @@
 /********************************************************************/
 /***** Plot Regions and states	 								*****/
 /********************************************************************/
+
+%let rc = %sysfunc(dlgcdir("&codepath./graphs/graphs")); 
 ods html close;ods rtf close;ods pdf close;ods document close;
 options orientation=landscape papersize=tabloid  nomprint nomlogic;
 ods graphics on / reset width=16in height=10in imagemap outputfmt=&graphFormat imagefmt=&graphFormat; 
@@ -41,7 +43,7 @@ option &mlv.mlogic &mlv.mprint;
 
 	%plotstate(state="South Carolina",level=state,numback=&overallplotdays); 
 	%plotstate(state="Greenville-Anderson, SC",level=cbsa,numback=&overallplotdays);
-	
+
 /* 	%plotstate(state="Ohio",level=state,numback=&overallplotdays); */
 /* 	%plotstate(state="Huntington-Ashland, WV-KY-OH",level=cbsa,numback=&overallplotdays); */
 /* 	%plotstate(state="North Carolina",level=state,numback=&overallplotdays);  */

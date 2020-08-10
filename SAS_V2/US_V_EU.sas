@@ -3,6 +3,8 @@ proc sql;
 select distinct location from global_trajectories order by location;
 quit;
 */
+%let codepath=/repositories/covid19_analysis/SAS_V2/;
+%let rc = %sysfunc(dlgcdir("&codepath")); 
 %include "US_V_EU_MACROS.sas";
 
 data _null_ ;call symput("wordDte",trim(left(put("&sysdate9"d, worddatx32.)))); run;
@@ -69,6 +71,7 @@ proc expand data=_e1 out=_us_v_eu;
 	convert dif1_confirmed	= MA7_new_confirmed  / transout=(movave 7);
 	convert dif1_deaths		= ma7_new_deaths 	 / transout=(movave 7);
 run;
+
 proc sort data=_us_v_eu; by glb filedate; run;
 
 
@@ -129,7 +132,7 @@ quit;
 ods html close;ods rtf close;ods pdf close;ods document close;
 options orientation=landscape papersize=tabloid  nomprint nomlogic;
 ods graphics on / reset width=16in height=10in imagemap outputfmt=svg imagefmt=svg; 
-ods html5  body="US_VS_Others.htm" (url=none) options(svg_mode="inline");
+ods html5 path="graphs/" body="US_VS_Others.htm" (url=none) options(svg_mode="inline");
 
 
 title 	  "SARS-CoV-2: Confirmed Cases in Major Population Areas Compared";
@@ -315,7 +318,16 @@ proc expand data=_e1 out=_us_v_eu;
 	id filedate;
 	convert dif1_confirmed	= MA7_new_confirmed  / transout=(movave 7);
 	convert dif1_deaths		= ma7_new_deaths 	 / transout=(movave 7);
+	convert dif1_confirmed	= cusum21_cases  / transout=(movsum 21);
+	convert dif1_confirmed	= cusum28_cases  / transout=(movsum 28);
 run;
+data _us_v_eu;
+	set _us_v_eu;
+	ma7_new_confirmed=int(ma7_new_confirmed);
+	ma7_new_deaths =int( ma7_new_deaths );
+	cusum21_cases=int(cusum21_cases);
+	cusum28_cases=int(cusum28_cases);
+run;	
 proc sort data=_us_v_eu; by glb filedate; run;
 
 
@@ -382,7 +394,7 @@ run;
 
 
 proc sql noprint ;
-	select int(max(y2val)+0.05*max(y2val)) into :y2max from us_v_eu;
+	select int(max(y2val)+0.05*max(y2val)) into :y2max from us_v_eu where filedate>'01jun20'd;
 quit;
 
 options orientation=landscape papersize=tabloid  nomprint nomlogic;
@@ -423,6 +435,10 @@ proc sgplot data=us_v_eu dattrmap=_regmap noautolegend;
 run;
 quit;
 
+
+
+
+
 proc sql;
 	create table topfips as
 	select combined_key as County, fips as FIPS, ma7_new_confirmed/census2010pop*1e5 as casesPer100k label='Cases per 100k' format=comma10.1, census2010pop format=comma12.
@@ -436,35 +452,48 @@ proc print data=topfips (obs=100);
 	label casesper100k="Cases per 100k";
 	label census2010pop='2010 Population';
 run;
+/******************************************************************************************************/
+/******************************************************************************************************/
+/******************************************************************************************************/
 
 /* ,'45035' ,'45083','45085','36047','36081','36005'*/
 
-data GAfips; set fips_trajectories(where=(fips in ('13057','13067','13121'
+data GAfips; set fips_trajectories(where=(fips in ('13057','13067','13121','13089'
 													,'48029','48355','48167'
 													,'45007','45015','45019','45013''45063','45045','45051'
-/* 													,'36061' */
+													,'36061'
 													,'37067'
 													,'12086')));
 	
 	yval=ma7_new_confirmed/census2010pop*1e5;
 	y2val=deaths/census2010pop*1e5;
-	if filedate>='01jun20'd;
+	ma7_new_confirmed=int(ma7_new_confirmed);
+	*if filedate>='01jun20'd;
 	label yval='Cases per 100,000';
 	label y2val='Deaths per 100,000';
 run;
 proc sort data=gafips; by fips combined_key; run;
-data gafips; set gafips;
-by fips province_state;
-if last.fips then plotlabel=combined_key;
-keep filedate plotlabel yval y2val fips combined_key;
+data gafips; 
+	set gafips;
+	by fips province_state;
+	if last.fips then plotlabel=combined_key;
+	keep filedate plotlabel yval y2val fips combined_key dif1_confirmed  ma7_new_confirmed ;
 run;
+proc expand data=gafips out=gafips;
+	by fips combined_key;
+	id filedate;
+	convert dif1_confirmed	= cusum21_cases  / transout=(movsum 21 );
+	convert dif1_confirmed	= cusum35_cases  / transout=(movsum 35 );
+run;
+
+proc sort data=gafips; by fips combined_key filedate; run;
 
 title 	  "SARS-CoV-2: Confirmed Cases per 100,000 in Selected Regions";
 title2 	  h=1 "Updated &wordDte";
 footnote1  j=c h=1 "Beware of drawing conclusions from this data beyond the purpose for which it was generated.";
 footnote2 j=c h=.95 "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19 Data Updated: &sysdate";
 footnote3 j=r h=0.5  "Samuel T. Croker - &sysdate9";
-proc sgplot data=gafips noautolegend;
+proc sgplot data=gafips(where=(filedate>='01jun2020'd)) noautolegend;
 	series x=filedate y=yval /  smoothconnect group=fips datalabel=plotlabel lineattrs=(pattern=solid thickness=2) tip=(combined_key fips yval);
 	yaxis  grid minorgrid offsetmin=1 offsetmax=1 min=0;
 	y2axis  			  offsetmin=1 offsetmax=1 min=0 ;
@@ -473,14 +502,20 @@ proc sgplot data=gafips noautolegend;
 run;
 quit;
 
-proc sgplot data=gafips(where=(fips in ('13057'))) noautolegend;
-	series x=filedate y=yval /  smoothconnect group=fips datalabel=plotlabel lineattrs=(pattern=solid thickness=2) tip=(combined_key fips yval);
+
+title 	  "SARS-CoV-2: Confirmed Cases per 100,000 in Cherokee County";
+title2 	  h=1 "Updated &wordDte";
+proc sgplot data=gafips(where=(fips in ('48029'))) noautolegend ;
+	series x=filedate y=yval /  smoothconnect group=fips datalabel=plotlabel lineattrs=(pattern=solid color=darkgreen thickness=2) tip=(combined_key fips yval);
+	series x=filedate y=cusum21_cases / y2axis group=fips datalabel=plotlabel lineattrs=(pattern=longdash color=royalblue thickness=2) tip=(combined_key fips yval);
+	label cusum21_cases='21 Day Moving Sum Cases';
 	yaxis  grid minorgrid offsetmin=1 offsetmax=1 min=0;
 	y2axis  			  offsetmin=1 offsetmax=1 min=0 ;
-	xaxis min='01jun2020'd offsetmin=0 offsetmax=.1;
+	xaxis min='01mar2020'd offsetmin=0 offsetmax=.1;
 /* 	refline 15 /axis=y label="15 Cases per 100k-Probable EU Cutoff-for Admission"  splitchar='-' lineattrs=(color=royalblue) labelloc=inside; */
 run;
 quit;
+
 
 
 proc sql noprint;
@@ -494,8 +529,6 @@ proc sgplot data=gafips  noautolegend;
 	xaxis min='01jun2020'd offsetmin=0 offsetmax=.1;
 run;
 quit;
-
-
 
 
 data states; set state_trajectories;
@@ -521,7 +554,7 @@ proc sgplot data=states noautolegend;
 	series x=filedate y=yval /  smoothconnect group=province_state datalabel=plotlabel lineattrs=(pattern=solid thickness=2) tip=(province_state yval);
 	yaxis  grid minorgrid offsetmin=1 offsetmax=1 min=0;
 	y2axis  			  offsetmin=1 offsetmax=1 min=0 ;
-	xaxis min='01jun2020'd offsetmin=0 offsetmax=.1;
+	xaxis min='01feb2020'd offsetmin=0 offsetmax=.1;
 run;
 quit;
 

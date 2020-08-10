@@ -6,7 +6,7 @@
 /********************************************************************************************************************************/
 /***** Create Colors - Create color dataset to use as attributes in PROC SGPLOT. 											*****/
 /********************************************************************************************************************************/
-FILENAME REFFILE '/covid_analysis/SAS_V2/colors/Main.csv';
+FILENAME REFFILE '/repositories/covid19_analysis/SAS_V2/colors/Main.csv';
 PROC IMPORT DATAFILE=REFFILE
 	DBMS=CSV
 	OUT=WORK.color_raw
@@ -73,7 +73,7 @@ size=8; symbol="circlefilled";
 		call symput("ptype", propcase("&type"));
 	run;
 
-	FILENAME REFFILE "/covid19data/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_&type._global.csv";
+	FILENAME REFFILE "/repositories/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_&type._global.csv";
 
 	PROC IMPORT DATAFILE=REFFILE DBMS=CSV OUT=WORK.T_IMPORT_TS;
 		GETNAMES=YES;
@@ -155,7 +155,7 @@ size=8; symbol="circlefilled";
 		call symput("ptype", propcase("&type"));
 	run;
 
-	FILENAME REFFILE "/covid19data/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_&type._US.csv";
+	FILENAME REFFILE "/repositories/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_&type._US.csv";
 
 	PROC IMPORT DATAFILE=REFFILE DBMS=CSV OUT=WORK.T_IMPORT_TS;
 		GETNAMES=YES;
@@ -252,7 +252,7 @@ size=8; symbol="circlefilled";
 	/* County to CBSA Crosswalk: Source: https://www.census.gov/programs-surveys/metro-micro/about/delineation-files.html */
 	/* https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/2018/delineation-files/list1_Sep_2018.xls */
 	data fips.CBSA_County_Crosswalk;
-		infile "/covid_analysis/data/MSA_CountyFipsCrosswalk.csv" delimiter=',' 
+		infile "/repositories/covid19_analysis/data/MSA_CountyFipsCrosswalk.csv" delimiter=',' 
 			MISSOVER DSD firstobs=2;
 		informat CBSA_Code $234.;
 		informat Metropolitan_Division_Code best32.;
@@ -354,7 +354,7 @@ size=8; symbol="circlefilled";
 
 	%put NOTE: Checking Repository Status;
 	data _null_;
-		rc0=GITFN_STATUS("/covid19data");
+		rc0=GITFN_STATUS("/repositories/COVID-19");
 		put "NOTE: Initial GIT STATUS Return Code " rc0=;
 		call symput("gitreturn", rc0);
 	run;
@@ -365,9 +365,9 @@ size=8; symbol="circlefilled";
 
 			data _null_;
 				%put NOTE: PULLING...;
-				rc1=GITFN_PULL("/covid19data");
+				rc1=GITFN_PULL("/repositories/COVID-19");
 				put "NOTE: GIT PULL Return Code " rc1=;
-				rc2=GITFN_STATUS("/covid19data");
+				rc2=GITFN_STATUS("/repositories/COVID-19");
 				put "NOTE: GIT STATUS Return Code " rc2=;
 			run;
 
@@ -416,7 +416,7 @@ size=8; symbol="circlefilled";
 
 %macro JhuXW;
 	FILENAME REFFILE 
-		'/covid19data/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv';
+		'/repositories/COVID-19/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv';
 
 	PROC IMPORT DATAFILE=REFFILE DBMS=CSV OUT=WORK.JHU_Crosswalk;
 		GETNAMES=YES;
@@ -1336,7 +1336,7 @@ size=8; symbol="circlefilled";
 	footnote1 j=c "Beware of drawing conclusions from this data. Lagged confirmations and deaths are contained.";
 	footnote2 j=r "Samuel T. Croker";
 	footnote3 j=c "Data Source: Johns Hopkins University - https://github.com/CSSEGISandData/COVID-19  Data Updated: &cvdate";
-	ods pdf text='^S={preimage="coronavirus-image.png"}';
+	ods pdf text='^S={preimage="/repositories/covid19_analysis/SAS_V2/coronavirus-image.png"}';
 	ods pdf text="^20n";
 	
 	/* Output the title text */
@@ -1635,7 +1635,7 @@ size=8; symbol="circlefilled";
 			from cbsa_trajectories
 			where substr(cbsa_title,length(cbsa_title)-1,2)="&county";
 	quit;
-	ods pdf file="/covid_analysis/SAS_V2/graphs/&county._CBSAs.pdf";
+	ods pdf file="/repositories/covid19_analysis/SAS_V2/graphs/&county._CBSAs.pdf";
 		%do i=1 %to &tot;		
 			%put NOTE: [&i, &&cbsa&i];
 			%plotstate(state="&&cbsa&i",level=cbsa,numback=30); 

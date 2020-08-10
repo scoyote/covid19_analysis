@@ -1,3 +1,5 @@
+%let codepath=/repositories/covid19_analysis/SAS_V2/;
+%let rc = %sysfunc(dlgcdir("&codepath")); 
 
 %let analysisvar=MA7_new_confirmed;
 %let tipvars=dif1_confirmed dif1_deaths;

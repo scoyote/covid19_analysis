@@ -1,4 +1,4 @@
-%let stateplot=CA;
+%let stateplot=SC;
 %let analysisvar=MA7_new_confirmed;
 %let tipvars=dif1_confirmed dif1_deaths;
 %let startdate='01mar20'd;

@@ -2,12 +2,12 @@
 /***** ShowChanges.sas - Run through all the graphs from load-plot*****/
 /********************************************************************/
 
-%let rc = %sysfunc(dlgcdir("/covid_analysis/SAS_V2/")); 
+%let rc = %sysfunc(dlgcdir("/repositories/covid19_analysis/SAS_V2")); 
 %include "MACROS.sas";
-%let graphFormat=png;
-options papersize=letter orientation=landscape;
+%let graphFormat=SVG;
+options papersize=letter orientation=landscape nomprint nomlogic;
 /* %include "LoadTimeseries.sas"; */
-
+%let rc = %sysfunc(dlgcdir("/repositories/covid19_analysis/SAS_V2/graphs/graphs")); 
 /********************************************************************/
 /***** MACROS													*****/
 /********************************************************************/
@@ -29,19 +29,19 @@ options papersize=letter orientation=landscape;
 						,analysisvar
 						,analysisvar_label
 						,region=
-						,titleinclude=
 						,regwindow=7
-						,lthresh=-1
-						,uthresh=1
+						,lthresh=-0.5
+						,uthresh=0.5
 						,plotmin='01feb20'd
 						,labelpos=topright);
 	%if &level=cbsa %then %do;
 		%let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="&region" and;
+		%put NOTE: WHCL=&whcl;
 	%end;
 	%else %do;
 		%let whcl=;
 	%end;
-
+	%let titleinclude=&region;
 	data _null_;
 		call symput("changesince",compress(intnx("days","&sysdate"d,%eval(&regwindow*(-1))))); run;data _null_;
 		call symput('changesince_fmt',trim(left(put(&changesince,worddate19.)))); 
@@ -288,36 +288,23 @@ options papersize=letter orientation=landscape;
 	run;
 	ods pdf close;
 %mend runShowChanges;	
-/*            (level, catvar,analysisvar,analysisvar_label, region=,titleinclude=, regwindow=7, lthresh=-1, uthresh=1, plotmin='01feb20'd,) */
+
 %runShowChanges(state, province_state,ma7_new_confirmed,Confirmed Cases);
+
 %runShowChanges(global, location,ma7_new_confirmed,Confirmed Cases);
-options mlogic mprint;
-%runShowChanges(cbsa,cbsa_title,ma7_new_confirmed,Confirmed Cases,region='GA',titleinclude=Georgia);
-/*  */
-/* %let Lthresh			=-1; */
-/* %let Uthresh			=1; */
-/* %let plotmin			='01feb20'd; */
-/* %let regwindow			=7; */
-/* %let whcl=; */
-/*  */
-/* %let analysisvar		=dif7_confirmed; */
-/* %let analysisvar_label	=Confirmed Cases; */
 
-/* %let level=state; */
-/* %let catvar=province_state; */
-/* %let level=global; */
-/* %let catvar=location; */
+%runShowChanges(cbsa,cbsa_title,ma7_new_confirmed,Confirmed Cases,region=GA);
+%runShowChanges(cbsa,cbsa_title,ma7_new_confirmed,Confirmed Cases,region=NC);
+%runShowChanges(cbsa,cbsa_title,ma7_new_confirmed,Confirmed Cases,region=SC);
+%runShowChanges(cbsa,cbsa_title,ma7_new_confirmed,Confirmed Cases,region=FL);
+%runShowChanges(cbsa,cbsa_title,ma7_new_confirmed,Confirmed Cases,region=AZ);
+%runShowChanges(cbsa,cbsa_title,ma7_new_confirmed,Confirmed Cases,region=TX);
+%runShowChanges(cbsa,cbsa_title,ma7_new_confirmed,Confirmed Cases,region=CA);
+%runShowChanges(cbsa,cbsa_title,ma7_new_confirmed,Confirmed Cases,region=TN);
+%runShowChanges(cbsa,cbsa_title,ma7_new_confirmed,Confirmed Cases,region=LA);
+%runShowChanges(cbsa,cbsa_title,ma7_new_confirmed,Confirmed Cases,region=OK);
+%runShowChanges(cbsa,cbsa_title,ma7_new_confirmed,Confirmed Cases,region=NV);
+%runShowChanges(cbsa,cbsa_title,ma7_new_confirmed,Confirmed Cases,region=OH);
 
-/**** CBSA Techniques *********/
-%let level=cbsa;
-%let catvar=cbsa_title;
-/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="GA" and; %let titleinclude=Georgia; */
-/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="CA" and; %let titleinclude=California; */
-/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="SC" and; %let titleinclude=South Carolina; */
-/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="FL" and; %let titleinclude=Florida; */
 
-%let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="NC" and; %let titleinclude=North Carolina;
-/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="AL" and; %let titleinclude=Alabama; */
-/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="TX" and; %let titleinclude=Texas; */
-/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="TN" and; %let titleinclude=Tennesee; */
-/* %let whcl=substr(cbsa_title,length(cbsa_title)-1,length(cbsa_title)) ="AZ" and; %let titleinclude=Arizona; */
+

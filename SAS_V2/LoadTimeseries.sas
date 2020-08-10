@@ -4,12 +4,12 @@ proc format;
 	picture fipsfive low-high= "99999"
 					 .= 'NONE';
 run;
-%let covidpath=/covid19data;
-%let progpath=/covid_analysis/sas_v2;
-%let outputpath=/covid_analysis/sas_v2/graphs;
+%let covidpath=/repositories/COVID-19;
+%let progpath=/repositories/covid19_analysis/sas_v2;
+%let outputpath=/repositories/covid19_analysis/sas_v2/graphs;
 
-libname covid '/covid19data';   
-libname fips "/covid_analysis/data";        
+libname covid "&covidpath";   
+libname fips "/repositories/covid19_analysis/data";        
 filename covid19 "&covidpath";
 
 %include "&progpath./MACROS.sas";
